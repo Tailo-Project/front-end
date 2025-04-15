@@ -222,41 +222,6 @@ const processData = (data: unknown) => {
 </div>
 ```
 
-### Styled-components 사용 규칙
-
--   컴포넌트 파일 내에서 스타일 정의 시 상단에 배치
--   의미 있는 이름으로 스타일 컴포넌트 정의
--   props를 활용한 조건부 스타일링 권장
-
-```tsx
-// Button.tsx
-import styled from "styled-components";
-
-const StyledButton = styled.button`
-    padding: 0.5rem 1rem;
-    border-radius: 0.25rem;
-    font-weight: bold;
-
-    ${({ variant }) =>
-        variant === "primary" &&
-        `
-    background-color: #3b82f6;
-    color: white;
-  `}
-
-    ${({ variant }) =>
-        variant === "secondary" &&
-        `
-    background-color: #e5e7eb;
-    color: #1f2937;
-  `}
-`;
-
-const Button = ({ variant = "primary", children }) => {
-    return { children };
-};
-```
-
 ### 들여쓰기 및 공백
 
 -   들여쓰기는 2칸 사용
