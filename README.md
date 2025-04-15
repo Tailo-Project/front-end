@@ -257,38 +257,6 @@ const Button = ({ variant = "primary", children }) => {
 };
 ```
 
-## 코드 포맷팅
-
-### ESLint 및 Prettier 설정
-
--   ESLint와 Prettier를 사용하여 코드 품질과 스타일 일관성 유지
--   저장 시 자동 포맷팅 활성화
-
-```json
-// .eslintrc
-{
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
-  "rules": {
-    "react/react-in-jsx-scope": "off",
-    "react/prop-types": "off"
-  }
-}
-
-// .prettierrc
-{
-  "semi": true,
-  "singleQuote": true,
-  "tabWidth": 2,
-  "trailingComma": "es5",
-  "printWidth": 100
-}
-```
-
 ### 들여쓰기 및 공백
 
 -   들여쓰기는 2칸 사용
