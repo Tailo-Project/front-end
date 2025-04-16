@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Combobox } from "@headlessui/react";
+import {
+    Combobox,
+    ComboboxButton,
+    ComboboxInput,
+    ComboboxOption,
+    ComboboxOptions
+} from "@headlessui/react";
 import tailoLogo from "../assets/tailogo.svg";
 import { ChevronUpDownIcon, PlusIcon } from "@heroicons/react/24/outline";
 
@@ -103,7 +109,7 @@ export default function SignUpForm() {
                             <div className="relative w-[100px] h-[100px] mx-auto">
                                 <input
                                     type="file"
-                                    accept="image/*"
+                                    accept="image/jpg, image/png"
                                     onChange={handleImageChange}
                                     className="hidden"
                                     id="profileImage"
@@ -176,7 +182,7 @@ export default function SignUpForm() {
                                     }}
                                 >
                                     <div className="relative">
-                                        <Combobox.Input
+                                        <ComboboxInput
                                             className={inputClassName}
                                             onChange={(event) => {
                                                 setQuery(event.target.value);
@@ -192,12 +198,12 @@ export default function SignUpForm() {
                                             }
                                             placeholder="품종을 선택해주세요"
                                         />
-                                        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center">
+                                        <ComboboxButton className="absolute inset-y-0 right-0 flex items-center">
                                             <ChevronUpDownIcon className="h-4 w-4 text-gray-400" />
-                                        </Combobox.Button>
-                                        <Combobox.Options className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-sm ring-1 ring-black/5 overflow-auto focus:outline-none">
+                                        </ComboboxButton>
+                                        <ComboboxOptions className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-sm ring-1 ring-black/5 overflow-auto focus:outline-none">
                                             {filteredBreeds.map((breed) => (
-                                                <Combobox.Option
+                                                <ComboboxOption
                                                     key={breed}
                                                     value={breed}
                                                     className={({ active }) =>
@@ -219,7 +225,7 @@ export default function SignUpForm() {
                                                             {breed}
                                                         </span>
                                                     )}
-                                                </Combobox.Option>
+                                                </ComboboxOption>
                                             ))}
                                             {showAddBreed && (
                                                 <button
@@ -233,7 +239,7 @@ export default function SignUpForm() {
                                                     </span>
                                                 </button>
                                             )}
-                                        </Combobox.Options>
+                                        </ComboboxOptions>
                                     </div>
                                 </Combobox>
                             </div>
