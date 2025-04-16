@@ -1,4 +1,4 @@
-import tailoLogo from "../assets/tailogo.jpg";
+import tailoLogo from "../assets/tailogo.svg";
 import kakaoSymbol from "../assets/kakao_login_medium_narrow.png";
 
 export default function Login() {
