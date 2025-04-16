@@ -17,10 +17,11 @@ const updateSW = registerSW({
     },
     onRegistered(r) {
         console.log("서비스 워커가 등록되었습니다.");
-        r &&
+        if (r) {
             setInterval(() => {
                 r.update();
             }, 60 * 60 * 1000); // 1시간마다 업데이트 체크
+        }
     },
     onRegisterError(error) {
         console.error("서비스 워커 등록 실패:", error);
