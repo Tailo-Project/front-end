@@ -62,7 +62,7 @@ export default function KakaoCallback() {
 
                 const userInfoData = await userInfo.json();
 
-                if (userInfoData.accessToken === null) {
+                if (userInfoData.data.accessToken === null) {
                     setToast({
                         message: '회원가입이 필요합니다.',
                         type: 'success',
