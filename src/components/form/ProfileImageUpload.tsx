@@ -15,9 +15,9 @@ export default function ProfileImageUpload({ profileImage, setProfileImage, setV
             const reader = new FileReader();
             reader.onloadend = () => {
                 setProfileImage(reader.result as string);
+                setValue('file', reader.result as string);
             };
             reader.readAsDataURL(file);
-            setValue('profileImage', file);
         }
     };
 
