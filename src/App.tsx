@@ -11,7 +11,7 @@ function App() {
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUpForm email={email || ''} />} />
+            <Route path="/signup" element={<SignUpForm email={email} />} />
             <Route path="/oauth/kakao" element={<KakaoCallback />} />
         </Routes>
     );

@@ -69,7 +69,7 @@ export default function KakaoCallback() {
                         show: true,
                     });
                     setTimeout(() => {
-                        navigate('/signup', { state: { email: userInfoData.data?.email } });
+                        navigate('/signup', { state: { email: userInfoData.data.email } });
                     }, 1500);
                 } else {
                     setToast({
