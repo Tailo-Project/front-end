@@ -9,6 +9,7 @@ interface FormInputProps {
     placeholder?: string;
     type?: string;
     suffix?: string;
+    disabled?: boolean;
 }
 
 export default function FormInput({
@@ -19,9 +20,10 @@ export default function FormInput({
     placeholder,
     type = 'text',
     suffix,
+    disabled = false,
 }: FormInputProps) {
     const inputClassName =
-        'flex-1 h-[32px] px-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:border-blue-500 transition-all duration-300 placeholder:text-gray-400 placeholder:text-xs hover:border-gray-400 bg-gray-50/30';
+        'flex-1 h-[32px] px-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:border-blue-500 transition-all duration-300 placeholder:text-gray-400 placeholder:text-xs hover:border-gray-400 bg-gray-50/30 disabled:bg-gray-100';
     const labelClassName = 'text-sm font-medium w-[49px] text-gray-700 select-none';
 
     return (
@@ -36,6 +38,7 @@ export default function FormInput({
                     {...register(name, { required })}
                     className={inputClassName}
                     placeholder={placeholder}
+                    disabled={disabled}
                 />
                 {suffix && <span className="text-sm text-gray-600">{suffix}</span>}
             </div>

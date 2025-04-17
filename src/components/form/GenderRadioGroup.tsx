@@ -14,7 +14,7 @@ export default function GenderRadioGroup({ register }: GenderRadioGroupProps) {
                     <input
                         type="radio"
                         {...register('gender')}
-                        value="male"
+                        value="MALE"
                         className="w-3.5 h-3.5 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
                     />
                     <span className="text-sm text-gray-600">남</span>
@@ -23,7 +23,7 @@ export default function GenderRadioGroup({ register }: GenderRadioGroupProps) {
                     <input
                         type="radio"
                         {...register('gender')}
-                        value="female"
+                        value="FEMALE"
                         className="w-3.5 h-3.5 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
                     />
                     <span className="text-sm text-gray-600">여</span>

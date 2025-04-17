@@ -8,14 +8,7 @@ interface ToastState {
     show: boolean;
 }
 
-interface UserInfo {
-    isNewUser: boolean;
-    accessToken?: string;
-    message?: string;
-}
-
 export default function KakaoCallback() {
-    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const navigate = useNavigate();
     const [toast, setToast] = useState<ToastState>({
         message: '',
@@ -54,35 +47,29 @@ export default function KakaoCallback() {
                 );
                 const data = await res.json();
                 const accessToken = data.access_token;
-                console.log(accessToken, 'accessToken');
 
                 const userInfo = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-in`, {
                     method: 'POST',
                     body: JSON.stringify({ provider: 'kakao', accessToken }),
-                    credentials: 'include',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                 });
-
-                console.log(userInfo, 'userInfo');
 
                 if (!userInfo.ok) {
                     throw new Error('로그인 처리 중 오류가 발생했습니다.');
                 }
 
                 const userInfoData = await userInfo.json();
-                console.log(userInfoData, 'userInfoData');
-                setUserInfo(userInfoData);
 
-                if (userInfoData.isNewUser) {
+                if (userInfoData.accessToken === null) {
                     setToast({
                         message: '회원가입이 필요합니다.',
                         type: 'success',
                         show: true,
                     });
                     setTimeout(() => {
-                        navigate('/signup');
+                        navigate('/signup', { state: { email: userInfoData.data.email } });
                     }, 1500);
                 } else {
                     setToast({
@@ -112,7 +99,6 @@ export default function KakaoCallback() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-white">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            <p className="mt-4 text-gray-600">로그인 처리 중...</p>
 
             {toast.show && (
                 <Toast

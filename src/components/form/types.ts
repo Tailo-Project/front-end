@@ -1,12 +1,13 @@
 export interface SignUpFormData {
+    email: string;
+    accountId: string;
     nickname: string;
-    userId: string;
-    profileImage: File;
     type: string;
+    age: number;
     breed: string;
-    gender: 'male' | 'female';
-    age: string;
-    location: string;
+    gender: 'MALE' | 'FEMALE';
+    address: string;
+    file: string;
 }
 
 export interface ToastState {

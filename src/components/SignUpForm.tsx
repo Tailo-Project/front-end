@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import tailoLogo from '../assets/tailogo.svg';
 import Toast from './Toast';
@@ -7,11 +7,16 @@ import ProfileImageUpload from './form/ProfileImageUpload';
 import FormInput from './form/FormInput';
 import BreedCombobox from './form/BreedCombobox';
 import GenderRadioGroup from './form/GenderRadioGroup';
+import { useNavigate } from 'react-router-dom';
 
 // 임시 품종 데이터
 const initialBreeds = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
-export default function SignUpForm() {
+interface SignUpFormProps {
+    email: string;
+}
+
+export default function SignUpForm({ email }: SignUpFormProps) {
     const [query, setQuery] = useState('');
     const [breeds, setBreeds] = useState(initialBreeds);
     const [selectedBreed, setSelectedBreed] = useState('');
@@ -23,52 +28,34 @@ export default function SignUpForm() {
         show: false,
     });
 
+    const navigate = useNavigate();
+
     const {
         register,
         handleSubmit,
         formState: { isValid },
         setValue,
-    } = useForm<SignUpFormData>({ mode: 'onChange' });
+    } = useForm<SignUpFormData>({
+        mode: 'onChange',
+        defaultValues: { email },
+    });
+
+    useEffect(() => {
+        setValue('email', email);
+    }, [email, setValue]);
 
     const onSubmit = async (data: SignUpFormData) => {
         try {
-            const formData = new FormData();
-            Object.entries(data).forEach(([key, value]) => {
-                if (value !== null) {
-                    formData.append(key, value);
-                }
-            });
-
-            const response = await fetch(`/api/auth/sign-up`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
                 method: 'POST',
+                body: JSON.stringify(data),
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                    'Content-Type': 'application/json',
                 },
-                body: formData,
             });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                setToast({
-                    message: '회원가입이 완료되었습니다!',
-                    type: 'success',
-                    show: true,
-                });
-                // 3초 후 메인 페이지로 이동
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 3000);
-            } else {
-                throw new Error(result.message);
-            }
-        } catch (error) {
-            console.error('회원가입 처리 중 오류 발생:', error);
-            setToast({
-                message: '회원가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
-                type: 'error',
-                show: true,
-            });
+            navigate('/login');
+        } catch {
+            console.log('error');
         }
     };
 
@@ -99,6 +86,15 @@ export default function SignUpForm() {
                         />
 
                         <FormInput
+                            label="이메일"
+                            name="email"
+                            register={register}
+                            required
+                            placeholder="이메일을 입력해주세요"
+                            disabled
+                        />
+
+                        <FormInput
                             label="닉네임"
                             name="nickname"
                             register={register}
@@ -108,7 +104,7 @@ export default function SignUpForm() {
 
                         <FormInput
                             label="아이디"
-                            name="userId"
+                            name="accountId"
                             register={register}
                             required
                             placeholder="사용하실 아이디를 적어주세요"
@@ -147,7 +143,7 @@ export default function SignUpForm() {
 
                         <FormInput
                             label="거주지"
-                            name="location"
+                            name="address"
                             register={register}
                             required
                             placeholder="거주지를 적어주세요"
