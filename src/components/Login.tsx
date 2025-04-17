@@ -20,17 +20,13 @@ const Login = () => {
 
     const handleKakaoLogin = async () => {
         try {
-            // 1. 카카오 인증 코드 요청
             const kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?client_id=${kakaoApiKey}&redirect_uri=${redirectUri}&response_type=code`;
 
-            // 2. 카카오 로그인 페이지로 리다이렉트
             window.location.href = kakaoAuthURL;
 
-            // 3. 인증 코드 받기 (리다이렉트 후 실행됨)
             const code = new URL(window.location.href).searchParams.get('code');
 
             if (code) {
-                // 4. 카카오 토큰 요청
                 const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', {
                     method: 'POST',
                     headers: {
@@ -51,7 +47,6 @@ const Login = () => {
                 const tokenData = await tokenResponse.json();
                 console.log('카카오 토큰:', tokenData);
 
-                // 5. 백엔드 서버에 토큰 전송
                 const serverResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-in`, {
                     method: 'POST',
                     headers: {
@@ -67,7 +62,6 @@ const Login = () => {
 
                 const serverData = await serverResponse.json();
 
-                // 서버에서 받은 JWT 토큰 저장
                 if (serverData.accessToken) {
                     localStorage.setItem('accessToken', serverData.accessToken);
                 }
@@ -78,7 +72,6 @@ const Login = () => {
                     show: true,
                 });
 
-                // 회원가입이 필요한 경우에만 페이지 이동
                 if (serverData.isNewUser) {
                     window.location.href = '/signup';
                 }
