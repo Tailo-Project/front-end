@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TabBar from './TabBar';
+
 import tailogo from '../assets/tailogo.svg';
+import Layout from './layout';
 
 interface ProfileStats {
     posts: number;
@@ -28,7 +29,7 @@ const Profile = () => {
     ]);
 
     return (
-        <>
+        <Layout>
             <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen pb-16">
                 {/* 프로필 헤더 */}
                 <header className="p-4 border-b border-gray-200">
@@ -95,8 +96,7 @@ const Profile = () => {
                     ))}
                 </div>
             </div>
-            <TabBar />
-        </>
+        </Layout>
     );
 };
 

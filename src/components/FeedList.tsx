@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import TabBar from './TabBar';
 import tailogo from '../assets/tailogo.svg';
 
@@ -57,9 +57,9 @@ const dummyFeeds: Feed[] = generateDummyFeeds(30);
 
 const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
     const observerRef = useRef<HTMLDivElement>(null);
-    const [displayedFeeds, setDisplayedFeeds] = React.useState<Feed[]>([]);
-    const [page, setPage] = React.useState(1);
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [displayedFeeds, setDisplayedFeeds] = useState<Feed[]>([]);
+    const [page, setPage] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
     const itemsPerPage = 5;
 
     const loadMoreFeeds = useCallback(() => {
@@ -80,6 +80,18 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
             setIsLoading(false);
         }
     }, [feeds, page, isLoading]);
+
+    useEffect(() => {
+        const fetchFeed = async () => {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/feed`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+        };
+        fetchFeed();
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(

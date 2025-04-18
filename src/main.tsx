@@ -33,9 +33,10 @@ const updateSW = registerSW({
 });
 
 createRoot(document.getElementById('root')!).render(
-    // <StrictMode>
-    <BrowserRouter>
-        <App />
-    </BrowserRouter>,
-    // </StrictMode>,
+    <StrictMode>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+        , //{' '}
+    </StrictMode>,
 );
