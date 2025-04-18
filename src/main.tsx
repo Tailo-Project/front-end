@@ -1,21 +1,22 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import "./index.css";
-import App from "./App.tsx";
-import { registerSW } from "virtual:pwa-register";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import './index.css';
+import App from './App.tsx';
+import { registerSW } from 'virtual:pwa-register';
 
 const updateSW = registerSW({
     immediate: true,
     onNeedRefresh() {
-        if (confirm("새로운 버전이 있습니다. 업데이트하시겠습니까?")) {
+        if (confirm('새로운 버전이 있습니다. 업데이트하시겠습니까?')) {
             updateSW(true);
         }
     },
     onOfflineReady() {
-        console.log("앱이 오프라인에서도 사용할 수 있습니다.");
+        console.log('앱이 오프라인에서도 사용할 수 있습니다.');
     },
     onRegistered(r) {
-        console.log("서비스 워커가 등록되었습니다.");
+        console.log('서비스 워커가 등록되었습니다.');
         if (r) {
             setInterval(
                 () => {
@@ -26,12 +27,14 @@ const updateSW = registerSW({
         }
     },
     onRegisterError(error) {
-        console.error("서비스 워커 등록 실패:", error);
-    }
+        console.error('서비스 워커 등록 실패:', error);
+    },
 });
 
-createRoot(document.getElementById("root")!).render(
-    <StrictMode>
+createRoot(document.getElementById('root')!).render(
+    // <StrictMode>
+    <BrowserRouter>
         <App />
-    </StrictMode>
+    </BrowserRouter>,
+    // </StrictMode>,
 );

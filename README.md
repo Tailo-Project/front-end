@@ -2,15 +2,15 @@
 
 ## 목차
 
--   [파일 및 폴더 구조](#파일_및_폴더_구조)
--   [명명 규칙](#명명_규칙)
--   [React 컴포넌트](#react-컴포넌트)
--   [TypeScript](#typescript)
--   [CSS / Styling](#css--styling)
--   [Import 순서](#import-순서)
--   [코드 포맷팅](#코드-포맷팅)
--   [주석](#주석)
--   [Git 커밋 메시지](#git-커밋-메시지)
+- [파일 및 폴더 구조](#파일_및_폴더_구조)
+- [명명 규칙](#명명_규칙)
+- [React 컴포넌트](#react-컴포넌트)
+- [TypeScript](#typescript)
+- [CSS / Styling](#css--styling)
+- [Import 순서](#import-순서)
+- [코드 포맷팅](#코드-포맷팅)
+- [주석](#주석)
+- [Git 커밋 메시지](#git-커밋-메시지)
 
 ## 파일 및 폴더 구조
 
@@ -33,18 +33,18 @@ src/
 
 ### 파일 명명 규칙
 
--   컴포넌트 파일: `PascalCase.tsx` (예: `Button.tsx`, `MapView.tsx`)
--   훅, 유틸리티 파일: `camelCase.ts` (예: `useAuth.ts`, `formatDate.ts`)
--   스타일 파일: 컴포넌트와 동일한 이름 사용 (예: `Button.styles.ts`)
--   테스트 파일: `.test.tsx` 또는 `.spec.tsx` 접미사 사용
+- 컴포넌트 파일: `PascalCase.tsx` (예: `Button.tsx`, `MapView.tsx`)
+- 훅, 유틸리티 파일: `camelCase.ts` (예: `useAuth.ts`, `formatDate.ts`)
+- 스타일 파일: 컴포넌트와 동일한 이름 사용 (예: `Button.styles.ts`)
+- 테스트 파일: `.test.tsx` 또는 `.spec.tsx` 접미사 사용
 
 ## 명명 규칙
 
 ### 변수 및 함수
 
--   변수와 함수는 `camelCase` 사용
--   의미 있는 이름 사용 (예: `getUserData`보다 `fetchUserProfile`이 더 명확함)
--   불리언 변수는 `is`, `has`, `should` 등의 접두사 사용 (예: `isLoading`, `hasError`)
+- 변수와 함수는 `camelCase` 사용
+- 의미 있는 이름 사용 (예: `getUserData`보다 `fetchUserProfile`이 더 명확함)
+- 불리언 변수는 `is`, `has`, `should` 등의 접두사 사용 (예: `isLoading`, `hasError`)
 
 ```typescript
 // 좋은 예
@@ -62,17 +62,17 @@ const data = async () => {
 
 ### 상수
 
--   상수는 `UPPER_SNAKE_CASE` 사용
+- 상수는 `UPPER_SNAKE_CASE` 사용
 
 ```typescript
-const API_BASE_URL = "https://api.example.com";
+const API_BASE_URL = 'https://api.example.com';
 const MAX_RETRY_COUNT = 3;
 ```
 
 ### 컴포넌트
 
--   컴포넌트는 `PascalCase` 사용
--   파일명과 컴포넌트명 일치시키기
+- 컴포넌트는 `PascalCase` 사용
+- 파일명과 컴포넌트명 일치시키기
 
 ```typescript
 // Button.tsx
@@ -87,7 +87,7 @@ export default Button;
 
 ### 함수형 컴포넌트 사용
 
--   클래스형 컴포넌트 대신 함수형 컴포넌트와 훅 사용
+- 클래스형 컴포넌트 대신 함수형 컴포넌트와 훅 사용
 
 ```typescript
 // 좋은 예
@@ -104,33 +104,27 @@ const UserProfile = ({ userId }: UserProfileProps) => {
 
 ### Props 타입 정의
 
--   컴포넌트 Props는 인터페이스로 정의하고 명확한 이름 사용
--   Props 인터페이스 이름은 컴포넌트 이름 + Props 형식 사용
+- 컴포넌트 Props는 인터페이스로 정의하고 명확한 이름 사용
+- Props 인터페이스 이름은 컴포넌트 이름 + Props 형식 사용
 
 ```typescript
 interface ButtonProps {
-    variant?: "primary" | "secondary";
-    size?: "small" | "medium" | "large";
+    variant?: 'primary' | 'secondary';
+    size?: 'small' | 'medium' | 'large';
     onClick?: () => void;
     disabled?: boolean;
     children: React.ReactNode;
 }
 
-const Button = ({
-    variant = "primary",
-    size = "medium",
-    onClick,
-    disabled,
-    children
-}: ButtonProps) => {
+const Button = ({ variant = 'primary', size = 'medium', onClick, disabled, children }: ButtonProps) => {
     // ...
 };
 ```
 
 ### 컴포넌트 구조화
 
--   큰 컴포넌트는 작은 컴포넌트로 분리
--   컴포넌트 내부에서 로직과 렌더링 부분 분리
+- 큰 컴포넌트는 작은 컴포넌트로 분리
+- 컴포넌트 내부에서 로직과 렌더링 부분 분리
 
 ```typescript
 const UserDashboard = () => {
@@ -166,8 +160,8 @@ const UserDashboard = () => {
 
 ### 타입 정의
 
--   인터페이스와 타입 정의는 명확하고 구체적으로 작성
--   재사용 가능한 타입은 별도 파일로 분리 (`types/` 폴더)
+- 인터페이스와 타입 정의는 명확하고 구체적으로 작성
+- 재사용 가능한 타입은 별도 파일로 분리 (`types/` 폴더)
 
 ```typescript
 // types/user.ts
@@ -175,7 +169,7 @@ export interface User {
     id: string;
     name: string;
     email: string;
-    role: "admin" | "user";
+    role: 'admin' | 'user';
     createdAt: Date;
 }
 
@@ -184,13 +178,13 @@ export type ID = string;
 export type Timestamp = number;
 
 // 유니온 타입 활용
-export type NotificationType = "email" | "sms" | "push";
+export type NotificationType = 'email' | 'sms' | 'push';
 ```
 
 ### any 타입 지양
 
--   `any` 타입은 가능한 사용하지 않기
--   불가피한 경우 `unknown`을 사용하고 타입 가드 적용
+- `any` 타입은 가능한 사용하지 않기
+- 불가피한 경우 `unknown`을 사용하고 타입 가드 적용
 
 ```typescript
 // 나쁜 예
@@ -200,10 +194,10 @@ const processData = (data: any) => {
 
 // 좋은 예
 const processData = (data: unknown) => {
-    if (typeof data === "object" && data !== null && "value" in data) {
+    if (typeof data === 'object' && data !== null && 'value' in data) {
         return data.value;
     }
-    throw new Error("Invalid data format");
+    throw new Error('Invalid data format');
 };
 ```
 
@@ -211,9 +205,9 @@ const processData = (data: unknown) => {
 
 ### TailwindCSS 사용 규칙
 
--   클래스 이름은 알파벳 순서로 정렬
--   관련 속성끼리 그룹화 (레이아웃, 색상, 타이포그래피 등)
--   반응형 클래스는 모바일 퍼스트 원칙에 따라 작성
+- 클래스 이름은 알파벳 순서로 정렬
+- 관련 속성끼리 그룹화 (레이아웃, 색상, 타이포그래피 등)
+- 반응형 클래스는 모바일 퍼스트 원칙에 따라 작성
 
 ```tsx
 // 좋은 예
@@ -224,9 +218,9 @@ const processData = (data: unknown) => {
 
 ### 들여쓰기 및 공백
 
--   들여쓰기는 2칸 사용
--   중괄호, 연산자 주변에 공백 추가
--   함수 선언과 호출 사이에 공백 없음
+- 들여쓰기는 2칸 사용
+- 중괄호, 연산자 주변에 공백 추가
+- 함수 선언과 호출 사이에 공백 없음
 
 ```typescript
 // 좋은 예
@@ -244,9 +238,9 @@ const calculateSum = (a: number, b: number): number => {
 
 ### 주석 작성 규칙
 
--   코드가 "무엇"을 하는지보다 "왜" 그렇게 하는지 설명
--   복잡한 로직에는 주석 추가
--   JSDoc 스타일 주석 권장
+- 코드가 "무엇"을 하는지보다 "왜" 그렇게 하는지 설명
+- 복잡한 로직에는 주석 추가
+- JSDoc 스타일 주석 권장
 
 ```typescript
 /**
@@ -270,9 +264,9 @@ function expensiveCalculation() {
 
 ### 커밋 메시지 형식
 
--   커밋 메시지는 다음 형식 준수: `type: subject`
--   타입은 소문자로 시작 (feat, fix, docs, style, refactor, test, chore)
--   제목은 명령문 형태로 작성 (과거형 X)
+- 커밋 메시지는 다음 형식 준수: `type: subject`
+- 타입은 소문자로 시작 (feat, fix, docs, style, refactor, test, chore)
+- 제목은 명령문 형태로 작성 (과거형 X)
 
 ```
 feat: 사용자 위치 기반 대피소 필터링 기능 추가
@@ -286,8 +280,8 @@ chore: 패키지 의존성 업데이트
 
 ### 브랜치 명명 규칙
 
--   브랜치 이름은 `type/description` 형식 사용
--   설명은 짧고 명확하게 작성 (kebab-case 사용)
+- 브랜치 이름은 `type/description` 형식 사용
+- 설명은 짧고 명확하게 작성 (kebab-case 사용)
 
 ```
 feat/user-location
