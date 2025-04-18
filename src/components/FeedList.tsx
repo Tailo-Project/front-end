@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import TabBar from './TabBar';
 import tailogo from '../assets/tailogo.svg';
+import CommentBottomSheet from './CommentBottomSheet';
 
 interface Feed {
     id: number;
@@ -60,7 +61,11 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
     const [displayedFeeds, setDisplayedFeeds] = useState<Feed[]>([]);
     const [page, setPage] = useState(1);
     const [isLoading, setIsLoading] = useState(false);
+    const [likedFeeds, setLikedFeeds] = useState<{ [key: number]: boolean }>({});
+    const [selectedFeedId, setSelectedFeedId] = useState<number | null>(null);
+    const [isCommentSheetOpen, setIsCommentSheetOpen] = useState(false);
     const itemsPerPage = 5;
+    const isInitialLoad = useRef(true);
 
     const loadMoreFeeds = useCallback(() => {
         if (isLoading) return;
@@ -71,27 +76,13 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
         const newFeeds = feeds.slice(start, end);
 
         if (newFeeds.length > 0) {
-            setTimeout(() => {
-                setDisplayedFeeds((prev) => [...prev, ...newFeeds]);
-                setPage((prev) => prev + 1);
-                setIsLoading(false);
-            }, 500); // 로딩 효과를 위한 지연
+            setDisplayedFeeds((prev) => [...prev, ...newFeeds]);
+            setPage((prev) => prev + 1);
+            setIsLoading(false);
         } else {
             setIsLoading(false);
         }
     }, [feeds, page, isLoading]);
-
-    useEffect(() => {
-        const fetchFeed = async () => {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/feed`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-        };
-        fetchFeed();
-    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -117,10 +108,42 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
 
     // 초기 로딩
     useEffect(() => {
-        setDisplayedFeeds([]);
-        setPage(1);
-        loadMoreFeeds();
-    }, [feeds, loadMoreFeeds]);
+        if (isInitialLoad.current) {
+            loadMoreFeeds();
+            isInitialLoad.current = false;
+        }
+    }, [loadMoreFeeds]);
+
+    if (displayedFeeds.length === 0 && isLoading) {
+        return (
+            <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+    const handleLike = (feedId: number) => {
+        setLikedFeeds((prev) => ({
+            ...prev,
+            [feedId]: !prev[feedId],
+        }));
+        // console.log(likedFeeds, 'likedFeeds');
+        // 좋아요 카운트 변경
+        const updatedFeeds = feeds.map((feed) =>
+            feed.id === feedId ? { ...feed, likes: likedFeeds[feedId] ? feed.likes + 1 : feed.likes - 1 } : feed,
+        );
+        console.log(updatedFeeds[0], 'updatedFeeds');
+        setDisplayedFeeds(updatedFeeds);
+    };
+
+    const handleCommentClick = (feedId: number) => {
+        setSelectedFeedId(feedId);
+        setIsCommentSheetOpen(true);
+    };
+
+    const handleCloseComments = () => {
+        setIsCommentSheetOpen(false);
+        setSelectedFeedId(null);
+    };
 
     return (
         <>
@@ -164,18 +187,27 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
 
                         {/* 좋아요, 댓글 카운트 */}
                         <div className="flex items-center text-gray-500 text-sm">
-                            <button className="flex items-center mr-4">
-                                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                    />
-                                </svg>
+                            <button
+                                onClick={() => handleLike(feed.id)}
+                                className={`flex items-center mr-4 ${likedFeeds[feed.id] ? 'text-red-500' : ''}`}
+                            >
+                                {likedFeeds[feed.id] ? (
+                                    <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                ) : (
+                                    <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                        />
+                                    </svg>
+                                )}
                                 {feed.likes}
                             </button>
-                            <button className="flex items-center mr-4">
+                            <button className="flex items-center mr-4" onClick={() => handleCommentClick(feed.id)}>
                                 <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path
                                         strokeLinecap="round"
@@ -207,6 +239,9 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
                     )}
                 </div>
             </div>
+            {selectedFeedId && (
+                <CommentBottomSheet isOpen={isCommentSheetOpen} onClose={handleCloseComments} feedId={selectedFeedId} />
+            )}
             <TabBar />
         </>
     );

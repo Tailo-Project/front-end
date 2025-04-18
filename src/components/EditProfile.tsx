@@ -173,14 +173,10 @@ const EditProfile = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                         </svg>
                     </button>
-                    <h1 className="text-lg font-semibold">프로필 수정</h1>
-                    <button onClick={handleSubmit} className="text-blue-500 font-semibold">
-                        완료
-                    </button>
+                    <h1 className="text-lg font-semibold text-center w-full">프로필 수정</h1>
                 </header>
 
                 <form onSubmit={handleSubmit} className="p-4">
-                    {/* 프로필 이미지 */}
                     <div className="flex flex-col items-center mb-8">
                         <div className="relative mb-2">
                             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
