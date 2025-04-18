@@ -8,7 +8,7 @@ interface ProfileImageUploadProps {
     setValue: UseFormSetValue<SignUpFormData>;
 }
 
-export default function ProfileImageUpload({ profileImage, setProfileImage, setValue }: ProfileImageUploadProps) {
+const ProfileImageUpload = ({ profileImage, setProfileImage, setValue }: ProfileImageUploadProps) => {
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -47,4 +47,6 @@ export default function ProfileImageUpload({ profileImage, setProfileImage, setV
             </div>
         </div>
     );
-}
+};
+
+export default ProfileImageUpload;

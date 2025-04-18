@@ -120,7 +120,7 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
         setDisplayedFeeds([]);
         setPage(1);
         loadMoreFeeds();
-    }, [feeds]);
+    }, [feeds, loadMoreFeeds]);
 
     return (
         <>

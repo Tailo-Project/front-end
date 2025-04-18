@@ -1,4 +1,3 @@
-import React from 'react';
 import { Gender } from '../../types/profile';
 
 interface GenderSelectProps {
@@ -7,7 +6,7 @@ interface GenderSelectProps {
     onChange: (value: Gender) => void;
 }
 
-const GenderSelect: React.FC<GenderSelectProps> = ({ label, value, onChange }) => (
+const GenderSelect = ({ label, value, onChange }: GenderSelectProps) => (
     <div className="mb-2">
         <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
         <div className="flex gap-2">

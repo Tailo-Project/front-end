@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TabBar from './TabBar';
 
@@ -8,7 +8,7 @@ interface PostForm {
     images: File[];
 }
 
-const WritePost: React.FC = () => {
+const WritePost = () => {
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [form, setForm] = useState<PostForm>({

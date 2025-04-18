@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface FormFieldProps {
     label: string;
     value: string;
@@ -10,15 +8,7 @@ interface FormFieldProps {
     min?: string;
 }
 
-const FormField: React.FC<FormFieldProps> = ({
-    label,
-    value,
-    onChange,
-    placeholder,
-    maxLength,
-    type = 'text',
-    min,
-}) => (
+const FormField = ({ label, value, onChange, placeholder, maxLength, type = 'text', min }: FormFieldProps) => (
     <div className="mb-2">
         <div className="flex justify-between items-center mb-2">
             <label className="text-sm font-medium text-gray-700">{label}</label>
