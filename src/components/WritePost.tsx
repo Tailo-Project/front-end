@@ -32,7 +32,7 @@ const WritePost = () => {
             return false;
         }
         if (file.size > MAX_IMAGE_SIZE) {
-            setError('이미지 크기는 5MB를 초과할 수 없습니다.');
+            setError(`이미지 크기는 ${MAX_IMAGE_SIZE / 1024 / 1024}MB를 초과할 수 없습니다.`);
             return false;
         }
         return true;
