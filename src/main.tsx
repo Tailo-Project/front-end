@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App.tsx";
 import { registerSW } from "virtual:pwa-register";
 
-// PWA 서비스 워커 등록
 const updateSW = registerSW({
     immediate: true,
     onNeedRefresh() {
@@ -18,9 +17,12 @@ const updateSW = registerSW({
     onRegistered(r) {
         console.log("서비스 워커가 등록되었습니다.");
         if (r) {
-            setInterval(() => {
-                r.update();
-            }, 60 * 60 * 1000); // 1시간마다 업데이트 체크
+            setInterval(
+                () => {
+                    r.update();
+                },
+                60 * 60 * 1000
+            );
         }
     },
     onRegisterError(error) {
