@@ -15,7 +15,7 @@ function App() {
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUpForm email={email || ''} />} />
+            <Route path="/signup" element={<SignUpForm email={email} />} />
             <Route path="/oauth/kakao" element={<KakaoCallback />} />
             <Route path="/feeds" element={<FeedList />} />
             <Route path="/search" element={<div className="p-4">검색 페이지 (준비중)</div>} />
