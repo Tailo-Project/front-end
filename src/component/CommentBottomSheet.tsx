@@ -1,6 +1,5 @@
-import React from 'react';
-import tailogo from '../assets/tailogo.svg';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import tailogo from '../assets/tailogo.svg';
 
 interface Comment {
     id: number;

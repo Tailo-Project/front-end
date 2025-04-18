@@ -1,12 +1,12 @@
 import './App.css';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import Login from './components/Login';
-import SignUpForm from './components/SignUpForm';
-import KakaoCallback from './components/KakaoCallback';
-import FeedList from './components/FeedList';
-import WritePost from './components/WritePost';
-import Profile from './components/Profile';
-import EditProfile from './components/EditProfile';
+import Login from './component/Login';
+import SignUpForm from './component/SignUpForm';
+import KakaoCallback from './component/KakaoCallback';
+import FeedList from './component/FeedList';
+import WritePost from './component/WritePost';
+import Profile from './component/Profile';
+import EditProfile from './component/EditProfile';
 
 function App() {
     const location = useLocation();

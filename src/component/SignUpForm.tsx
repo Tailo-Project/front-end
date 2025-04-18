@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import tailoLogo from '../assets/tailogo.svg';
 import Toast from './Toast';
-import { SignUpFormData, ToastState } from './form/types';
-import ProfileImageUpload from './form/ProfileImageUpload';
-import FormInput from './form/FormInput';
-import BreedCombobox from './form/BreedCombobox';
-import GenderRadioGroup from './form/GenderRadioGroup';
+import { SignUpFormData, ToastState } from '../components/form/types';
+import ProfileImageUpload from '../components/form/ProfileImageUpload';
+import FormInput from '../components/form/FormInput';
+import BreedCombobox from '../components/form/BreedCombobox';
+import GenderRadioGroup from '../components/form/GenderRadioGroup';
 import { useNavigate } from 'react-router-dom';
 
 // 임시 품종 데이터
