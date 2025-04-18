@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from './Toast';
+import { authService } from '../services/authService';
 
 interface ToastState {
     message: string;
@@ -8,7 +9,7 @@ interface ToastState {
     show: boolean;
 }
 
-export default function KakaoCallback() {
+const KakaoCallback = () => {
     const navigate = useNavigate();
     const [toast, setToast] = useState<ToastState>({
         message: '',
@@ -33,36 +34,23 @@ export default function KakaoCallback() {
                 return;
             }
 
-            const grant_type = 'authorization_code';
-            const REST_API = import.meta.env.VITE_KAKAO_API_KEY;
-            const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
-
-            if (code) {
-                const res = await fetch(
-                    `https://kauth.kakao.com/oauth/token?grant_type=${grant_type}&client_id=${REST_API}&redirect_uri=${REDIRECT_URI}&code=${code}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    },
-                );
-                const data = await res.json();
-                const accessToken = data.access_token;
-
-                const userInfo = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-in`, {
-                    method: 'POST',
-                    body: JSON.stringify({ provider: 'kakao', accessToken }),
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+            if (!code) {
+                setToast({
+                    message: '인증 코드를 찾을 수 없습니다.',
+                    type: 'error',
+                    show: true,
                 });
+                setTimeout(() => {
+                    navigate('/login');
+                }, 1500);
+                return;
+            }
 
-                if (!userInfo.ok) {
-                    throw new Error('로그인 처리 중 오류가 발생했습니다.');
-                }
+            try {
+                const accessToken = await authService.getKakaoToken(code);
+                const userInfoData = await authService.signInWithKakao(accessToken);
 
-                const userInfoData = await userInfo.json();
-
-                if (userInfoData.accessToken === null) {
+                if (userInfoData.data.accessToken === null) {
                     setToast({
                         message: '회원가입이 필요합니다.',
                         type: 'success',
@@ -81,9 +69,9 @@ export default function KakaoCallback() {
                         navigate('/');
                     }, 1500);
                 }
-            } else {
+            } catch (error) {
                 setToast({
-                    message: '인증 코드를 찾을 수 없습니다.',
+                    message: error instanceof Error ? error.message : '로그인 처리 중 오류가 발생했습니다.',
                     type: 'error',
                     show: true,
                 });
@@ -109,4 +97,6 @@ export default function KakaoCallback() {
             )}
         </div>
     );
-}
+};
+
+export default KakaoCallback;

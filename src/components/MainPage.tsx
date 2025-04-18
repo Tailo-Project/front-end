@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function MainPage() {
+const MainPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,4 +18,6 @@ export default function MainPage() {
             <p className="text-gray-600">환영합니다!</p>
         </div>
     );
-}
+};
+
+export default MainPage;

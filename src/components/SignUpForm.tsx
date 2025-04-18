@@ -16,7 +16,7 @@ interface SignUpFormProps {
     email: string;
 }
 
-export default function SignUpForm({ email }: SignUpFormProps) {
+const SignUpForm = ({ email }: SignUpFormProps) => {
     const [query, setQuery] = useState('');
     const [breeds, setBreeds] = useState(initialBreeds);
     const [selectedBreed, setSelectedBreed] = useState('');
@@ -165,4 +165,6 @@ export default function SignUpForm({ email }: SignUpFormProps) {
             </div>
         </div>
     );
-}
+};
+
+export default SignUpForm;
