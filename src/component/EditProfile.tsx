@@ -96,8 +96,8 @@ const GenderSelect: React.FC<{
         <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
         <div className="flex gap-4">
             {[
-                { value: 'male', label: '남' },
-                { value: 'female', label: '여' },
+                { value: 'MALE', label: '남' },
+                { value: 'FEMALE', label: '여' },
             ].map((option) => (
                 <label key={option.value} className="flex items-center">
                     <input
