@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import tailogo from '../assets/tailogo.svg';
 import TabBar from './TabBar';
+import Toast from './Toast';
+import { useToast } from '../hooks/useToast';
 
 type Gender = 'MALE' | 'FEMALE';
 
@@ -114,6 +116,7 @@ const GenderSelect: React.FC<{
 );
 
 const EditProfile = () => {
+    const { toast, showToast } = useToast();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [profileData, setProfileData] = useState<ProfileData>(INITIAL_PROFILE_DATA);
@@ -136,11 +139,25 @@ const EditProfile = () => {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: API 연동 후 프로필 업데이트 로직 구현
-        console.log(profileData);
-        navigate('/profile');
+        try {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(profileData),
+            });
+
+            showToast('프로필 수정 완료', 'success');
+            setTimeout(() => {
+                navigate('/profile');
+            }, 1500);
+        } catch (error) {
+            console.error('프로필 수정 실패', error);
+            showToast('프로필 수정에 실패했습니다.', 'error');
+        }
     };
 
     const updateField = (field: keyof ProfileData) => (value: string) => {
@@ -245,6 +262,9 @@ const EditProfile = () => {
                 </form>
             </div>
             <TabBar />
+            {toast.show && (
+                <Toast message={toast.message} type={toast.type} onClose={() => showToast('', toast.type, 0)} />
+            )}
         </>
     );
 };
