@@ -1,5 +1,6 @@
 import React from 'react';
 import tailogo from '../assets/tailogo.svg';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 interface Comment {
     id: number;
@@ -17,7 +18,7 @@ interface CommentBottomSheetProps {
     feedId: number;
 }
 
-const CommentBottomSheet: React.FC<CommentBottomSheetProps> = ({ isOpen, onClose }) => {
+const CommentBottomSheet = ({ isOpen, onClose }: CommentBottomSheetProps) => {
     // 임시 더미 댓글 데이터
     const dummyComments: Comment[] = [
         {
@@ -40,37 +41,17 @@ const CommentBottomSheet: React.FC<CommentBottomSheetProps> = ({ isOpen, onClose
         },
     ];
 
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 z-50">
-            <div className="fixed inset-0 bg-black/80" onClick={onClose} />
-            <div
-                className="fixed bottom-[64px] left-1/2 -translate-x-1/2 w-full max-w-[375px] bg-white rounded-t-3xl max-h-[80vh] overflow-y-auto"
-                style={{
-                    transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
-                    transition: 'transform 0.3s ease-out',
-                }}
-            >
-                {/* 헤더 */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 p-4">
+        <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+            <SheetContent side="bottom" className="h-[80vh] w-full max-w-[375px] mx-auto rounded-t-3xl p-0 bg-white">
+                <SheetHeader className="px-4 py-3 border-b">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-lg font-semibold">댓글</h2>
-                        <button onClick={onClose} className="text-gray-500">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
+                        <SheetTitle className="text-lg font-semibold">댓글</SheetTitle>
                     </div>
-                </div>
+                </SheetHeader>
 
                 {/* 댓글 목록 */}
-                <div className="px-4 py-2">
+                <div className="px-4 py-2 overflow-y-auto h-[calc(100%-140px)]">
                     {dummyComments.map((comment) => (
                         <div key={comment.id} className="py-4 border-b border-gray-100">
                             <div className="flex items-start">
@@ -92,7 +73,7 @@ const CommentBottomSheet: React.FC<CommentBottomSheetProps> = ({ isOpen, onClose
                 </div>
 
                 {/* 댓글 입력 */}
-                <div className="sticky bottom-0 bg-white border-t border-gray-200 p-4">
+                <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
                     <div className="flex items-center">
                         <input
                             type="text"
@@ -104,8 +85,8 @@ const CommentBottomSheet: React.FC<CommentBottomSheetProps> = ({ isOpen, onClose
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
+            </SheetContent>
+        </Sheet>
     );
 };
 
