@@ -1,26 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import tailoLogo from '../assets/tailogo.svg';
-import Toast from './Toast';
-import { SignUpFormData, ToastState } from '../components/form/types';
-import ProfileImageUpload from '../components/form/ProfileImageUpload';
-import FormInput from '../components/form/FormInput';
-import BreedCombobox from '../components/form/BreedCombobox';
-import GenderRadioGroup from '../components/form/GenderRadioGroup';
-import { useNavigate } from 'react-router-dom';
+import Toast from '../component/Toast';
 
-// 임시 품종 데이터
-const initialBreeds = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
+import { useNavigate } from 'react-router-dom';
+import { SignUpFormData, ToastState } from '@/components/form/types';
+import ProfileImageUpload from '@/components/form/ProfileImageUpload';
+import FormInput from '@/components/form/FormInput';
+import BreedCombobox from '@/components/form/BreedCombobox';
+import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 
 interface SignUpFormProps {
     email: string;
 }
 
 const SignUpForm = ({ email }: SignUpFormProps) => {
-    const [query, setQuery] = useState('');
-    const [breeds, setBreeds] = useState(initialBreeds);
-    const [selectedBreed, setSelectedBreed] = useState('');
-    const [showAddBreed, setShowAddBreed] = useState(false);
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [toast, setToast] = useState<ToastState>({
         message: '',
@@ -33,7 +27,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
     const {
         register,
         handleSubmit,
-        formState: { isValid },
+        formState: { isValid, errors },
         setValue,
     } = useForm<SignUpFormData>({
         mode: 'onChange',
@@ -46,13 +40,14 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
 
     const onSubmit = async (data: SignUpFormData) => {
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
                 method: 'POST',
                 body: JSON.stringify(data),
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
+            console.log(response, 'sign up response');
             navigate('/login');
         } catch {
             console.log('error');
@@ -118,17 +113,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                             placeholder="ex) 강아지, 고양이, 햄스터"
                         />
 
-                        <BreedCombobox
-                            selectedBreed={selectedBreed}
-                            setSelectedBreed={setSelectedBreed}
-                            query={query}
-                            setQuery={setQuery}
-                            breeds={breeds}
-                            setBreeds={setBreeds}
-                            showAddBreed={showAddBreed}
-                            setShowAddBreed={setShowAddBreed}
-                            setValue={setValue}
-                        />
+                        <BreedCombobox setValue={setValue} error={errors.breed?.message} required />
 
                         <GenderRadioGroup register={register} />
 
