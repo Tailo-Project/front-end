@@ -22,6 +22,9 @@ export const authService = {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             },
         );
+        if (!response.ok) {
+            throw new Error(`카카오 토큰 발급 중 오류가 발생했습니다. 상태 코드 :  ${response.status}`);
+        }
         const data: KakaoTokenResponse = await response.json();
         return data.access_token;
     },
