@@ -4,6 +4,7 @@ import tailogo from '../assets/tailogo.svg';
 import TabBar from './TabBar';
 import Toast from './Toast';
 import { useToast } from '../hooks/useToast';
+import GenderSelect from '@/components/common/GenderSelect';
 
 type Gender = 'MALE' | 'FEMALE';
 
@@ -84,34 +85,6 @@ const FormField: React.FC<FormFieldProps> = ({
                 min={min}
             />
         )}
-    </div>
-);
-
-// 성별 선택 컴포넌트
-const GenderSelect: React.FC<{
-    value: Gender;
-    onChange: (value: Gender) => void;
-}> = ({ value, onChange }) => (
-    <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
-        <div className="flex gap-4">
-            {[
-                { value: 'MALE', label: '남' },
-                { value: 'FEMALE', label: '여' },
-            ].map((option) => (
-                <label key={option.value} className="flex items-center">
-                    <input
-                        type="radio"
-                        name="gender"
-                        value={option.value}
-                        checked={value === option.value}
-                        onChange={(e) => onChange(e.target.value as Gender)}
-                        className="mr-2"
-                    />
-                    <span className="text-sm">{option.label}</span>
-                </label>
-            ))}
-        </div>
     </div>
 );
 
@@ -244,6 +217,7 @@ const EditProfile = () => {
                         />
 
                         <GenderSelect
+                            label="성별"
                             value={profileData.petGender}
                             onChange={(value) => updateField('petGender')(value)}
                         />
