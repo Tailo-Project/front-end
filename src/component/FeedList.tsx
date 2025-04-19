@@ -1,21 +1,8 @@
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useReducer } from 'react';
 import TabBar from './TabBar';
 import tailogo from '../assets/tailogo.svg';
 import CommentBottomSheet from './CommentBottomSheet';
-
-interface Feed {
-    id: number;
-    title: string;
-    content: string;
-    author: {
-        name: string;
-        profileImage: string;
-    };
-    createdAt: string;
-    likes: number;
-    comments: number;
-    images?: string[];
-}
+import { feedReducer, initialState, Feed } from '@/reducers/feedReducer';
 
 interface FeedListProps {
     feeds?: Feed[];
@@ -58,36 +45,27 @@ const dummyFeeds: Feed[] = generateDummyFeeds(30);
 
 const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
     const observerRef = useRef<HTMLDivElement>(null);
-    const [displayedFeeds, setDisplayedFeeds] = useState<Feed[]>([]);
-    const [page, setPage] = useState(1);
-    const [isLoading, setIsLoading] = useState(false);
-    const [likedFeeds, setLikedFeeds] = useState<{ [key: number]: boolean }>({});
-    const [selectedFeedId, setSelectedFeedId] = useState<number | null>(null);
-    const [isCommentSheetOpen, setIsCommentSheetOpen] = useState(false);
-    const itemsPerPage = 5;
     const isInitialLoad = useRef(true);
+    const [state, dispatch] = useReducer(feedReducer, initialState);
+    const itemsPerPage = 5;
 
     const loadMoreFeeds = useCallback(() => {
-        if (isLoading) return;
+        if (state.isLoading) return;
 
-        setIsLoading(true);
-        const start = (page - 1) * itemsPerPage;
-        const end = page * itemsPerPage;
+        dispatch({ type: 'LOAD_MORE_START' });
+        const start = (state.page - 1) * itemsPerPage;
+        const end = state.page * itemsPerPage;
         const newFeeds = feeds.slice(start, end);
 
         if (newFeeds.length > 0) {
-            setDisplayedFeeds((prev) => [...prev, ...newFeeds]);
-            setPage((prev) => prev + 1);
-            setIsLoading(false);
-        } else {
-            setIsLoading(false);
+            dispatch({ type: 'LOAD_MORE_SUCCESS', feeds: newFeeds });
         }
-    }, [feeds, page, isLoading]);
+    }, [feeds, state.page, state.isLoading]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting && !isLoading) {
+                if (entries[0].isIntersecting && !state.isLoading) {
                     loadMoreFeeds();
                 }
             },
@@ -104,9 +82,8 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
                 observer.unobserve(currentRef);
             }
         };
-    }, [loadMoreFeeds, isLoading]);
+    }, [loadMoreFeeds, state.isLoading]);
 
-    // 초기 로딩
     useEffect(() => {
         if (isInitialLoad.current) {
             loadMoreFeeds();
@@ -114,41 +91,30 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
         }
     }, [loadMoreFeeds]);
 
-    if (displayedFeeds.length === 0 && isLoading) {
+    if (state.displayedFeeds.length === 0 && state.isLoading) {
         return (
             <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
             </div>
         );
     }
+
     const handleLike = (feedId: number) => {
-        setLikedFeeds((prev) => ({
-            ...prev,
-            [feedId]: !prev[feedId],
-        }));
-        // console.log(likedFeeds, 'likedFeeds');
-        // 좋아요 카운트 변경
-        const updatedFeeds = feeds.map((feed) =>
-            feed.id === feedId ? { ...feed, likes: likedFeeds[feedId] ? feed.likes + 1 : feed.likes - 1 } : feed,
-        );
-        console.log(updatedFeeds[0], 'updatedFeeds');
-        setDisplayedFeeds(updatedFeeds);
+        dispatch({ type: 'TOGGLE_LIKE', feedId });
     };
 
     const handleCommentClick = (feedId: number) => {
-        setSelectedFeedId(feedId);
-        setIsCommentSheetOpen(true);
+        dispatch({ type: 'OPEN_COMMENTS', feedId });
     };
 
     const handleCloseComments = () => {
-        setIsCommentSheetOpen(false);
-        setSelectedFeedId(null);
+        dispatch({ type: 'CLOSE_COMMENTS' });
     };
 
     return (
         <>
             <div className="w-full max-w-[375px] mx-auto bg-white pb-16 border border-gray-200">
-                {displayedFeeds.map((feed) => (
+                {state.displayedFeeds.map((feed) => (
                     <article key={feed.id} className="p-4 border-b border-gray-200">
                         {/* 작성자 정보 */}
                         <div className="flex items-center mb-3">
@@ -189,9 +155,9 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
                         <div className="flex items-center text-gray-500 text-sm">
                             <button
                                 onClick={() => handleLike(feed.id)}
-                                className={`flex items-center mr-4 ${likedFeeds[feed.id] ? 'text-red-500' : ''}`}
+                                className={`flex items-center mr-4 ${state.likedFeeds[feed.id] ? 'text-red-500' : ''}`}
                             >
-                                {likedFeeds[feed.id] ? (
+                                {state.likedFeeds[feed.id] ? (
                                     <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
@@ -233,16 +199,16 @@ const FeedList = ({ feeds = dummyFeeds }: FeedListProps) => {
                 ))}
 
                 {/* Intersection Observer 타겟 */}
-                <div ref={observerRef} className="h-16 flex items-center justify-center">
-                    {isLoading && displayedFeeds.length < feeds.length && (
-                        <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
-                    )}
-                </div>
+                <div ref={observerRef} className="h-10" />
             </div>
-            {selectedFeedId && (
-                <CommentBottomSheet isOpen={isCommentSheetOpen} onClose={handleCloseComments} feedId={selectedFeedId} />
-            )}
             <TabBar />
+            {state.isCommentSheetOpen && state.selectedFeedId && (
+                <CommentBottomSheet
+                    isOpen={state.isCommentSheetOpen}
+                    feedId={state.selectedFeedId}
+                    onClose={handleCloseComments}
+                />
+            )}
         </>
     );
 };
