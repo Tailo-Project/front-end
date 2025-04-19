@@ -1,4 +1,4 @@
-import React, { useRef, ChangeEvent } from 'react';
+import { useRef, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import tailogo from '../assets/tailogo.svg';
@@ -6,6 +6,7 @@ import TabBar from './TabBar';
 import Toast from './Toast';
 import { useToast } from '../hooks/useToast';
 import GenderSelect from '@/components/common/GenderSelect';
+import FormField from './FormField';
 
 const MAX_NICKNAME_LENGTH = 10;
 const MAX_BIO_LENGTH = 150;
@@ -19,22 +20,6 @@ interface ProfileData {
     petGender: 'MALE' | 'FEMALE';
     address: string;
 }
-
-interface FormFieldProps {
-    label: string;
-    error?: string;
-    children: React.ReactNode;
-}
-
-const FormField: React.FC<FormFieldProps> = ({ label, error, children }) => (
-    <div className="mb-2">
-        <div className="flex justify-between items-center mb-2">
-            <label className="text-sm font-medium text-gray-700">{label}</label>
-        </div>
-        {children}
-        {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
-);
 
 const INITIAL_PROFILE_DATA: ProfileData = {
     nickname: '멍멍이맘',
