@@ -128,6 +128,12 @@ const EditProfile = () => {
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
+            const maxSize = 1024 * 1024 * 5; // 5MB
+            if (file.size > maxSize) {
+                showToast('최대 5MB의 이미지를 업로드할 수 있습니다.', 'error');
+                return;
+            }
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 const profileImage = reader.result;
@@ -191,7 +197,7 @@ const EditProfile = () => {
                             <input
                                 ref={fileInputRef}
                                 type="file"
-                                accept="image/*"
+                                accept="image/jpeg, image/png, image/jpg"
                                 onChange={handleImageChange}
                                 className="hidden"
                             />
