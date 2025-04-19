@@ -5,7 +5,6 @@ import './index.css';
 import App from './App.tsx';
 import { registerSW } from 'virtual:pwa-register';
 
-// PWA 서비스 워커 등록
 const updateSW = registerSW({
     immediate: true,
     onNeedRefresh() {
@@ -23,8 +22,8 @@ const updateSW = registerSW({
                 () => {
                     r.update();
                 },
-                60 * 60 * 1000,
-            ); // 1시간마다 업데이트 체크
+                60 * 60 * 1000
+            );
         }
     },
     onRegisterError(error) {
