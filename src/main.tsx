@@ -26,15 +26,15 @@ const updateSW = registerSW({
             );
         }
     },
-    onRegisterError(error) {
+    onRegisterError(error: Error) {
         console.error('서비스 워커 등록 실패:', error);
     },
 });
 
 createRoot(document.getElementById('root')!).render(
-    // <StrictMode>
-    <BrowserRouter>
-        <App />
-    </BrowserRouter>,
-    // </StrictMode>,
+    <StrictMode>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </StrictMode>,
 );

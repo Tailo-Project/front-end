@@ -12,7 +12,7 @@ interface FormInputProps {
     disabled?: boolean;
 }
 
-export default function FormInput({
+const FormInput = ({
     label,
     name,
     register,
@@ -21,7 +21,7 @@ export default function FormInput({
     type = 'text',
     suffix,
     disabled = false,
-}: FormInputProps) {
+}: FormInputProps) => {
     const inputClassName =
         'flex-1 h-[32px] px-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:border-blue-500 transition-all duration-300 placeholder:text-gray-400 placeholder:text-xs hover:border-gray-400 bg-gray-50/30 disabled:bg-gray-100';
     const labelClassName = 'text-sm font-medium w-[49px] text-gray-700 select-none';
@@ -44,4 +44,6 @@ export default function FormInput({
             </div>
         </div>
     );
-}
+};
+
+export default FormInput;

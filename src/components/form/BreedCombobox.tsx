@@ -15,7 +15,7 @@ interface BreedComboboxProps {
     setValue: UseFormSetValue<SignUpFormData>;
 }
 
-export default function BreedCombobox({
+const BreedCombobox = ({
     selectedBreed,
     setSelectedBreed,
     query,
@@ -25,7 +25,7 @@ export default function BreedCombobox({
     showAddBreed,
     setShowAddBreed,
     setValue,
-}: BreedComboboxProps) {
+}: BreedComboboxProps) => {
     const filteredBreeds =
         query === '' ? breeds : breeds.filter((breed) => breed.toLowerCase().includes(query.toLowerCase()));
 
@@ -101,4 +101,6 @@ export default function BreedCombobox({
             </div>
         </div>
     );
-}
+};
+
+export default BreedCombobox;

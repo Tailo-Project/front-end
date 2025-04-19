@@ -8,7 +8,7 @@ interface ToastProps {
     onClose: () => void;
 }
 
-export default function Toast({ message, type, duration = 3000, onClose }: ToastProps) {
+const Toast = ({ message, type, duration = 3000, onClose }: ToastProps) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             onClose();
@@ -31,4 +31,6 @@ export default function Toast({ message, type, duration = 3000, onClose }: Toast
             <p className={`text-sm font-medium ${type === 'success' ? 'text-green-800' : 'text-red-800'}`}>{message}</p>
         </div>
     );
-}
+};
+
+export default Toast;
