@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import tailogo from '../assets/tailogo.svg';
 import TabBar from './TabBar';
@@ -125,27 +125,28 @@ const EditProfile = () => {
         fileInputRef.current?.click();
     };
 
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setProfileData((prev) => ({
-                    ...prev,
-                    profileImage: reader.result as string,
-                }));
+                const profileImage = reader.result;
+                if (profileImage && typeof profileImage === 'string') {
+                    setProfileData((prev) => ({ ...prev, profileImage }));
+                }
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         try {
             await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
                 },
                 body: JSON.stringify(profileData),
             });

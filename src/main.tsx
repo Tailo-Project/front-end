@@ -27,7 +27,7 @@ const updateSW = registerSW({
             ); // 1시간마다 업데이트 체크
         }
     },
-    onRegisterError(error) {
+    onRegisterError(error: Error) {
         console.error('서비스 워커 등록 실패:', error);
     },
 });
