@@ -22,7 +22,7 @@ const updateSW = registerSW({
                 () => {
                     r.update();
                 },
-                60 * 60 * 1000
+                60 * 60 * 1000,
             );
         }
     },
@@ -32,9 +32,7 @@ const updateSW = registerSW({
 });
 
 createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-        <BrowserRouter>
-            <App />
-        </BrowserRouter>
-    </StrictMode>,
+    <BrowserRouter>
+        <App />
+    </BrowserRouter>,
 );
