@@ -1,49 +1,50 @@
 import { InputHTMLAttributes } from 'react';
-import { UseFormRegister } from 'react-hook-form';
-import { SignUpFormData } from './types';
+import { UseFormRegister, Path, FieldValues } from 'react-hook-form';
 
-interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface FormInputProps<T extends FieldValues> extends InputHTMLAttributes<HTMLInputElement> {
     label: string;
-    name: keyof SignUpFormData;
-    register: UseFormRegister<SignUpFormData>;
+    name: Path<T>;
+    register: UseFormRegister<T>;
     required?: boolean;
-    suffix?: string;
+    placeholder?: string;
     disabled?: boolean;
+    suffix?: string;
     rightElement?: React.ReactNode;
 }
 
-const FormInput = ({
+const FormInput = <T extends FieldValues>({
     label,
     name,
     register,
-    required = false,
-    type = 'text',
+    required,
     placeholder,
-    suffix,
     disabled = false,
+    suffix,
     rightElement,
-}: FormInputProps) => {
+    ...props
+}: FormInputProps<T>) => {
     const labelClassName = 'text-sm font-medium text-gray-700';
 
     return (
-        <div className="flex flex-col gap-2">
-            <label htmlFor={name} className={labelClassName}>
+        <div className="space-y-1">
+            <label htmlFor={name.toString()} className={labelClassName}>
                 {label}
-                {required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className="relative flex items-center">
+            <div className="relative">
                 <input
-                    id={name}
-                    type={type}
+                    id={name.toString()}
                     {...register(name, { required })}
-                    className={`w-full h-[45px] px-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 ${
-                        rightElement ? 'pr-[100px]' : ''
-                    }`}
                     placeholder={placeholder}
                     disabled={disabled}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    {...props}
                 />
-                {suffix && <span className="absolute right-4 text-gray-500">{suffix}</span>}
-                {rightElement && <div className="absolute right-2">{rightElement}</div>}
+                {suffix && (
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">{suffix}</span>
+                )}
+                {rightElement && (
+                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">{rightElement}</div>
+                )}
             </div>
         </div>
     );

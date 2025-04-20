@@ -4,7 +4,10 @@ import tailogo from '../assets/tailogo.svg';
 import TabBar from './TabBar';
 import Toast from './Toast';
 import { useToast } from '../hooks/useToast';
-import GenderSelect from '@/components/common/GenderSelect';
+
+import GenderRadioGroup from '@/components/form/GenderRadioGroup';
+import { useForm } from 'react-hook-form';
+import FormInput from '@/components/form/FormInput';
 
 type Gender = 'MALE' | 'FEMALE';
 
@@ -89,6 +92,7 @@ const FormField: React.FC<FormFieldProps> = ({
 );
 
 const EditProfile = () => {
+    const { register } = useForm({ mode: 'onChange', defaultValues: INITIAL_PROFILE_DATA });
     const { toast, showToast } = useToast();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -207,20 +211,16 @@ const EditProfile = () => {
                             placeholder="품종을 입력해주세요."
                         />
 
-                        <FormField
+                        <FormInput
                             label="나이"
-                            value={profileData.petAge}
-                            onChange={updateField('petAge')}
+                            name="petAge"
+                            register={register}
+                            required
                             placeholder="나이를 입력해주세요."
-                            type="number"
-                            min="0"
+                            suffix="세"
                         />
 
-                        <GenderSelect
-                            label="성별"
-                            value={profileData.petGender}
-                            onChange={(value) => updateField('petGender')(value)}
-                        />
+                        <GenderRadioGroup register={register} />
 
                         <FormField
                             label="주소"
