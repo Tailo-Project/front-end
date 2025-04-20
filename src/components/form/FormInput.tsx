@@ -36,7 +36,7 @@ const FormInput = ({
                     id={name}
                     type={type}
                     {...register(name, { required })}
-                    className={`w-full h-[45px] px-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    className={`w-full h-[45px] px-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 ${
                         rightElement ? 'pr-[100px]' : ''
                     }`}
                     placeholder={placeholder}
