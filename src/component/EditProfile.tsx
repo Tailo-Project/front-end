@@ -1,35 +1,15 @@
-import React, { useState, useRef, FormEvent, ChangeEvent } from 'react';
+import React, { useRef, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import tailogo from '../assets/tailogo.svg';
 import TabBar from './TabBar';
 import Toast from './Toast';
 import { useToast } from '../hooks/useToast';
-
+import { useProfileImage } from '../hooks/useProfileImage';
 import GenderRadioGroup from '@/components/form/GenderRadioGroup';
-import { useForm } from 'react-hook-form';
 import FormInput from '@/components/form/FormInput';
-
-type Gender = 'MALE' | 'FEMALE';
-
-interface ProfileData {
-    nickname: string;
-    bio: string;
-    profileImage: string;
-    petType: string;
-    petAge: string;
-    petGender: Gender;
-    address: string;
-}
-
-interface FormFieldProps {
-    label: string;
-    value: string;
-    onChange: (value: string) => void;
-    placeholder: string;
-    maxLength?: number;
-    type?: string;
-    min?: string;
-}
+import { ProfileData } from '../types/profile';
+import { updateProfile, createFormDataWithJson } from '../api/profile';
 
 // 상수
 const MAX_NICKNAME_LENGTH = 10;
@@ -44,108 +24,48 @@ const INITIAL_PROFILE_DATA: ProfileData = {
     address: '서울시 강남구',
 };
 
-// 재사용 가능한 폼 필드 컴포넌트
-const FormField: React.FC<FormFieldProps> = ({
-    label,
-    value,
-    onChange,
-    placeholder,
-    maxLength,
-    type = 'text',
-    min,
-}) => (
-    <div className="mb-2">
-        <div className="flex justify-between items-center mb-2">
-            <label className="text-sm font-medium text-gray-700">{label}</label>
-            {maxLength && (
-                <span className="text-xs text-gray-400">
-                    {value.length}/{maxLength}
-                </span>
-            )}
-        </div>
-        {type === 'textarea' ? (
-            <textarea
-                value={value}
-                onChange={(e) => {
-                    if (!maxLength || e.target.value.length <= maxLength) {
-                        onChange(e.target.value);
-                    }
-                }}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-none text-sm"
-                placeholder={placeholder}
-            />
-        ) : (
-            <input
-                type={type}
-                value={value}
-                onChange={(e) => {
-                    if (!maxLength || e.target.value.length <= maxLength) {
-                        onChange(e.target.value);
-                    }
-                }}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                placeholder={placeholder}
-                min={min}
-            />
-        )}
-    </div>
-);
-
 const EditProfile = () => {
-    const { register } = useForm({ mode: 'onChange', defaultValues: INITIAL_PROFILE_DATA });
+    const { register, handleSubmit: handleFormSubmit } = useForm<ProfileData>({
+        mode: 'onChange',
+        defaultValues: INITIAL_PROFILE_DATA,
+    });
     const { toast, showToast } = useToast();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [profileData, setProfileData] = useState<ProfileData>(INITIAL_PROFILE_DATA);
+    const { imageUrl, profileImage, handleImageChange } = useProfileImage(INITIAL_PROFILE_DATA.profileImage);
 
     const handleImageClick = () => {
         fileInputRef.current?.click();
     };
 
-    const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            const maxSize = 1024 * 1024 * 5; // 5MB
-            if (file.size > maxSize) {
-                showToast('최대 5MB의 이미지를 업로드할 수 있습니다.', 'error');
-                return;
+    const handleImageInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+        try {
+            const file = event.target.files?.[0];
+            if (file) {
+                handleImageChange(file);
             }
-
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const profileImage = reader.result;
-                if (profileImage && typeof profileImage === 'string') {
-                    setProfileData((prev) => ({ ...prev, profileImage }));
-                }
-            };
-            reader.readAsDataURL(file);
+        } catch (error) {
+            if (error instanceof Error) {
+                showToast(error.message, 'error');
+            }
         }
     };
 
-    const handleSubmit = async (e: FormEvent) => {
-        e.preventDefault();
+    const onSubmit = async (data: ProfileData) => {
         try {
-            await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-                },
-                body: JSON.stringify(profileData),
-            });
-
+            const formData = createFormDataWithJson({ ...data, profileImage });
+            await updateProfile(formData);
             showToast('프로필 수정 완료', 'success');
-            setTimeout(() => {
+
+            const navigationTimeout = setTimeout(() => {
                 navigate('/profile');
             }, 1500);
+
+            return () => clearTimeout(navigationTimeout);
         } catch (error) {
             console.error('프로필 수정 실패', error);
             showToast('프로필 수정에 실패했습니다.', 'error');
         }
-    };
-
-    const updateField = (field: keyof ProfileData) => (value: string) => {
-        setProfileData((prev) => ({ ...prev, [field]: value }));
     };
 
     return (
@@ -160,12 +80,12 @@ const EditProfile = () => {
                     <h1 className="text-lg font-semibold text-center w-full">프로필 수정</h1>
                 </header>
 
-                <form onSubmit={handleSubmit} className="p-4">
+                <form onSubmit={handleFormSubmit(onSubmit)} className="p-4">
                     <div className="flex flex-col items-center mb-8">
                         <div className="relative mb-2">
                             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
                                 <img
-                                    src={profileData.profileImage}
+                                    src={imageUrl || tailogo}
                                     alt="프로필"
                                     className="w-full h-full object-cover cursor-pointer"
                                     onClick={handleImageClick}
@@ -175,7 +95,7 @@ const EditProfile = () => {
                                 ref={fileInputRef}
                                 type="file"
                                 accept="image/jpeg, image/png, image/jpg"
-                                onChange={handleImageChange}
+                                onChange={handleImageInputChange}
                                 className="hidden"
                             />
                         </div>
@@ -184,30 +104,31 @@ const EditProfile = () => {
                         </button>
                     </div>
 
-                    <FormField
+                    <FormInput
                         label="닉네임"
-                        value={profileData.nickname}
-                        onChange={updateField('nickname')}
-                        placeholder="닉네임을 입력하세요"
+                        name="nickname"
+                        register={register}
+                        required
                         maxLength={MAX_NICKNAME_LENGTH}
+                        placeholder="닉네임을 입력하세요"
                     />
 
-                    <FormField
+                    <FormInput
                         label="소개"
-                        value={profileData.bio}
-                        onChange={updateField('bio')}
-                        placeholder="자기소개를 입력하세요"
+                        name="bio"
+                        register={register}
+                        required
                         maxLength={MAX_BIO_LENGTH}
+                        placeholder="자기소개를 입력하세요"
                         type="textarea"
                     />
 
                     <div className="mb-2">
-                        <h2 className="text-lg font-semibold mb-4">반려동물 정보</h2>
-
-                        <FormField
+                        <FormInput
                             label="품종"
-                            value={profileData.petType}
-                            onChange={updateField('petType')}
+                            name="petType"
+                            register={register}
+                            required
                             placeholder="품종을 입력해주세요."
                         />
 
@@ -220,12 +141,13 @@ const EditProfile = () => {
                             suffix="세"
                         />
 
-                        <GenderRadioGroup register={register} />
+                        <GenderRadioGroup register={register} name="petGender" />
 
-                        <FormField
+                        <FormInput
                             label="주소"
-                            value={profileData.address}
-                            onChange={updateField('address')}
+                            name="address"
+                            register={register}
+                            required
                             placeholder="주소를 입력해주세요."
                         />
                     </div>

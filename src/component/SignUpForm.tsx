@@ -15,16 +15,9 @@ interface SignUpFormProps {
     email?: string;
 }
 
-interface ToastConfig {
-    message: string;
-    type: 'success' | 'error';
-}
-
 const SignUpForm = ({ email }: SignUpFormProps) => {
-    const [query, setQuery] = useState('');
     const [breeds, setBreeds] = useState(INITIAL_BREEDS);
     const [selectedBreed, setSelectedBreed] = useState('');
-    const [showAddBreed, setShowAddBreed] = useState(false);
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [isCheckingId, setIsCheckingId] = useState(false);
     const [idCheckStatus, setIdCheckStatus] = useState<number | null>(null);
@@ -44,7 +37,10 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
         watch,
     } = useForm<SignUpFormData>({
         mode: 'onChange',
-        defaultValues: { email },
+        defaultValues: {
+            email,
+            gender: 'MALE',
+        },
     });
 
     const accountId = watch('accountId');
@@ -53,7 +49,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
         setIdCheckStatus(null);
     }, [accountId]);
 
-    const showToastMessage = ({ message, type }: ToastConfig) => {
+    const showToastMessage = (message: string, type: ToastState['type']) => {
         setToast({
             message,
             type,
@@ -85,10 +81,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
 
     const checkAccountIdDuplicate = async () => {
         if (!accountId) {
-            showToastMessage({
-                message: '아이디를 입력해주세요.',
-                type: 'error',
-            });
+            showToastMessage('아이디를 입력해주세요.', 'error');
             return;
         }
 
@@ -104,15 +97,12 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
             const data = await response.json();
             setIdCheckStatus(data.statusCode);
 
-            showToastMessage({
-                message: data.statusCode === 200 ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.',
-                type: data.statusCode === 200 ? 'success' : 'error',
-            });
+            showToastMessage(
+                data.statusCode === 200 ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.',
+                data.statusCode === 200 ? 'success' : 'error',
+            );
         } catch (error) {
-            showToastMessage({
-                message: error instanceof Error ? error.message : '중복 확인 중 오류가 발생했습니다.',
-                type: 'error',
-            });
+            showToastMessage(error instanceof Error ? error.message : '중복 확인 중 오류가 발생했습니다.', 'error');
         } finally {
             setIsCheckingId(false);
         }
@@ -120,10 +110,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
 
     const onSubmit = async (data: SignUpFormData) => {
         if (idCheckStatus !== 200) {
-            showToastMessage({
-                message: '아이디 중복 확인을 해주세요.',
-                type: 'error',
-            });
+            showToastMessage('아이디 중복 확인을 해주세요.', 'error');
             return;
         }
 
@@ -137,9 +124,13 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
             navigate('/login');
         } catch (error) {
             if (error instanceof Error) {
-                throw new Error(error.message);
+                showToastMessage(error.message, 'error');
             }
         }
+    };
+
+    const handleAddBreed = (newBreed: string) => {
+        setBreeds((prev) => [...prev, newBreed]);
     };
 
     return (
@@ -217,18 +208,14 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                         />
 
                         <BreedCombobox
-                            selectedBreed={selectedBreed}
-                            setSelectedBreed={setSelectedBreed}
-                            query={query}
-                            setQuery={setQuery}
+                            value={selectedBreed}
+                            onChange={setSelectedBreed}
                             breeds={breeds}
-                            setBreeds={setBreeds}
-                            showAddBreed={showAddBreed}
-                            setShowAddBreed={setShowAddBreed}
+                            onAddBreed={handleAddBreed}
                             setValue={setValue}
                         />
 
-                        <GenderRadioGroup register={register} />
+                        <GenderRadioGroup register={register} name="gender" />
 
                         <FormInput
                             label="나이"

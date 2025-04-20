@@ -2,37 +2,27 @@ import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headl
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { UseFormSetValue } from 'react-hook-form';
 import { SignUpFormData } from './types';
+import { useState } from 'react';
 
 interface BreedComboboxProps {
-    selectedBreed: string;
-    setSelectedBreed: (breed: string) => void;
-    query: string;
-    setQuery: (query: string) => void;
+    value: string;
+    onChange: (value: string) => void;
     breeds: string[];
-    setBreeds: (breeds: string[]) => void;
-    showAddBreed: boolean;
-    setShowAddBreed: (show: boolean) => void;
+    onAddBreed?: (breed: string) => void;
     setValue: UseFormSetValue<SignUpFormData>;
 }
 
-const BreedCombobox = ({
-    selectedBreed,
-    setSelectedBreed,
-    query,
-    setQuery,
-    breeds,
-    setBreeds,
-    showAddBreed,
-    setShowAddBreed,
-    setValue,
-}: BreedComboboxProps) => {
+const BreedCombobox = ({ value, onChange, breeds, onAddBreed, setValue }: BreedComboboxProps) => {
+    const [query, setQuery] = useState('');
+    const [showAddBreed, setShowAddBreed] = useState(false);
+
     const filteredBreeds =
         query === '' ? breeds : breeds.filter((breed) => breed.toLowerCase().includes(query.toLowerCase()));
 
     const handleAddBreed = () => {
-        if (query && !breeds.includes(query)) {
-            setBreeds([...breeds, query]);
-            setSelectedBreed(query);
+        if (query && !breeds.includes(query) && onAddBreed) {
+            onAddBreed(query);
+            onChange(query);
             setValue('breed', query);
             setShowAddBreed(false);
         }
@@ -46,10 +36,10 @@ const BreedCombobox = ({
             <label className="text-sm font-medium w-[49px] text-gray-700 select-none">품종</label>
             <div className="flex-1">
                 <Combobox
-                    value={selectedBreed}
-                    onChange={(value: string) => {
-                        setSelectedBreed(value || '');
-                        setValue('breed', value || '');
+                    value={value}
+                    onChange={(newValue: string) => {
+                        onChange(newValue || '');
+                        setValue('breed', newValue || '');
                     }}
                 >
                     <div className="relative">
