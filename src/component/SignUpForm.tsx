@@ -50,7 +50,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                 method: 'POST',
                 body: JSON.stringify(data),
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                 },
             });
             navigate('/login');
