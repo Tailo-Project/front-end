@@ -1,6 +1,8 @@
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { UseFormSetValue } from 'react-hook-form';
 import { SignUpFormData } from './types';
+import { useToast } from '@/hooks/useToast';
+import Toast from '@/component/Toast';
 
 interface ProfileImageUploadProps {
     profileImage: string | null;
@@ -9,8 +11,14 @@ interface ProfileImageUploadProps {
 }
 
 const ProfileImageUpload = ({ profileImage, setProfileImage, setValue }: ProfileImageUploadProps) => {
+    const { showToast, toast } = useToast();
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
+
+        if (file && file.size > 8 * 1024 * 1024) {
+            showToast('최대 8MB의 이미지를 업로드 해주세요.', 'error');
+            return;
+        }
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -44,6 +52,9 @@ const ProfileImageUpload = ({ profileImage, setProfileImage, setValue }: Profile
                         </div>
                     )}
                 </label>
+                {toast.show && (
+                    <Toast message={toast.message} type={toast.type} onClose={() => showToast('', toast.type, 0)} />
+                )}
             </div>
         </div>
     );
