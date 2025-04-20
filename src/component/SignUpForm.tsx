@@ -12,7 +12,7 @@ import GenderRadioGroup from '../components/form/GenderRadioGroup';
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
 interface SignUpFormProps {
-    email: string;
+    email?: string;
 }
 
 interface ToastConfig {
@@ -78,7 +78,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
         const blob = new Blob([JSON.stringify(jsonData)], { type: 'application/json' });
         formData.append('request', blob);
 
-        if (data.file) formData.append('file', data.file);
+        if (data.file instanceof File) formData.append('file', data.file);
 
         return formData;
     };

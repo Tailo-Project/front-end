@@ -6,23 +6,22 @@ import { useToast } from '../hooks/useToast';
 
 const KakaoCallback = () => {
     const navigate = useNavigate();
-    const { toast, showToast } = useToast();
+    const { toast, showToast, hideToast } = useToast();
 
     useEffect(() => {
         const processKakaoLogin = async () => {
-            const code = new URL(window.location.href).searchParams.get('code')!;
-            const error = new URL(window.location.href).searchParams.get('error');
-
-            if (error) {
-                showToast('카카오 로그인이 취소되었습니다.', 'error');
+            const code = new URL(window.location.href).searchParams.get('code');
+            if (!code) {
+                showToast('인증 코드를 찾을 수 없습니다.', 'error');
                 setTimeout(() => {
                     navigate('/login');
                 }, 1500);
                 return;
             }
+            const error = new URL(window.location.href).searchParams.get('error');
 
-            if (!code) {
-                showToast('인증 코드를 찾을 수 없습니다.', 'error');
+            if (error) {
+                showToast('카카오 로그인이 취소되었습니다.', 'error');
                 setTimeout(() => {
                     navigate('/login');
                 }, 1500);
@@ -59,9 +58,7 @@ const KakaoCallback = () => {
         <div className="flex flex-col items-center justify-center min-h-screen bg-white">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
 
-            {toast.show && (
-                <Toast message={toast.message} type={toast.type} onClose={() => showToast('', toast.type, 0)} />
-            )}
+            {toast.show && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
         </div>
     );
 };
