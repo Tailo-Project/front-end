@@ -204,14 +204,14 @@ const EditProfile = () => {
                             label="품종"
                             value={profileData.petType}
                             onChange={updateField('petType')}
-                            placeholder="반려동물의 품종을 입력하세요"
+                            placeholder="품종을 입력해주세요."
                         />
 
                         <FormField
                             label="나이"
                             value={profileData.petAge}
                             onChange={updateField('petAge')}
-                            placeholder="반려동물의 나이를 입력하세요"
+                            placeholder="나이를 입력해주세요."
                             type="number"
                             min="0"
                         />
@@ -226,7 +226,7 @@ const EditProfile = () => {
                             label="주소"
                             value={profileData.address}
                             onChange={updateField('address')}
-                            placeholder="주소를 입력하세요"
+                            placeholder="주소를 입력해주세요."
                         />
                     </div>
 

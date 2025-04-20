@@ -1,5 +1,5 @@
-import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
-import { ChevronUpDownIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
+import { PlusIcon } from '@heroicons/react/24/outline';
 import { UseFormSetValue } from 'react-hook-form';
 import { SignUpFormData } from './types';
 
@@ -64,15 +64,13 @@ const BreedCombobox = ({
                             displayValue={(breed: string) => breed}
                             placeholder="품종을 선택해주세요"
                         />
-                        <ComboboxButton className="absolute inset-y-0 right-0 flex items-center">
-                            <ChevronUpDownIcon className="h-4 w-4 text-gray-400" />
-                        </ComboboxButton>
+
                         <ComboboxOptions className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-sm ring-1 ring-black/5 overflow-auto focus:outline-none">
                             {filteredBreeds.map((breed) => (
                                 <ComboboxOption
                                     key={breed}
                                     value={breed}
-                                    className={({ active }) =>
+                                    className={({ active }: { active: boolean }) =>
                                         `cursor-default select-none relative py-2.5 pl-3 pr-9 ${
                                             active ? 'text-white bg-blue-500' : 'text-gray-900'
                                         }`

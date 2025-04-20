@@ -1,15 +1,15 @@
+import { InputHTMLAttributes } from 'react';
 import { UseFormRegister } from 'react-hook-form';
 import { SignUpFormData } from './types';
 
-interface FormInputProps {
+interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
     label: string;
     name: keyof SignUpFormData;
     register: UseFormRegister<SignUpFormData>;
     required?: boolean;
-    placeholder?: string;
-    type?: string;
     suffix?: string;
     disabled?: boolean;
+    rightElement?: React.ReactNode;
 }
 
 const FormInput = ({
@@ -17,30 +17,33 @@ const FormInput = ({
     name,
     register,
     required = false,
-    placeholder,
     type = 'text',
+    placeholder,
     suffix,
     disabled = false,
+    rightElement,
 }: FormInputProps) => {
-    const inputClassName =
-        'flex-1 h-[32px] px-2 text-sm border rounded-md border-gray-300 focus:outline-none focus:border-blue-500 transition-all duration-300 placeholder:text-gray-400 placeholder:text-xs hover:border-gray-400 bg-gray-50/30 disabled:bg-gray-100';
-    const labelClassName = 'text-sm font-medium w-[49px] text-gray-700 select-none';
+    const labelClassName = 'text-sm font-medium text-gray-700';
 
     return (
-        <div className="flex items-center gap-3">
-            <label className={labelClassName}>
+        <div className="flex flex-col gap-2">
+            <label htmlFor={name} className={labelClassName}>
                 {label}
-                {required && <span className="text-red-500">*</span>}
+                {required && <span className="text-red-500 ml-1">*</span>}
             </label>
-            <div className="flex items-center gap-2 flex-1">
+            <div className="relative flex items-center">
                 <input
+                    id={name}
                     type={type}
                     {...register(name, { required })}
-                    className={inputClassName}
+                    className={`w-full h-[45px] px-4 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 ${
+                        rightElement ? 'pr-[100px]' : ''
+                    }`}
                     placeholder={placeholder}
                     disabled={disabled}
                 />
-                {suffix && <span className="text-sm text-gray-600">{suffix}</span>}
+                {suffix && <span className="absolute right-4 text-gray-500">{suffix}</span>}
+                {rightElement && <div className="absolute right-2">{rightElement}</div>}
             </div>
         </div>
     );
