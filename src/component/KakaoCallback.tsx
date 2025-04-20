@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from './Toast';
 import { authService } from '../services/authService';
@@ -7,11 +7,15 @@ import { useToast } from '../hooks/useToast';
 const KakaoCallback = () => {
     const navigate = useNavigate();
     const { toast, showToast, hideToast } = useToast();
-    const isProcessing = useRef(false);
 
     useEffect(() => {
         const processKakaoLogin = async () => {
-            const code = new URL(window.location.href).searchParams.get('code');
+            const searchParams = new URLSearchParams(window.location.search);
+            const code = searchParams.get('code');
+            const error = searchParams.get('error');
+
+            window.history.replaceState({}, '', window.location.pathname);
+
             if (!code) {
                 showToast('인증 코드를 찾을 수 없습니다.', 'error');
                 setTimeout(() => {
@@ -20,7 +24,6 @@ const KakaoCallback = () => {
                 return;
             }
 
-            const error = new URL(window.location.href).searchParams.get('error');
             if (error) {
                 showToast('카카오 로그인이 취소되었습니다.', 'error');
                 setTimeout(() => {
@@ -28,11 +31,6 @@ const KakaoCallback = () => {
                 }, 1500);
                 return;
             }
-
-            if (isProcessing.current) {
-                return;
-            }
-            isProcessing.current = true;
 
             try {
                 const accessToken = await authService.getKakaoToken(code);
@@ -54,15 +52,11 @@ const KakaoCallback = () => {
                 setTimeout(() => {
                     navigate('/login');
                 }, 1500);
-            } finally {
-                setTimeout(() => {
-                    isProcessing.current = false;
-                }, 2000);
             }
         };
 
         processKakaoLogin();
-    }, []);
+    }, [navigate, showToast]);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-white">
