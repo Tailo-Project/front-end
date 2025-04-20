@@ -1,34 +1,25 @@
-import { UseFormRegister } from 'react-hook-form';
-import { SignUpFormData } from './types';
+import { UseFormRegister, FieldValues, Path } from 'react-hook-form';
 
-interface GenderRadioGroupProps {
-    register: UseFormRegister<SignUpFormData>;
+interface GenderRadioGroupProps<T extends FieldValues> {
+    register: UseFormRegister<T>;
 }
 
-const GenderRadioGroup = ({ register }: GenderRadioGroupProps) => (
-    <div className="flex items-center gap-3">
-        <label className="text-sm font-medium w-[49px] text-gray-700 select-none">성별</label>
-        <div className="flex items-center gap-6">
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-                <input
-                    type="radio"
-                    {...register('gender')}
-                    value="MALE"
-                    className="w-3.5 h-3.5 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
-                />
-                <span className="text-sm text-gray-600">남</span>
-            </label>
-            <label className="flex items-center gap-1.5 cursor-pointer select-none">
-                <input
-                    type="radio"
-                    {...register('gender')}
-                    value="FEMALE"
-                    className="w-3.5 h-3.5 text-blue-500 focus:ring-blue-500 focus:ring-offset-0"
-                />
-                <span className="text-sm text-gray-600">여</span>
-            </label>
+const GenderRadioGroup = <T extends FieldValues>({ register }: GenderRadioGroupProps<T>) => {
+    return (
+        <div className="mb-2">
+            <label className="text-sm font-medium text-gray-700">성별</label>
+            <div className="mt-2 flex gap-4">
+                <label className="flex items-center">
+                    <input type="radio" {...register('petGender' as Path<T>)} value="MALE" className="mr-2" />
+                    <span>남자</span>
+                </label>
+                <label className="flex items-center">
+                    <input type="radio" {...register('petGender' as Path<T>)} value="FEMALE" className="mr-2" />
+                    <span>여자</span>
+                </label>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default GenderRadioGroup;
