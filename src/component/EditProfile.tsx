@@ -1,52 +1,98 @@
-import { useRef, ChangeEvent } from 'react';
+import React, { useState, useRef, FormEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import tailogo from '../assets/tailogo.svg';
 import TabBar from './TabBar';
 import Toast from './Toast';
 import { useToast } from '../hooks/useToast';
 import GenderSelect from '@/components/common/GenderSelect';
-import FormField from './FormField';
 
-const MAX_NICKNAME_LENGTH = 10;
-const MAX_BIO_LENGTH = 150;
+type Gender = 'MALE' | 'FEMALE';
 
 interface ProfileData {
     nickname: string;
     bio: string;
     profileImage: string;
     petType: string;
-    petAge: number;
-    petGender: 'MALE' | 'FEMALE';
+    petAge: string;
+    petGender: Gender;
     address: string;
 }
 
+interface FormFieldProps {
+    label: string;
+    value: string;
+    onChange: (value: string) => void;
+    placeholder: string;
+    maxLength?: number;
+    type?: string;
+    min?: string;
+}
+
+// 상수
+const MAX_NICKNAME_LENGTH = 10;
+const MAX_BIO_LENGTH = 150;
 const INITIAL_PROFILE_DATA: ProfileData = {
     nickname: '멍멍이맘',
     bio: '반려동물과 함께하는 일상을 공유해요 🐶',
     profileImage: tailogo,
     petType: '말티즈',
-    petAge: 2,
+    petAge: '2',
     petGender: 'MALE',
     address: '서울시 강남구',
 };
+
+// 재사용 가능한 폼 필드 컴포넌트
+const FormField: React.FC<FormFieldProps> = ({
+    label,
+    value,
+    onChange,
+    placeholder,
+    maxLength,
+    type = 'text',
+    min,
+}) => (
+    <div className="mb-2">
+        <div className="flex justify-between items-center mb-2">
+            <label className="text-sm font-medium text-gray-700">{label}</label>
+            {maxLength && (
+                <span className="text-xs text-gray-400">
+                    {value.length}/{maxLength}
+                </span>
+            )}
+        </div>
+        {type === 'textarea' ? (
+            <textarea
+                value={value}
+                onChange={(e) => {
+                    if (!maxLength || e.target.value.length <= maxLength) {
+                        onChange(e.target.value);
+                    }
+                }}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-none text-sm"
+                placeholder={placeholder}
+            />
+        ) : (
+            <input
+                type={type}
+                value={value}
+                onChange={(e) => {
+                    if (!maxLength || e.target.value.length <= maxLength) {
+                        onChange(e.target.value);
+                    }
+                }}
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+                placeholder={placeholder}
+                min={min}
+            />
+        )}
+    </div>
+);
 
 const EditProfile = () => {
     const { toast, showToast } = useToast();
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        setValue,
-        watch,
-    } = useForm<ProfileData>({
-        defaultValues: INITIAL_PROFILE_DATA,
-    });
-
-    const profileImage = watch('profileImage');
+    const [profileData, setProfileData] = useState<ProfileData>(INITIAL_PROFILE_DATA);
 
     const handleImageClick = () => {
         fileInputRef.current?.click();
@@ -65,28 +111,24 @@ const EditProfile = () => {
             reader.onloadend = () => {
                 const profileImage = reader.result;
                 if (profileImage && typeof profileImage === 'string') {
-                    setValue('profileImage', profileImage);
+                    setProfileData((prev) => ({ ...prev, profileImage }));
                 }
             };
             reader.readAsDataURL(file);
         }
     };
 
-    const onSubmit = async (data: ProfileData) => {
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
+            await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(profileData),
             });
-
-            if (!response.ok) {
-                showToast('프로필 수정에 실패했습니다.', 'error');
-                return;
-            }
 
             showToast('프로필 수정 완료', 'success');
             setTimeout(() => {
@@ -94,8 +136,12 @@ const EditProfile = () => {
             }, 1500);
         } catch (error) {
             console.error('프로필 수정 실패', error);
-            showToast(error instanceof Error ? error.message : '프로필 수정에 실패했습니다.', 'error');
+            showToast('프로필 수정에 실패했습니다.', 'error');
         }
+    };
+
+    const updateField = (field: keyof ProfileData) => (value: string) => {
+        setProfileData((prev) => ({ ...prev, [field]: value }));
     };
 
     return (
@@ -110,12 +156,12 @@ const EditProfile = () => {
                     <h1 className="text-lg font-semibold text-center w-full">프로필 수정</h1>
                 </header>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="p-4">
+                <form onSubmit={handleSubmit} className="p-4">
                     <div className="flex flex-col items-center mb-8">
                         <div className="relative mb-2">
                             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
                                 <img
-                                    src={profileImage}
+                                    src={profileData.profileImage}
                                     alt="프로필"
                                     className="w-full h-full object-cover cursor-pointer"
                                     onClick={handleImageClick}
@@ -134,78 +180,54 @@ const EditProfile = () => {
                         </button>
                     </div>
 
-                    <FormField label="닉네임" error={errors.nickname?.message}>
-                        <input
-                            {...register('nickname', {
-                                required: '닉네임을 입력해주세요',
-                                maxLength: {
-                                    value: MAX_NICKNAME_LENGTH,
-                                    message: `닉네임은 최대 ${MAX_NICKNAME_LENGTH}자까지 입력 가능합니다`,
-                                },
-                            })}
-                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                            placeholder="닉네임을 입력하세요"
-                        />
-                    </FormField>
+                    <FormField
+                        label="닉네임"
+                        value={profileData.nickname}
+                        onChange={updateField('nickname')}
+                        placeholder="닉네임을 입력하세요"
+                        maxLength={MAX_NICKNAME_LENGTH}
+                    />
 
-                    <FormField label="소개" error={errors.bio?.message}>
-                        <textarea
-                            {...register('bio', {
-                                maxLength: {
-                                    value: MAX_BIO_LENGTH,
-                                    message: `소개는 최대 ${MAX_BIO_LENGTH}자까지 입력 가능합니다`,
-                                },
-                            })}
-                            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 h-24 resize-none text-sm"
-                            placeholder="자기소개를 입력하세요"
-                        />
-                    </FormField>
+                    <FormField
+                        label="소개"
+                        value={profileData.bio}
+                        onChange={updateField('bio')}
+                        placeholder="자기소개를 입력하세요"
+                        maxLength={MAX_BIO_LENGTH}
+                        type="textarea"
+                    />
 
                     <div className="mb-2">
                         <h2 className="text-lg font-semibold mb-4">반려동물 정보</h2>
 
-                        <FormField label="품종" error={errors.petType?.message}>
-                            <input
-                                {...register('petType', {
-                                    required: '반려동물의 품종을 입력해주세요',
-                                })}
-                                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                                placeholder="반려동물의 품종을 입력하세요"
-                            />
-                        </FormField>
+                        <FormField
+                            label="품종"
+                            value={profileData.petType}
+                            onChange={updateField('petType')}
+                            placeholder="품종을 입력해주세요."
+                        />
 
-                        <FormField label="나이" error={errors.petAge?.message}>
-                            <input
-                                {...register('petAge', {
-                                    required: '반려동물의 나이를 입력해주세요',
-                                    min: {
-                                        value: 0,
-                                        message: '0세 이상 입력해주세요',
-                                    },
-                                })}
-                                type="number"
-                                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                                placeholder="반려동물의 나이를 입력하세요"
-                            />
-                        </FormField>
+                        <FormField
+                            label="나이"
+                            value={profileData.petAge}
+                            onChange={updateField('petAge')}
+                            placeholder="나이를 입력해주세요."
+                            type="number"
+                            min="0"
+                        />
 
-                        <FormField label="성별" error={errors.petGender?.message}>
-                            <GenderSelect
-                                label="성별"
-                                value={watch('petGender')}
-                                onChange={(value) => setValue('petGender', value)}
-                            />
-                        </FormField>
+                        <GenderSelect
+                            label="성별"
+                            value={profileData.petGender}
+                            onChange={(value) => updateField('petGender')(value)}
+                        />
 
-                        <FormField label="주소" error={errors.address?.message}>
-                            <input
-                                {...register('address', {
-                                    required: '주소를 입력해주세요',
-                                })}
-                                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                                placeholder="주소를 입력하세요"
-                            />
-                        </FormField>
+                        <FormField
+                            label="주소"
+                            value={profileData.address}
+                            onChange={updateField('address')}
+                            placeholder="주소를 입력해주세요."
+                        />
                     </div>
 
                     <button
