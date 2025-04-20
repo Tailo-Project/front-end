@@ -8,7 +8,6 @@ import ProfileImageUpload from '../components/form/ProfileImageUpload';
 import FormInput from '../components/form/FormInput';
 import BreedCombobox from '../components/form/BreedCombobox';
 import GenderRadioGroup from '../components/form/GenderRadioGroup';
-import { Gender } from '../types/profile';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
@@ -40,7 +39,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
         mode: 'onChange',
         defaultValues: {
             email,
-            gender: Gender.MALE,
+            gender: 'MALE',
         },
     });
 
@@ -216,7 +215,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                             setValue={setValue}
                         />
 
-                        <GenderRadioGroup register={register} />
+                        <GenderRadioGroup register={register} name="gender" />
 
                         <FormInput
                             label="나이"

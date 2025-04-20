@@ -14,7 +14,7 @@ type Gender = 'MALE' | 'FEMALE';
 interface ProfileData {
     nickname: string;
     bio: string;
-    profileImage: string;
+    profileImage: string | File;
     petType: string;
     petAge: string;
     petGender: Gender;
@@ -122,16 +122,34 @@ const EditProfile = () => {
         }
     };
 
+    const createFormDataWithJson = (data: ProfileData) => {
+        const { nickname, bio, petType, petAge, petGender, address } = data;
+        const formData = new FormData();
+        const jsonData = {
+            nickname,
+            bio,
+            petType,
+            petAge,
+            petGender,
+            address,
+        };
+        const blob = new Blob([JSON.stringify(jsonData)], { type: 'application/json' });
+        formData.append('request', blob);
+
+        if (data.profileImage instanceof File) formData.append('file', data.profileImage);
+
+        return formData;
+    };
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         try {
+            const formData = createFormDataWithJson(profileData);
             await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
                 },
-                body: JSON.stringify(profileData),
+                body: formData,
             });
 
             showToast('프로필 수정 완료', 'success');
@@ -165,7 +183,11 @@ const EditProfile = () => {
                         <div className="relative mb-2">
                             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
                                 <img
-                                    src={profileData.profileImage}
+                                    src={
+                                        profileData.profileImage instanceof File
+                                            ? URL.createObjectURL(profileData.profileImage)
+                                            : profileData.profileImage
+                                    }
                                     alt="프로필"
                                     className="w-full h-full object-cover cursor-pointer"
                                     onClick={handleImageClick}
@@ -220,7 +242,7 @@ const EditProfile = () => {
                             suffix="세"
                         />
 
-                        <GenderRadioGroup register={register} />
+                        <GenderRadioGroup register={register} name="petGender" />
 
                         <FormField
                             label="주소"

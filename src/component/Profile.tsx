@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 
 import tailogo from '../assets/tailogo.svg';
 import Layout from './layout';
+import Toast from './Toast';
 
 interface ProfileStats {
     posts: number;
@@ -17,6 +19,7 @@ const Profile = () => {
         followers: 128,
         following: 84,
     });
+    const [showToast, setShowToast] = useState(false);
 
     // 임시 게시물 데이터
     const [posts] = useState([
@@ -28,6 +31,29 @@ const Profile = () => {
         { id: 6, imageUrl: tailogo },
     ]);
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                // 로컬 스토리지의 사용자 관련 데이터 삭제
+                localStorage.removeItem('user');
+                // 로그인 페이지로 리다이렉트
+                navigate('/login');
+            } else {
+                setShowToast(true);
+                setTimeout(() => setShowToast(false), 3000);
+            }
+        } catch (error) {
+            console.error('로그아웃 중 오류가 발생했습니다:', error);
+            setShowToast(true);
+            setTimeout(() => setShowToast(false), 3000);
+        }
+    };
+
     return (
         <Layout>
             <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen pb-16">
@@ -35,22 +61,18 @@ const Profile = () => {
                 <header className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between mb-4">
                         <h1 className="text-xl font-bold">마이페이지</h1>
-                        <button className="text-gray-600">
-                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                                />
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                            </svg>
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={handleLogout}
+                                className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                                aria-label="로그아웃"
+                            >
+                                <ArrowRightOnRectangleIcon className="w-6 h-6" />
+                            </button>
+                            <button className="p-2 text-gray-600 hover:text-gray-900 transition-colors">
+                                <Cog6ToothIcon className="w-6 h-6" />
+                            </button>
+                        </div>
                     </div>
 
                     {/* 프로필 정보 */}
@@ -81,7 +103,7 @@ const Profile = () => {
                     {/* 프로필 수정 버튼 */}
                     <button
                         onClick={() => navigate('/profile/edit')}
-                        className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium"
+                        className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors"
                     >
                         프로필 수정
                     </button>
@@ -95,6 +117,15 @@ const Profile = () => {
                         </div>
                     ))}
                 </div>
+
+                {/* 토스트 메시지 */}
+                {showToast && (
+                    <Toast
+                        message="로그아웃 중 오류가 발생했습니다."
+                        type="error"
+                        onClose={() => setShowToast(false)}
+                    />
+                )}
             </div>
         </Layout>
     );
