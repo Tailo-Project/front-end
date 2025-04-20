@@ -162,7 +162,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                             name="nickname"
                             register={register}
                             required
-                            placeholder="반려동물의 프로필에 사용 될 닉네임을 적어주세요"
+                            placeholder="닉네임을 입력해주세요."
                         />
 
                         <FormInput
@@ -170,7 +170,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                             name="accountId"
                             register={register}
                             required
-                            placeholder="사용하실 아이디를 적어주세요"
+                            placeholder="아이디를 입력해주세요."
                             rightElement={
                                 <button
                                     type="button"
@@ -215,7 +215,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                             name="age"
                             register={register}
                             required
-                            placeholder="반려동물의 나이를 적어주세요"
+                            placeholder="나이를 입력해주세요."
                             suffix="세"
                         />
 
@@ -224,7 +224,7 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                             name="address"
                             register={register}
                             required
-                            placeholder="거주지를 적어주세요"
+                            placeholder="거주지를 입력해주세요."
                         />
                     </div>
 
