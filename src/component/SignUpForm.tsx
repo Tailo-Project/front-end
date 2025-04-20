@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import tailoLogo from '../assets/tailogo.svg';
 import Toast from './Toast';
 import { SignUpFormData, ToastState } from '../components/form/types';
@@ -7,18 +8,21 @@ import ProfileImageUpload from '../components/form/ProfileImageUpload';
 import FormInput from '../components/form/FormInput';
 import BreedCombobox from '../components/form/BreedCombobox';
 import GenderRadioGroup from '../components/form/GenderRadioGroup';
-import { useNavigate } from 'react-router-dom';
 
-// 임시 품종 데이터
-const initialBreeds = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
+const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
 interface SignUpFormProps {
     email: string;
 }
 
+interface ToastConfig {
+    message: string;
+    type: 'success' | 'error';
+}
+
 const SignUpForm = ({ email }: SignUpFormProps) => {
     const [query, setQuery] = useState('');
-    const [breeds, setBreeds] = useState(initialBreeds);
+    const [breeds, setBreeds] = useState(INITIAL_BREEDS);
     const [selectedBreed, setSelectedBreed] = useState('');
     const [showAddBreed, setShowAddBreed] = useState(false);
     const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -49,12 +53,41 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
         setIdCheckStatus(null);
     }, [accountId]);
 
+    const showToastMessage = ({ message, type }: ToastConfig) => {
+        setToast({
+            message,
+            type,
+            show: true,
+        });
+    };
+
+    const createFormDataWithJson = (data: SignUpFormData) => {
+        const { email, nickname, accountId, type, breed, gender, age, address } = data;
+        const formData = new FormData();
+        const jsonData = {
+            email,
+            nickname,
+            accountId,
+            type,
+            breed,
+            gender,
+            age,
+            address,
+        };
+
+        const blob = new Blob([JSON.stringify(jsonData)], { type: 'application/json' });
+        formData.append('request', blob);
+
+        if (data.file) formData.append('file', data.file);
+
+        return formData;
+    };
+
     const checkAccountIdDuplicate = async () => {
         if (!accountId) {
-            setToast({
+            showToastMessage({
                 message: '아이디를 입력해주세요.',
                 type: 'error',
-                show: true,
             });
             return;
         }
@@ -69,27 +102,16 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
             });
 
             const data = await response.json();
-
             setIdCheckStatus(data.statusCode);
 
-            if (data.statusCode === 200) {
-                setToast({
-                    message: '사용 가능한 아이디입니다.',
-                    type: 'success',
-                    show: true,
-                });
-            } else {
-                setToast({
-                    message: '이미 사용 중인 아이디입니다.',
-                    type: 'error',
-                    show: true,
-                });
-            }
+            showToastMessage({
+                message: data.statusCode === 200 ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.',
+                type: data.statusCode === 200 ? 'success' : 'error',
+            });
         } catch (error) {
-            setToast({
+            showToastMessage({
                 message: error instanceof Error ? error.message : '중복 확인 중 오류가 발생했습니다.',
                 type: 'error',
-                show: true,
             });
         } finally {
             setIsCheckingId(false);
@@ -98,21 +120,19 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
 
     const onSubmit = async (data: SignUpFormData) => {
         if (idCheckStatus !== 200) {
-            setToast({
+            showToastMessage({
                 message: '아이디 중복 확인을 해주세요.',
                 type: 'error',
-                show: true,
             });
             return;
         }
 
         try {
+            const formData = createFormDataWithJson(data);
+
             await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
                 method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+                body: formData,
             });
             navigate('/login');
         } catch (error) {
@@ -177,11 +197,11 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                                     onClick={checkAccountIdDuplicate}
                                     disabled={isCheckingId || !accountId}
                                     className={`px-3 py-1.5 rounded-lg text-sm transition-all duration-300
-                                        ${
-                                            idCheckStatus === 200
-                                                ? 'bg-green-500 text-white'
-                                                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                                        } ${isCheckingId ? 'cursor-not-allowed opacity-50' : ''}`}
+                            ${
+                                idCheckStatus === 200
+                                    ? 'bg-green-500 text-white'
+                                    : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                            } ${isCheckingId ? 'cursor-not-allowed opacity-50' : ''}`}
                                 >
                                     {isCheckingId ? '확인 중...' : idCheckStatus === 200 ? '확인 완료' : '중복 확인'}
                                 </button>
