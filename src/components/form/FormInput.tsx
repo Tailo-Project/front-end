@@ -5,9 +5,6 @@ interface FormInputProps<T extends FieldValues> extends InputHTMLAttributes<HTML
     label: string;
     name: Path<T>;
     register: UseFormRegister<T>;
-    required?: boolean;
-    placeholder?: string;
-    disabled?: boolean;
     suffix?: string;
     rightElement?: React.ReactNode;
 }
@@ -16,27 +13,21 @@ const FormInput = <T extends FieldValues>({
     label,
     name,
     register,
-    required,
-    placeholder,
-    disabled = false,
     suffix,
     rightElement,
+    className = '',
     ...props
 }: FormInputProps<T>) => {
-    const labelClassName = 'text-sm font-medium text-gray-700';
-
     return (
         <div className="space-y-1">
-            <label htmlFor={name.toString()} className={labelClassName}>
+            <label htmlFor={name.toString()} className="text-sm font-medium text-gray-700">
                 {label}
             </label>
             <div className="relative">
                 <input
                     id={name.toString()}
-                    {...register(name, { required })}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    {...register(name)}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${className}`}
                     {...props}
                 />
                 {suffix && (

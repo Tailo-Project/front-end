@@ -1,4 +1,7 @@
-export type Gender = 'MALE' | 'FEMALE';
+export enum Gender {
+    MALE = 'MALE',
+    FEMALE = 'FEMALE',
+}
 
 export interface ProfileData {
     nickname: string;
