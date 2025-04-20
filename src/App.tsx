@@ -1,29 +1,69 @@
 import './App.css';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
+import FeedList from './component/FeedList';
 import Login from './component/Login';
 import SignUpForm from './component/SignUpForm';
-import KakaoCallback from './component/KakaoCallback';
-import FeedList from './component/FeedList';
-import WritePost from './component/WritePost';
 import Profile from './component/Profile';
 import EditProfile from './component/EditProfile';
+import KakaoCallback from './component/KakaoCallback';
+import WritePost from './component/WritePost';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-    const location = useLocation();
-    const email = location.state?.email;
-
     return (
         <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUpForm email={email} />} />
-            <Route path="/oauth/kakao" element={<KakaoCallback />} />
-            <Route path="/feeds" element={<FeedList />} />
-            <Route path="/search" element={<div className="p-4">검색 페이지 (준비중)</div>} />
-            <Route path="/write" element={<WritePost />} />
-            <Route path="/chat" element={<div className="p-4">채팅 페이지 (준비중)</div>} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/edit" element={<EditProfile />} />
             <Route path="/" element={<FeedList />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUpForm />} />
+            <Route path="/oauth/kakao" element={<KakaoCallback />} />
+            <Route
+                path="/feeds"
+                element={
+                    <ProtectedRoute>
+                        <FeedList />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/search"
+                element={
+                    <ProtectedRoute>
+                        <div className="p-4">검색 페이지 (준비중)</div>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/write"
+                element={
+                    <ProtectedRoute>
+                        <WritePost />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/chat"
+                element={
+                    <ProtectedRoute>
+                        <div className="p-4">채팅 페이지 (준비중)</div>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/profile"
+                element={
+                    <ProtectedRoute>
+                        <Profile />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/profile/edit"
+                element={
+                    <ProtectedRoute>
+                        <EditProfile />
+                    </ProtectedRoute>
+                }
+            />
         </Routes>
     );
 }

@@ -1,3 +1,5 @@
+import { setToken, removeToken } from '../utils/auth';
+
 interface KakaoTokenResponse {
     access_token: string;
 }
@@ -42,6 +44,16 @@ export const authService = {
             throw new Error('로그인 처리 중 오류가 발생했습니다.');
         }
 
-        return response.json();
+        const data = await response.json();
+
+        if (data.data.accessToken) {
+            setToken(data.data.accessToken);
+        }
+
+        return data;
+    },
+
+    logout() {
+        removeToken();
     },
 };
