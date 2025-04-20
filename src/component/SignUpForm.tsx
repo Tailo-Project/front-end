@@ -22,6 +22,8 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
     const [selectedBreed, setSelectedBreed] = useState('');
     const [showAddBreed, setShowAddBreed] = useState(false);
     const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [isCheckingId, setIsCheckingId] = useState(false);
+    const [idCheckStatus, setIdCheckStatus] = useState<number | null>(null);
     const [toast, setToast] = useState<ToastState>({
         message: '',
         type: 'success',
@@ -35,16 +37,75 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
         handleSubmit,
         formState: { isValid },
         setValue,
+        watch,
     } = useForm<SignUpFormData>({
         mode: 'onChange',
         defaultValues: { email },
     });
 
+    const accountId = watch('accountId');
+
     useEffect(() => {
-        setValue('email', email);
-    }, [email, setValue]);
+        setIdCheckStatus(null);
+    }, [accountId]);
+
+    const checkAccountIdDuplicate = async () => {
+        if (!accountId) {
+            setToast({
+                message: '아이디를 입력해주세요.',
+                type: 'error',
+                show: true,
+            });
+            return;
+        }
+
+        setIsCheckingId(true);
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/member/duplicate/${accountId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+
+            setIdCheckStatus(data.statusCode);
+
+            if (data.statusCode === 200) {
+                setToast({
+                    message: '사용 가능한 아이디입니다.',
+                    type: 'success',
+                    show: true,
+                });
+            } else {
+                setToast({
+                    message: '이미 사용 중인 아이디입니다.',
+                    type: 'error',
+                    show: true,
+                });
+            }
+        } catch (error) {
+            setToast({
+                message: error instanceof Error ? error.message : '중복 확인 중 오류가 발생했습니다.',
+                type: 'error',
+                show: true,
+            });
+        } finally {
+            setIsCheckingId(false);
+        }
+    };
 
     const onSubmit = async (data: SignUpFormData) => {
+        if (idCheckStatus !== 200) {
+            setToast({
+                message: '아이디 중복 확인을 해주세요.',
+                type: 'error',
+                show: true,
+            });
+            return;
+        }
+
         try {
             await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
                 method: 'POST',
@@ -54,8 +115,10 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                 },
             });
             navigate('/login');
-        } catch {
-            console.log('error');
+        } catch (error) {
+            if (error instanceof Error) {
+                throw new Error(error.message);
+            }
         }
     };
 
@@ -108,6 +171,21 @@ const SignUpForm = ({ email }: SignUpFormProps) => {
                             register={register}
                             required
                             placeholder="사용하실 아이디를 적어주세요"
+                            rightElement={
+                                <button
+                                    type="button"
+                                    onClick={checkAccountIdDuplicate}
+                                    disabled={isCheckingId || !accountId}
+                                    className={`px-3 py-1.5 rounded-lg text-sm transition-all duration-300
+                                        ${
+                                            idCheckStatus === 200
+                                                ? 'bg-green-500 text-white'
+                                                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                                        } ${isCheckingId ? 'cursor-not-allowed opacity-50' : ''}`}
+                                >
+                                    {isCheckingId ? '확인 중...' : idCheckStatus === 200 ? '확인 완료' : '중복 확인'}
+                                </button>
+                            }
                         />
 
                         <FormInput
