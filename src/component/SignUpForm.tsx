@@ -109,7 +109,7 @@ const SignUpForm = () => {
                     age: data.age,
                     address: data.address,
                 },
-                files: data.file ? [{ key: 'file', files: [data.file] }] : undefined,
+                files: data.file ? [{ key: 'profileImage', files: [data.file] }] : undefined,
             });
 
             await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
