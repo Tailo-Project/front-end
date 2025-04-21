@@ -29,7 +29,16 @@ export const fetchApi = async <T>(endpoint: string, options: FetchOptions = {}):
         if (response.status === 401) {
             throw createApiError('AUTH');
         }
-        throw new Error('요청을 처리하는 중 오류가 발생했습니다.');
+        if (response.status === 404) {
+            throw createApiError('NOT_FOUND');
+        }
+        if (response.status === 400) {
+            throw createApiError('BAD_REQUEST');
+        }
+        if (response.status === 500) {
+            throw createApiError('NETWORK');
+        }
+        throw createApiError('UNKNOWN');
     }
 
     const data = await response.json();

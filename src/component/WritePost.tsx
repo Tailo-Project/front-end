@@ -159,15 +159,6 @@ const WritePost = () => {
                     <button onClick={() => navigate('/')} className="text-gray-500 font-semibold">
                         취소
                     </button>
-                    <button
-                        onClick={handleSubmit}
-                        className={`font-semibold ${
-                            isFormValid() ? 'text-blue-500' : 'text-gray-300 cursor-not-allowed'
-                        }`}
-                        disabled={!isFormValid()}
-                    >
-                        게시
-                    </button>
                 </header>
                 <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
                     <div className="relative">
