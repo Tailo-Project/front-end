@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import TabBar from './TabBar';
 import FeedItem from './FeedItem';
 import { FeedPost } from '@/types/feed';
+import { getToken } from '@/utils/auth';
 
 const LoadingSpinner = () => (
     <div className="flex justify-center p-4">
@@ -23,7 +24,7 @@ const FeedList = () => {
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed?page=0&size=10`, {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                        Authorization: `Bearer ${getToken()}`,
                     },
                 });
 

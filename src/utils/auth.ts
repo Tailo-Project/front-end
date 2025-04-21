@@ -1,6 +1,10 @@
 export const TOKEN_KEY = 'accessToken';
 
 export const getToken = () => {
+    // token 없는 경우 처리
+    if (!localStorage.getItem(TOKEN_KEY)) {
+        throw new Error('No access token found');
+    }
     return localStorage.getItem(TOKEN_KEY);
 };
 

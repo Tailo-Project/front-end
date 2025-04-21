@@ -5,6 +5,7 @@ import FeedHeader from '@/components/feed/FeedHeader';
 import FeedImages from '@/components/feed/FeedImages';
 import FeedActions from '@/components/feed/FeedActions';
 import { FeedPost } from '@/types/feed';
+import { getToken } from '@/utils/auth';
 
 const FeedDetailPage = () => {
     const { feedId } = useParams();
@@ -22,7 +23,7 @@ const FeedDetailPage = () => {
                 const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                        Authorization: `Bearer ${getToken()}`,
                     },
                 });
 
@@ -45,16 +46,19 @@ const FeedDetailPage = () => {
     }, [feedId]);
 
     const handleLike = (e: React.MouseEvent) => {
+        console.log(e, 'like');
         e.stopPropagation();
         // 좋아요 기능 구현
     };
 
     const handleComment = (e: React.MouseEvent) => {
+        console.log(e, 'comment');
         e.stopPropagation();
         // 댓글 기능 구현
     };
 
     const handleShare = (e: React.MouseEvent) => {
+        console.log(e, 'share');
         e.stopPropagation();
         // 공유 기능 구현
     };

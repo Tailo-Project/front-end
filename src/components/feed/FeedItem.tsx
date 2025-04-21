@@ -3,6 +3,7 @@ import { FeedPost } from '../../types/feed';
 import FeedHeader from './FeedHeader';
 import FeedImages from './FeedImages';
 import FeedActions from './FeedActions';
+import { getToken } from '@/utils/auth';
 
 interface FeedItemProps {
     feed: FeedPost;
@@ -23,7 +24,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feed.feedId}`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                    Authorization: `Bearer ${getToken()}`,
                 },
             });
 
@@ -88,6 +89,18 @@ const FeedItem = ({ feed }: FeedItemProps) => {
         if (detailFeed) {
             return (
                 <div className="fixed inset-0 bg-white flex flex-col z-50">
+                    <header className="p-4 border-b flex items-center bg-red-500">
+                        <button onClick={() => setIsDetailView(false)} aria-label="닫기" type="button">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M6 18 18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                    </header>
                     {/* 상세 보기 UI는 별도 컴포넌트로 분리 예정 */}
                 </div>
             );
