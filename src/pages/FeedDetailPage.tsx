@@ -38,10 +38,11 @@ const FeedDetailPage = () => {
         fetchFeedDetail();
     }, [feedId]);
 
-    const handleLike = (e: React.MouseEvent) => {
+    const handleLike = async (e: React.MouseEvent) => {
         console.log(e, 'like');
         e.stopPropagation();
         // 좋아요 기능 구현
+        await fetchApi<FeedPost>(`/api/feed/${feedId}/likes`);
     };
 
     const handleComment = (e: React.MouseEvent) => {
