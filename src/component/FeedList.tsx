@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import TabBar from './TabBar';
-import FeedItem, { FeedPost } from './FeedItem';
+import FeedItem from './FeedItem';
+import { FeedPost } from '@/types/feed';
 
 const LoadingSpinner = () => (
     <div className="flex justify-center p-4">

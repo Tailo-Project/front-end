@@ -1,9 +1,19 @@
-export interface Feed {
-    updated_at: string;
+export interface Author {
+    nickname: string;
+    profile: string | File;
+}
+
+export interface FeedPost {
+    feedId: number;
     content: string;
-    author_profile: string;
-    author_nickname: string;
-    images: string[];
-    tags: string[];
-    created_at: string;
+    id: number;
+    createdAt: string;
+    updatedAt: string;
+    likesCount: number;
+    commentsCount: number;
+    likes: number;
+    imageUrls?: string[];
+    authorNickname: string;
+    authorProfile: string | File;
+    hashtags: string[];
 }
