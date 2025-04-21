@@ -8,6 +8,7 @@ import EditProfile from './component/EditProfile';
 import KakaoCallback from './component/KakaoCallback';
 import WritePost from './component/WritePost';
 import ProtectedRoute from './components/ProtectedRoute';
+import FeedDetailPage from '@/pages/FeedDetailPage';
 
 function App() {
     return (
@@ -21,6 +22,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <FeedList />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/feeds/:feedId"
+                element={
+                    <ProtectedRoute>
+                        <FeedDetailPage />
                     </ProtectedRoute>
                 }
             />
