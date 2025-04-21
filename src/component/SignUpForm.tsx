@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import tailoLogo from '../assets/tailogo.svg';
 import Toast from './Toast';
 import { SignUpFormData, ToastState } from '../components/form/types';
@@ -11,11 +11,14 @@ import GenderRadioGroup from '../components/form/GenderRadioGroup';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
-interface SignUpFormProps {
+interface LocationState {
     email?: string;
 }
 
-const SignUpForm = ({ email }: SignUpFormProps) => {
+const SignUpForm = () => {
+    const location = useLocation();
+    const email = (location.state as LocationState)?.email;
+
     const [breeds, setBreeds] = useState(INITIAL_BREEDS);
     const [selectedBreed, setSelectedBreed] = useState('');
     const [profileImage, setProfileImage] = useState<string | null>(null);
