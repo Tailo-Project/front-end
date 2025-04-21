@@ -1,4 +1,4 @@
-import { setToken, removeToken } from '../utils/auth';
+import { setToken, removeToken, setAccountId } from '../utils/auth';
 
 interface KakaoTokenResponse {
     access_token: string;
@@ -8,6 +8,7 @@ interface UserInfoResponse {
     data: {
         email: string;
         accessToken: string | null;
+        accountId: string | null;
     };
 }
 
@@ -48,6 +49,7 @@ export const authService = {
 
         if (data.data.accessToken) {
             setToken(data.data.accessToken);
+            setAccountId(data.data.accountId);
         }
 
         return data;
