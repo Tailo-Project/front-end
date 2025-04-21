@@ -1,15 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, KeyboardEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TabBar from './TabBar';
+import { createFormDataWithJson } from '@/utils/formData';
 
 interface PostForm {
-    title: string;
     content: string;
     images: File[];
+    hashtags: { hashtag: string }[];
 }
 
-// 상수 정의
-const MAX_TITLE_LENGTH = 50;
 const MAX_CONTENT_LENGTH = 2000;
 const MAX_IMAGES = 4;
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
@@ -19,12 +18,13 @@ const WritePost = () => {
     const navigate = useNavigate();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [form, setForm] = useState<PostForm>({
-        title: '',
         content: '',
         images: [],
+        hashtags: [],
     });
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [error, setError] = useState<string>('');
+    const [hashtag, setHashtag] = useState<string>('');
 
     const validateImage = (file: File): boolean => {
         if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
@@ -73,27 +73,83 @@ const WritePost = () => {
     };
 
     const isFormValid = (): boolean => {
-        return form.title.trim().length > 0 && form.content.trim().length > 0;
+        return form.content.trim().length > 0;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!isFormValid()) {
-            setError('제목과 내용을 모두 입력해주세요.');
+            setError('내용을 입력해주세요.');
             return;
         }
-        // TODO: API 호출 구현
-        await fetch(`${import.meta.env.VITE_API_URL}/api/feeds`, {
-            method: 'POST',
-            body: JSON.stringify(form),
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
+
+        const formData = createFormDataWithJson({
+            requestKey: 'feedPostRequest',
+            jsonData: {
+                content: form.content,
+                hashtags: form.hashtags,
             },
+            files: [
+                {
+                    key: 'images',
+                    files: form.images,
+                },
+            ],
         });
 
-        console.log('Form submitted:', form);
-        navigate('/');
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('서버 응답 에러:', errorData);
+                throw new Error('게시글 등록에 실패했습니다.');
+            }
+
+            const responseData = await response.json();
+            console.log('서버 응답:', responseData);
+
+            navigate('/');
+        } catch (error) {
+            console.error('게시글 생성 실패:', error);
+            setError('게시글 등록에 실패했습니다. 다시 시도해주세요.');
+        }
+    };
+
+    const handleHashtagSubmit = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const trimmedHashtag = hashtag.trim();
+
+            if (trimmedHashtag && !form.hashtags.some((h) => h.hashtag === trimmedHashtag)) {
+                setForm((prev) => ({
+                    ...prev,
+                    hashtags: [...prev.hashtags, { hashtag: trimmedHashtag }],
+                }));
+                setHashtag('');
+            }
+        }
+    };
+
+    const handleHashtagChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (!value.includes(' ')) {
+            // 공백 입력 방지
+            setHashtag(value);
+        }
+    };
+
+    const removeHashtag = (index: number) => {
+        setForm((prev) => ({
+            ...prev,
+            hashtags: prev.hashtags.filter((_, i) => i !== index),
+        }));
     };
 
     return (
@@ -115,25 +171,10 @@ const WritePost = () => {
                 </header>
                 <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
                     <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="제목을 입력하세요"
-                            value={form.title}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                const newValue = e.target.value.slice(0, MAX_TITLE_LENGTH);
-                                setForm((prev) => ({ ...prev, title: newValue }));
-                            }}
-                            className="text-2xl p-2 border-b border-gray-200 focus:outline-none focus:border-blue-500 w-full"
-                        />
-                        <span className="absolute right-2 bottom-2 text-sm text-gray-400">
-                            {form.title.length}/{MAX_TITLE_LENGTH}
-                        </span>
-                    </div>
-                    <div className="relative">
                         <textarea
                             placeholder="내용을 입력하세요"
                             value={form.content}
-                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                            onChange={(e) => {
                                 const newValue = e.target.value.slice(0, MAX_CONTENT_LENGTH);
                                 setForm((prev) => ({ ...prev, content: newValue }));
                             }}
@@ -142,6 +183,37 @@ const WritePost = () => {
                         <span className="absolute right-2 bottom-2 text-sm text-gray-400">
                             {form.content.length}/{MAX_CONTENT_LENGTH}
                         </span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="text"
+                                value={hashtag}
+                                onChange={handleHashtagChange}
+                                onKeyDown={handleHashtagSubmit}
+                                placeholder="해시태그를 입력하고 Enter를 누르세요"
+                                className="flex-1 p-2 border border-gray-300 rounded-lg"
+                            />
+                        </div>
+                        {form.hashtags.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {form.hashtags.map((tag, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full"
+                                    >
+                                        <span>#{tag.hashtag}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeHashtag(index)}
+                                            className="text-gray-500 hover:text-gray-700"
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                     <div className="mt-4">
                         <input
@@ -185,6 +257,16 @@ const WritePost = () => {
                             ))}
                         </div>
                     </div>
+                    <button
+                        type="button"
+                        onClick={handleSubmit}
+                        className={`mt-4 w-full py-2 rounded-lg font-semibold ${
+                            isFormValid() ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                        }`}
+                        disabled={!isFormValid()}
+                    >
+                        게시하기
+                    </button>
                 </form>
             </div>
             <TabBar />

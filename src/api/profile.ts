@@ -1,4 +1,5 @@
 import { ProfileData } from '../types/profile';
+import { createFormDataWithJson } from '@/utils/formData';
 
 export const updateProfile = async (formData: FormData): Promise<void> => {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
@@ -14,23 +15,19 @@ export const updateProfile = async (formData: FormData): Promise<void> => {
     }
 };
 
-export const createFormDataWithJson = (data: ProfileData) => {
-    const { nickname, bio, petType, petAge, petGender, address } = data;
-    const formData = new FormData();
-    const jsonData = {
-        nickname,
-        bio,
-        petType,
-        petAge,
-        petGender,
-        address,
-    };
-    const blob = new Blob([JSON.stringify(jsonData)], { type: 'application/json' });
-    formData.append('request', blob);
+export const createProfileFormData = (data: ProfileData): FormData => {
+    const { nickname, bio, petType, petAge, petGender, address, profileImage } = data;
 
-    if (data.profileImage instanceof File) {
-        formData.append('file', data.profileImage);
-    }
-
-    return formData;
+    return createFormDataWithJson({
+        requestKey: 'request',
+        jsonData: {
+            nickname,
+            bio,
+            petType,
+            petAge,
+            petGender,
+            address,
+        },
+        files: profileImage instanceof File ? [{ key: 'file', files: [profileImage] }] : undefined,
+    });
 };

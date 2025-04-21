@@ -9,7 +9,7 @@ import { useProfileImage } from '../hooks/useProfileImage';
 import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 import FormInput from '@/components/form/FormInput';
 import { ProfileData } from '../types/profile';
-import { updateProfile, createFormDataWithJson } from '../api/profile';
+import { updateProfile, createProfileFormData } from '../api/profile';
 
 // 상수
 const MAX_NICKNAME_LENGTH = 10;
@@ -53,7 +53,7 @@ const EditProfile = () => {
 
     const onSubmit = async (data: ProfileData) => {
         try {
-            const formData = createFormDataWithJson({ ...data, profileImage });
+            const formData = createProfileFormData({ ...data, profileImage });
             await updateProfile(formData);
             showToast('프로필 수정 완료', 'success');
 

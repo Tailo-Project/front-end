@@ -8,6 +8,7 @@ import ProfileImageUpload from '../components/form/ProfileImageUpload';
 import FormInput from '../components/form/FormInput';
 import BreedCombobox from '../components/form/BreedCombobox';
 import GenderRadioGroup from '../components/form/GenderRadioGroup';
+import { createFormDataWithJson } from '@/utils/formData';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
@@ -60,28 +61,6 @@ const SignUpForm = () => {
         });
     };
 
-    const createFormDataWithJson = (data: SignUpFormData) => {
-        const { email, nickname, accountId, type, breed, gender, age, address } = data;
-        const formData = new FormData();
-        const jsonData = {
-            email,
-            nickname,
-            accountId,
-            type,
-            breed,
-            gender,
-            age,
-            address,
-        };
-
-        const blob = new Blob([JSON.stringify(jsonData)], { type: 'application/json' });
-        formData.append('request', blob);
-
-        if (data.file instanceof File) formData.append('file', data.file);
-
-        return formData;
-    };
-
     const checkAccountIdDuplicate = async () => {
         if (!accountId) {
             showToastMessage('아이디를 입력해주세요.', 'error');
@@ -118,7 +97,20 @@ const SignUpForm = () => {
         }
 
         try {
-            const formData = createFormDataWithJson(data);
+            const formData = createFormDataWithJson({
+                requestKey: 'request',
+                jsonData: {
+                    email: data.email,
+                    nickname: data.nickname,
+                    accountId: data.accountId,
+                    type: data.type,
+                    breed: data.breed,
+                    gender: data.gender,
+                    age: data.age,
+                    address: data.address,
+                },
+                files: data.file ? [{ key: 'file', files: [data.file] }] : undefined,
+            });
 
             await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
                 method: 'POST',
