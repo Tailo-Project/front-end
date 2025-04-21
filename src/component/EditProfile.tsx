@@ -1,7 +1,7 @@
 import React, { useRef, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import tailogo from '../assets/tailogo.svg';
+import defaultProfileImage from '../assets/defaultImage.png';
 import TabBar from './TabBar';
 import Toast from './Toast';
 import { useToast } from '../hooks/useToast';
@@ -17,7 +17,7 @@ const MAX_BIO_LENGTH = 150;
 const INITIAL_PROFILE_DATA: ProfileData = {
     nickname: '멍멍이맘',
     bio: '반려동물과 함께하는 일상을 공유해요 🐶',
-    profileImage: tailogo,
+    profileImage: defaultProfileImage,
     petType: '말티즈',
     petAge: '2',
     petGender: 'MALE',
@@ -85,7 +85,7 @@ const EditProfile = () => {
                         <div className="relative mb-2">
                             <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200">
                                 <img
-                                    src={imageUrl || tailogo}
+                                    src={imageUrl || defaultProfileImage}
                                     alt="프로필"
                                     className="w-full h-full object-cover cursor-pointer"
                                     onClick={handleImageClick}

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import tailoLogo from '../assets/tailogo.svg';
+import defaultProfileImage from '../assets/defaultImage.png';
 import kakaoSymbol from '../assets/kakao_login_medium_narrow.png';
 import Toast from './Toast';
 import { useToast } from '../hooks/useToast';
@@ -45,6 +45,7 @@ const Login = () => {
                     navigate('/signup', { state: { email: userInfoData.data.email } });
                 } else {
                     showToast('로그인이 완료되었습니다.', 'success');
+
                     navigate('/');
                 }
             } catch (error) {
@@ -59,7 +60,7 @@ const Login = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4">
             <div className="mb-16">
-                <img src={tailoLogo} alt="Tailo Logo" className="w-[140px] h-[140px]" />
+                <img src={defaultProfileImage} alt="Tailo Logo" className="w-[140px] h-[140px]" />
             </div>
 
             <button
