@@ -1,48 +1,41 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Layout from '@/component/layout';
+import Layout from '../component/layout';
 import FeedHeader from '@/components/feed/FeedHeader';
 import FeedImages from '@/components/feed/FeedImages';
 import FeedActions from '@/components/feed/FeedActions';
 import { FeedPost } from '@/types/feed';
-import { getToken } from '@/utils/auth';
+import { fetchApi } from '@/utils/api';
+import { ApiError } from '@/types/error';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import AuthRequiredView from '@/components/common/AuthRequiredView';
 
 const FeedDetailPage = () => {
-    const { feedId } = useParams();
+    const { feedId } = useParams<{ feedId: string }>();
     const navigate = useNavigate();
     const [feed, setFeed] = useState<FeedPost | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [error, setError] = useState<ApiError | null>(null);
 
     useEffect(() => {
         const fetchFeedDetail = async () => {
+            if (!feedId) return;
+
             setIsLoading(true);
             setError(null);
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('피드를 불러오는데 실패했습니다.');
-                }
-
-                const data = await response.json();
-                setFeed(data.data);
+                const response = await fetchApi<FeedPost>(`/api/feed/${feedId}`);
+                setFeed(response);
             } catch (error) {
-                setError(error instanceof Error ? error.message : '알 수 없는 에러가 발생했습니다.');
+                const apiError = error as ApiError;
+                setError(apiError);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        if (feedId) {
-            fetchFeedDetail();
-        }
+        fetchFeedDetail();
     }, [feedId]);
 
     const handleLike = (e: React.MouseEvent) => {
@@ -71,24 +64,28 @@ const FeedDetailPage = () => {
     if (isLoading) {
         return (
             <Layout>
-                <div className="fixed inset-0 bg-white flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500" />
+                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
+                    <LoadingSpinner />
                 </div>
             </Layout>
         );
     }
 
+    if (error?.type === 'AUTH') {
+        return <AuthRequiredView />;
+    }
+
     if (error) {
         return (
             <Layout>
-                <div className="fixed inset-0 bg-white flex items-center justify-center">
-                    <div className="p-4 text-center">
-                        <p className="text-red-500">{error}</p>
+                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
+                    <div className="text-center p-4">
+                        <p className="text-gray-600 mb-4">{error.message}</p>
                         <button
-                            onClick={() => navigate('/feeds')}
-                            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg"
+                            onClick={() => setError(null)}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                         >
-                            피드 목록으로
+                            다시 시도
                         </button>
                     </div>
                 </div>
@@ -97,7 +94,13 @@ const FeedDetailPage = () => {
     }
 
     if (!feed) {
-        return null;
+        return (
+            <Layout>
+                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
+                    <p className="text-gray-600">피드를 찾을 수 없습니다.</p>
+                </div>
+            </Layout>
+        );
     }
 
     return (
