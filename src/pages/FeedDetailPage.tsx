@@ -140,6 +140,12 @@ const FeedDetailPage = () => {
                                 {feed.content}
                             </p>
                         </div>
+
+                        <div className="flex flex-wrap gap-2 mb-4">
+                            {feed.hashtags.map((hashtag) => (
+                                <div key={hashtag}>#{hashtag}</div>
+                            ))}
+                        </div>
                         <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
                         <FeedActions
                             likesCount={feed.likesCount}
