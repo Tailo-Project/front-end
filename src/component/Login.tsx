@@ -7,7 +7,7 @@ import { useToast } from '../hooks/useToast';
 import { authService } from '../services/authService';
 
 const Login = () => {
-    const kakaoApiKey = import.meta.env.VITE_KAKAO_API_KEY;
+    const kakaoApiKey = import.meta.env.VITE_KAKAO_CLIENT_ID;
     const redirectUri = import.meta.env.VITE_REDIRECT_URI;
     const { toast, showToast } = useToast();
     const navigate = useNavigate();
