@@ -161,7 +161,7 @@ const Profile = () => {
                             <div className="text-gray-500 text-sm">게시물</div>
                         </div>
                         <div className="text-center">
-                            <div className="font-semibold">{profileData.data?.countFollowing}</div>
+                            <div className="font-semibold">{profileData.data?.countFollower}</div>
                             <div className="text-gray-500 text-sm">팔로워</div>
                         </div>
                         <div className="text-center">
