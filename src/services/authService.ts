@@ -16,6 +16,7 @@ export const authService = {
     async getKakaoToken(code: string): Promise<string> {
         const grant_type = 'authorization_code';
         const REST_API = import.meta.env.VITE_KAKAO_API_KEY;
+
         const REDIRECT_URI = import.meta.env.VITE_REDIRECT_URI;
 
         const response = await fetch(
