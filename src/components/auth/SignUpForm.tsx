@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
-import defaultProfileImage from '../assets/defaultImage.png';
-import Toast from './Toast';
-import { SignUpFormData, ToastState } from '../components/form/types';
-import ProfileImageUpload from '../components/form/ProfileImageUpload';
-import FormInput from '../components/form/FormInput';
-import BreedCombobox from '../components/form/BreedCombobox';
-import GenderRadioGroup from '../components/form/GenderRadioGroup';
+import defaultProfileImage from '@/assets/defaultImage.png';
+import { SignUpFormData, ToastState } from '@/components/form/types';
+import ProfileImageUpload from '@/components/form/ProfileImageUpload';
+import FormInput from '@/components/form/FormInput';
+import BreedCombobox from '@/components/form/BreedCombobox';
+import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 import { createFormDataWithJson } from '@/utils/formData';
 import { setToken, setAccountId } from '@/utils/auth';
+import Toast from '@/components/ui/Toast';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 

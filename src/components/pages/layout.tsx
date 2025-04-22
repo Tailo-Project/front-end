@@ -1,4 +1,4 @@
-import TabBar from './TabBar';
+import TabBar from '@/components/ui/TabBar';
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
     return (

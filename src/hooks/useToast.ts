@@ -1,14 +1,16 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+
+type ToastType = 'success' | 'error';
 
 interface ToastState {
     message: string;
-    type: 'success' | 'error';
+    type: ToastType;
     show: boolean;
 }
 
 interface UseToastReturn {
     toast: ToastState;
-    showToast: (message: string, type: 'success' | 'error', duration?: number) => void;
+    showToast: (message: string, type: ToastType, duration?: number) => void;
     hideToast: () => void;
 }
 
@@ -18,13 +20,22 @@ export const useToast = (defaultDuration = 1500): UseToastReturn => {
         type: 'success',
         show: false,
     });
+    const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
+
+    const clearTimer = useCallback(() => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = undefined;
+        }
+    }, []);
 
     const hideToast = useCallback(() => {
         setToast((prev) => ({ ...prev, show: false }));
     }, []);
 
     const showToast = useCallback(
-        (message: string, type: 'success' | 'error', duration = defaultDuration) => {
+        (message: string, type: ToastType, duration = defaultDuration) => {
+            clearTimer();
             setToast({
                 message,
                 type,
@@ -32,11 +43,15 @@ export const useToast = (defaultDuration = 1500): UseToastReturn => {
             });
 
             if (duration > 0) {
-                setTimeout(hideToast, duration);
+                timerRef.current = setTimeout(hideToast, duration);
             }
         },
-        [defaultDuration, hideToast],
+        [defaultDuration, hideToast, clearTimer],
     );
+
+    useEffect(() => {
+        return clearTimer;
+    }, [clearTimer]);
 
     return { toast, showToast, hideToast };
 };

@@ -1,15 +1,15 @@
 import { useRef, ChangeEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import defaultProfileImage from '../assets/defaultImage.png';
-import TabBar from './TabBar';
-import Toast from './Toast';
-import { useToast } from '../hooks/useToast';
-import { useProfileImage } from '../hooks/useProfileImage';
+import defaultProfileImage from '@/assets/defaultImage.png';
+import TabBar from '../ui/TabBar';
+import Toast from '../ui/Toast';
+import { useToast } from '@/hooks/useToast';
+import { useProfileImage } from '@/hooks/useProfileImage';
 import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 import FormInput from '@/components/form/FormInput';
-import { Gender, ProfileData } from '../types/profile';
-import { updateProfile, createProfileFormData } from '../api/profile';
+import { Gender, ProfileData } from '@/types/profile';
+import { updateProfile, createProfileFormData } from '@/api/profile';
 
 import BreedCombobox from '@/components/form/BreedCombobox';
 import { getToken } from '@/utils/auth';
@@ -129,13 +129,9 @@ const EditProfile = () => {
         try {
             const formData = createProfileFormData({ ...data, profileImage });
             await updateProfile(formData);
-            showToast('프로필 수정 완료', 'success');
-
-            const navigationTimeout = setTimeout(() => {
-                navigate('/profile');
-            }, 1500);
-
-            return () => clearTimeout(navigationTimeout);
+            navigate('/profile', {
+                state: { toast: { message: '프로필이 성공적으로 수정되었습니다.', type: 'success' } },
+            });
         } catch {
             showToast('프로필 수정에 실패했습니다.', 'error');
         }

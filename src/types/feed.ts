@@ -17,3 +17,19 @@ export interface FeedPost {
     authorProfile: string | File;
     hashtags: string[];
 }
+
+export interface Comment {
+    commentId: number;
+    content: string;
+    authorNickname: string;
+    authorProfile: string | null;
+    createdAt: string;
+    replies: {
+        replies: Comment[];
+        totalCount: number;
+    };
+}
+
+export interface CommentsResponse {
+    comments: Comment[];
+}

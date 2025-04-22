@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import defaultProfileImage from '../assets/defaultImage.png';
-import kakaoSymbol from '../assets/kakao_login_medium_narrow.png';
-import Toast from './Toast';
-import { useToast } from '../hooks/useToast';
-import { authService } from '../services/authService';
+import defaultProfileImage from '@/assets/defaultImage.png';
+import kakaoSymbol from '@/assets/kakao_login_medium_narrow.png';
+import { useToast } from '@/hooks/useToast';
+import { authService } from '@/services/authService';
+import Toast from '@/components/ui/Toast';
 
 const Login = () => {
     const kakaoApiKey = import.meta.env.VITE_KAKAO_API_KEY;
