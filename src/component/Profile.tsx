@@ -5,7 +5,7 @@ import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/out
 import defaultProfileImage from '../assets/defaultImage.png';
 import Layout from './layout';
 import Toast from './Toast';
-import { getAccountId, getToken } from '@/utils/auth';
+import { getAccountId, getToken, removeAccountId, removeToken } from '@/utils/auth';
 import { fetchApi } from '@/utils/api';
 
 interface ProfileData {
@@ -98,17 +98,11 @@ const Profile = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch('/api/auth/logout', {
-                method: 'POST',
-                credentials: 'include',
-            });
-
-            if (response.ok) {
-                navigate('/login');
-            } else {
-                setToastMessage('로그아웃 중 오류가 발생했습니다.');
-                setShowToast(true);
-            }
+            removeToken();
+            removeAccountId();
+            navigate('/login');
+            setToastMessage('로그아웃 중 오류가 발생했습니다.');
+            setShowToast(true);
         } catch (error) {
             console.error('로그아웃 중 오류가 발생했습니다:', error);
             setToastMessage('로그아웃 중 오류가 발생했습니다.');

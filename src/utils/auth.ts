@@ -21,6 +21,10 @@ export const removeToken = () => {
     localStorage.removeItem(TOKEN_KEY);
 };
 
+export const removeAccountId = () => {
+    localStorage.removeItem(ACCOUNT_ID_KEY);
+};
+
 export const isAuthenticated = () => {
     return !!getToken();
 };
