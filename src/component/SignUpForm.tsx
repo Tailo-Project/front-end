@@ -207,7 +207,6 @@ const SignUpForm = () => {
                             onChange={setSelectedBreed}
                             breeds={breeds}
                             onAddBreed={handleAddBreed}
-                            setValue={setValue}
                         />
 
                         <GenderRadioGroup register={register} name="gender" />
