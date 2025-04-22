@@ -130,12 +130,7 @@ const EditProfile = () => {
             const formData = createProfileFormData({ ...data, profileImage });
             await updateProfile(formData);
             showToast('프로필 수정 완료', 'success');
-
-            const navigationTimeout = setTimeout(() => {
-                navigate('/profile');
-            }, 1500);
-
-            return () => clearTimeout(navigationTimeout);
+            navigate('/profile');
         } catch {
             showToast('프로필 수정에 실패했습니다.', 'error');
         }
