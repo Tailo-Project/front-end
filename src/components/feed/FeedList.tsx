@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import TabBar from './TabBar';
 import { FeedPost } from '@/types/feed';
 import AuthRequiredView from '@/components/common/AuthRequiredView';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -7,6 +6,7 @@ import { ApiError } from '@/types/error';
 import { useNavigate } from 'react-router-dom';
 import { getToken } from '@/utils/auth';
 import FeedItem from '@/components/feed/FeedItem';
+import TabBar from '../ui/TabBar';
 
 const FeedList = () => {
     const [feeds, setFeeds] = useState<FeedPost[]>([]);

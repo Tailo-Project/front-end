@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 
-import defaultProfileImage from '../assets/defaultImage.png';
-import Layout from './layout';
-import Toast from './Toast';
+import defaultProfileImage from '@/assets/defaultImage.png';
+import Layout from '@/components/pages/layout';
+import Toast from '@/components/ui/Toast';
 import { getAccountId, getToken, removeAccountId, removeToken } from '@/utils/auth';
 
 interface ProfileData {

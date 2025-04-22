@@ -1,13 +1,13 @@
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
-import FeedList from './component/FeedList';
-import Login from './component/Login';
-import SignUpForm from './component/SignUpForm';
-import Profile from './component/Profile';
-import EditProfile from './component/EditProfile';
-import KakaoCallback from './component/KakaoCallback';
-import WritePost from './component/WritePost';
-import ProtectedRoute from './components/ProtectedRoute';
+import FeedList from '@/components/feed/FeedList';
+import Login from '@/components/auth/Login';
+import SignUpForm from '@/components/auth/SignUpForm';
+import Profile from '@/components/profile/Profile';
+import EditProfile from '@/components/profile/EditProfile';
+import KakaoCallback from '@/components/auth/KakaoCallback';
+import WritePost from '@/components/feed/WritePost';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import FeedDetailPage from '@/pages/FeedDetailPage';
 
 function App() {

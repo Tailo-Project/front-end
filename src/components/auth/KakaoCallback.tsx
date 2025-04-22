@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Toast from './Toast';
-import { authService } from '../services/authService';
-import { useToast } from '../hooks/useToast';
+import Toast from '../ui/Toast';
+import { authService } from '@/services/authService';
+import { useToast } from '@/hooks/useToast';
 
 const KakaoCallback = () => {
     const navigate = useNavigate();

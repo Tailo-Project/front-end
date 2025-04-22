@@ -1,6 +1,6 @@
 import { useState, useRef, KeyboardEvent, ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TabBar from './TabBar';
+import TabBar from '../ui/TabBar';
 import { createFormDataWithJson } from '@/utils/formData';
 
 interface PostForm {

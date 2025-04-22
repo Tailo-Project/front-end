@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Layout from '../component/layout';
+
 import FeedHeader from '@/components/feed/FeedHeader';
 import FeedImages from '@/components/feed/FeedImages';
 import FeedActions from '@/components/feed/FeedActions';
@@ -10,6 +10,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import AuthRequiredView from '@/components/common/AuthRequiredView';
 import tailogo from '../assets/tailogo.svg';
 import { getToken, getAccountId } from '@/utils/auth';
+import Layout from '@/components/pages/layout';
 
 interface Comment {
     commentId: number;

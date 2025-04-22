@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import Layout from '@/component/layout';
+import Layout from '@/components/pages/layout';
 
 const AuthRequiredView = () => {
     const navigate = useNavigate();
