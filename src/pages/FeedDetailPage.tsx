@@ -84,44 +84,36 @@ const FeedDetailPage = () => {
         try {
             setIsSubmitting(true);
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
+            await fetchApi(`/api/feed/${feedId}/comments`, {
                 method: 'POST',
                 body: JSON.stringify({
                     parentId: replyToId,
                     content: newComment.trim(),
                 }),
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${getToken()}`,
-                },
             });
 
-            const result = await response.json();
+            // 새로운 댓글을 목록 맨 앞에 추가
+            const newCommentObj: Comment = {
+                commentId: Date.now(),
+                content: newComment.trim(),
+                authorNickname: feed?.authorNickname || '',
+                authorProfile: typeof feed?.authorProfile === 'string' ? feed.authorProfile : '',
+                createdAt: new Date().toISOString(),
+            };
 
-            if (result.statusCode === 201) {
-                // 새로운 댓글을 목록 맨 앞에 추가
-                const newCommentObj: Comment = {
-                    commentId: Date.now(),
-                    content: newComment.trim(),
-                    authorNickname: feed?.authorNickname || '',
-                    authorProfile: typeof feed?.authorProfile === 'string' ? feed.authorProfile : '',
-                    createdAt: new Date().toISOString(),
-                };
+            setComments((prevComments) => [newCommentObj, ...prevComments]);
 
-                setComments((prevComments) => [newCommentObj, ...prevComments]);
-
-                // 피드의 댓글 수 업데이트
-                if (feed) {
-                    setFeed({
-                        ...feed,
-                        commentsCount: feed.commentsCount + 1,
-                    });
-                }
-
-                // 입력 필드 초기화
-                setNewComment('');
-                setReplyToId(null);
+            // 피드의 댓글 수 업데이트
+            if (feed) {
+                setFeed({
+                    ...feed,
+                    commentsCount: feed.commentsCount + 1,
+                });
             }
+
+            // 입력 필드 초기화
+            setNewComment('');
+            setReplyToId(null);
         } catch (error) {
             console.error('댓글 등록 실패:', error);
         } finally {
@@ -152,6 +144,8 @@ const FeedDetailPage = () => {
             inputElement.focus();
         }
     };
+
+    console.log(replyToId, 'replyToId');
 
     // 댓글 삭제 처리
     const handleDeleteComment = async (commentId: number) => {
@@ -208,6 +202,16 @@ const FeedDetailPage = () => {
                             다시 시도
                         </button>
                     </div>
+                </div>
+            </Layout>
+        );
+    }
+
+    if (!feed) {
+        return (
+            <Layout>
+                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
+                    <p className="text-gray-600">피드를 찾을 수 없습니다.</p>
                 </div>
             </Layout>
         );
