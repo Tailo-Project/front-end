@@ -213,16 +213,6 @@ const FeedDetailPage = () => {
         );
     }
 
-    if (!feed) {
-        return (
-            <Layout>
-                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
-                    <p className="text-gray-600">피드를 찾을 수 없습니다.</p>
-                </div>
-            </Layout>
-        );
-    }
-
     return (
         <Layout>
             <div className="bg-white min-h-screen flex flex-col">
