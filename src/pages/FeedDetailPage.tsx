@@ -342,7 +342,7 @@ const FeedDetailPage = () => {
                                                 <h3 className="font-medium text-sm">{comment.authorNickname}</h3>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-xs text-gray-500">{comment.createdAt}</span>
-                                                    {comment.authorNickname === feed?.authorNickname && (
+                                                    {comment.authorNickname === userProfile?.nickname && (
                                                         <div className="flex gap-2">
                                                             <button
                                                                 onClick={() => handleDeleteComment(comment.commentId)}
