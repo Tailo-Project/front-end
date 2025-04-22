@@ -10,6 +10,7 @@ import BreedCombobox from '../components/form/BreedCombobox';
 import GenderRadioGroup from '../components/form/GenderRadioGroup';
 import { createFormDataWithJson } from '@/utils/formData';
 import { fetchApi } from '@/utils/api';
+import { setToken, setAccountId } from '@/utils/auth';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
@@ -103,11 +104,19 @@ const SignUpForm = () => {
                 files: profileImage ? [{ key: 'profileImage', files: [profileImage] }] : undefined,
             });
 
-            await fetchApi<SignUpFormData>(`/api/auth/sign-up`, {
+            const response = await fetchApi<{ accessToken: string; accountId: string }>(`/api/auth/sign-up`, {
                 method: 'POST',
                 body: formData,
             });
-            navigate('/');
+
+            if (response.accessToken && response.accountId) {
+                setToken(response.accessToken);
+                setAccountId(response.accountId);
+                showToastMessage('회원가입이 완료되었습니다.', 'success');
+                navigate('/');
+            } else {
+                throw new Error('회원가입 응답에 필요한 데이터가 없습니다.');
+            }
         } catch (error) {
             if (error instanceof Error) {
                 showToastMessage(error.message, 'error');
