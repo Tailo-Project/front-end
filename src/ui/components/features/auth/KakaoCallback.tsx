@@ -35,11 +35,13 @@ const KakaoCallback = () => {
             try {
                 const accessToken = await authService.getKakaoToken(code);
                 const userInfoData = await authService.signInWithKakao(accessToken);
-                console.log(userInfoData, 'userInfoData');
 
                 if (userInfoData.data.accessToken === null) {
                     showToast('회원가입이 필요합니다.', 'success');
-                    handleNavigation('/signup');
+                    navigate('/signup', {
+                        replace: true,
+                        state: { email: userInfoData.data.email },
+                    });
                 } else {
                     showToast('로그인이 완료되었습니다.', 'success');
                     handleNavigation('/');
