@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import tailLogo from '../../assets/tailogo.svg';
+import { useNavigate } from 'react-router-dom';
 
 interface FeedHeaderProps {
     authorNickname: string;
@@ -9,6 +10,7 @@ interface FeedHeaderProps {
 }
 
 const FeedHeader = ({ authorNickname, authorProfile, createdAt, onMoreClick }: FeedHeaderProps) => {
+    const navigate = useNavigate();
     const [objectUrl, setObjectUrl] = useState<string | null>(null);
     const getProfileUrl = (profile: string | File): string => {
         if (profile instanceof File) {
@@ -28,9 +30,15 @@ const FeedHeader = ({ authorNickname, authorProfile, createdAt, onMoreClick }: F
         };
     }, [objectUrl]);
 
+    const handleProfileClick = () => {
+        // console.log('profile clicked');
+        navigate(`/profile`);
+    };
+
     return (
         <div className="flex items-center mb-4">
             <img
+                onClick={handleProfileClick}
                 src={authorProfile ? getProfileUrl(authorProfile) : tailLogo}
                 alt={authorNickname}
                 className="w-10 h-10 rounded-full object-cover"

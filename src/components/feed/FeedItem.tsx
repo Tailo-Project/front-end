@@ -36,14 +36,14 @@ const FeedItem = ({ feed }: FeedItemProps) => {
     };
 
     return (
-        <article className="p-4 border-b border-gray-200 cursor-pointer" onClick={handleFeedClick}>
+        <article className="p-4 border-b border-gray-200 cursor-pointer">
             <FeedHeader
                 authorNickname={feed.authorNickname}
                 authorProfile={feed.authorProfile}
                 createdAt={feed.createdAt}
                 onMoreClick={handleMoreClick}
             />
-            <div className="mb-4">
+            <div onClick={handleFeedClick} className="mb-4">
                 <p className="text-gray-800 whitespace-pre-wrap">{feed.content}</p>
             </div>
             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
