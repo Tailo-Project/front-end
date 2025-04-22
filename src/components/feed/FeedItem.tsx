@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import FeedActions from '@/components/feed/FeedActions';
-import FeedHeader from '@/components/feed/FeedHeader';
 import { FeedPost } from '@/types/feed';
-import FeedImages from '@/components/feed/FeedImages';
+import FeedHeader from './FeedHeader';
+import FeedImages from './FeedImages';
+import FeedActions from './FeedActions';
 
 interface FeedItemProps {
     feed: FeedPost;
@@ -11,18 +11,27 @@ interface FeedItemProps {
 const FeedItem = ({ feed }: FeedItemProps) => {
     const navigate = useNavigate();
 
-    const handleFeedClick = () => {
-        navigate(`/feeds/${feed.feedId}`);
+    const handleMoreClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        // 추가 메뉴 기능 구현
     };
 
-    const handleLike = (e: React.MouseEvent) => {
+    const handleLike = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        // 좋아요 기능 구현
-    };
-
-    const handleComment = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        navigate(`/feeds/${feed.feedId}`);
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feed.feedId}/likes`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) {
+                throw new Error('좋아요 처리에 실패했습니다.');
+            }
+            // TODO: 좋아요 상태 업데이트
+        } catch (error) {
+            console.error('좋아요 처리 실패:', error);
+        }
     };
 
     const handleShare = (e: React.MouseEvent) => {
@@ -30,23 +39,33 @@ const FeedItem = ({ feed }: FeedItemProps) => {
         // 공유 기능 구현
     };
 
-    const handleMoreClick = (e: React.MouseEvent) => {
+    const handleComment = (e: React.MouseEvent) => {
         e.stopPropagation();
-        // 추가 메뉴 기능 구현
+        navigate(`/feeds/${feed.feedId}`);
     };
 
     return (
-        <article className="p-4 border-b border-gray-200 cursor-pointer">
+        <article
+            className="border-b border-gray-200 p-4 cursor-pointer"
+            onClick={() => navigate(`/feeds/${feed.feedId}`)}
+        >
             <FeedHeader
                 authorNickname={feed.authorNickname}
                 authorProfile={feed.authorProfile}
                 createdAt={feed.createdAt}
                 onMoreClick={handleMoreClick}
             />
-            <div onClick={handleFeedClick} className="mb-4">
-                <p className="text-gray-800 whitespace-pre-wrap">{feed.content}</p>
+            <div className="mt-4 mb-6">
+                <p className="text-gray-800 text-[15px] leading-[22px] whitespace-pre-wrap">{feed.content}</p>
             </div>
-            <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
+
+            <div className="flex flex-wrap gap-2 mb-4">
+                {feed.hashtags.map((hashtag) => (
+                    <div key={hashtag}>#{hashtag}</div>
+                ))}
+            </div>
+
+            <FeedImages images={feed.imageUrls} authorNickname={feed.authorNickname} />
             <FeedActions
                 likesCount={feed.likesCount}
                 commentsCount={feed.commentsCount}

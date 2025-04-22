@@ -384,44 +384,41 @@ const FeedDetailPage = () => {
                     <div className="px-4 border-t border-gray-200">
                         {comments?.comments.map((comment) => (
                             <div key={comment.commentId} className="py-4 border-b border-gray-100">
-                                <div className="flex items-start">
-                                    <img
-                                        src={comment.authorProfile || tailogo}
-                                        alt="프로필"
-                                        className="w-8 h-8 rounded-full object-cover"
-                                    />
-                                    <div className="ml-3 flex-1">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="font-medium text-sm">{comment.authorNickname}</h3>
+                                <FeedHeader
+                                    authorNickname={comment.authorNickname}
+                                    authorProfile={comment.authorProfile || tailogo}
+                                    createdAt={comment.createdAt}
+                                    rightElement={
+                                        comment.authorNickname === userProfile?.nickname ? (
                                             <div className="flex items-center gap-2">
                                                 <span className="text-xs text-gray-500">
                                                     {new Date(comment.createdAt).toLocaleString()}
                                                 </span>
-                                                {comment.authorNickname === userProfile?.nickname && (
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                                handleDeleteComment(comment.commentId);
-                                                            }}
-                                                            className="text-xs text-red-500 hover:text-red-600"
-                                                        >
-                                                            삭제
-                                                        </button>
-                                                    </div>
-                                                )}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleDeleteComment(comment.commentId);
+                                                    }}
+                                                    className="text-xs text-red-500 hover:text-red-600"
+                                                >
+                                                    삭제
+                                                </button>
                                             </div>
-                                        </div>
-                                        <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
-                                        <button
-                                            onClick={() => handleReply(comment.commentId)}
-                                            className="text-xs text-gray-500 mt-2 hover:text-blue-500"
-                                        >
-                                            답글 달기
-                                        </button>
-                                    </div>
-                                </div>
+                                        ) : (
+                                            <span className="text-xs text-gray-500">
+                                                {new Date(comment.createdAt).toLocaleString()}
+                                            </span>
+                                        )
+                                    }
+                                />
+                                <p className="text-sm text-gray-700 mt-1 ml-[52px]">{comment.content}</p>
+                                <button
+                                    onClick={() => handleReply(comment.commentId)}
+                                    className="text-xs text-gray-500 mt-2 ml-[52px] hover:text-blue-500"
+                                >
+                                    답글 달기
+                                </button>
                             </div>
                         ))}
                     </div>
