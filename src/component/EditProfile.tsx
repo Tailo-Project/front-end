@@ -1,4 +1,4 @@
-import React, { useRef, ChangeEvent } from 'react';
+import React, { useRef, ChangeEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import defaultProfileImage from '../assets/defaultImage.png';
@@ -8,31 +8,66 @@ import { useToast } from '../hooks/useToast';
 import { useProfileImage } from '../hooks/useProfileImage';
 import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 import FormInput from '@/components/form/FormInput';
-import { ProfileData } from '../types/profile';
+import { Gender, ProfileData } from '../types/profile';
 import { updateProfile, createProfileFormData } from '../api/profile';
+import { fetchApi } from '@/utils/api';
 
-// 상수
-const MAX_NICKNAME_LENGTH = 10;
-const MAX_BIO_LENGTH = 150;
-const INITIAL_PROFILE_DATA: ProfileData = {
-    nickname: '멍멍이맘',
-    bio: '반려동물과 함께하는 일상을 공유해요 🐶',
-    profileImage: defaultProfileImage,
-    petType: '말티즈',
-    petAge: '2',
-    petGender: 'MALE',
-    address: '서울시 강남구',
-};
+interface ProfileResponse {
+    nickname: string;
+    breed: string;
+    type: string;
+    age: number;
+    gender: Gender;
+    address: string;
+    profileImageUrl: string | null;
+    isFollow: boolean;
+    accountId: string;
+}
 
 const EditProfile = () => {
-    const { register, handleSubmit: handleFormSubmit } = useForm<ProfileData>({
-        mode: 'onChange',
-        defaultValues: INITIAL_PROFILE_DATA,
-    });
-    const { toast, showToast } = useToast();
     const navigate = useNavigate();
+    const { toast, showToast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { imageUrl, profileImage, handleImageChange } = useProfileImage(INITIAL_PROFILE_DATA.profileImage);
+    const { imageUrl, profileImage, handleImageChange } = useProfileImage(defaultProfileImage);
+
+    const { register, handleSubmit: handleFormSubmit, reset } = useForm<ProfileData>({ mode: 'onChange' });
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await fetchApi<ProfileResponse>(`/api/member`);
+                const { nickname, breed, type, age, gender, address, profileImageUrl, accountId } = response;
+
+                const updatedProfileData = {
+                    nickname,
+                    profileImage: profileImageUrl || defaultProfileImage,
+                    type,
+                    breed,
+                    age,
+                    gender,
+                    address,
+                    accountId,
+                };
+
+                reset(updatedProfileData);
+
+                if (profileImageUrl) {
+                    try {
+                        const response = await fetch(profileImageUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
+                        handleImageChange(file);
+                    } catch (error) {
+                        console.error('프로필 이미지 로드 실패', error);
+                    }
+                }
+            } catch (error) {
+                console.error('프로필 조회 실패', error);
+                showToast('프로필 정보를 불러오는데 실패했습니다.', 'error');
+            }
+        };
+        fetchProfile();
+    }, []);
 
     const handleImageClick = () => {
         fileInputRef.current?.click();
@@ -109,39 +144,36 @@ const EditProfile = () => {
                         name="nickname"
                         register={register}
                         required
-                        maxLength={MAX_NICKNAME_LENGTH}
                         placeholder="닉네임을 입력하세요"
-                    />
-
-                    <FormInput
-                        label="소개"
-                        name="bio"
-                        register={register}
-                        required
-                        maxLength={MAX_BIO_LENGTH}
-                        placeholder="자기소개를 입력하세요"
-                        type="textarea"
                     />
 
                     <div className="mb-2">
                         <FormInput
                             label="품종"
-                            name="petType"
+                            name="breed"
                             register={register}
                             required
                             placeholder="품종을 입력해주세요."
                         />
 
                         <FormInput
+                            label="타입"
+                            name="type"
+                            register={register}
+                            required
+                            placeholder="타입을 입력해주세요."
+                        />
+
+                        <FormInput
                             label="나이"
-                            name="petAge"
+                            name="age"
                             register={register}
                             required
                             placeholder="나이를 입력해주세요."
                             suffix="세"
                         />
 
-                        <GenderRadioGroup register={register} name="petGender" />
+                        <GenderRadioGroup register={register} name="gender" />
 
                         <FormInput
                             label="주소"
