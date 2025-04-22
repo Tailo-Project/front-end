@@ -1,10 +1,9 @@
 import { getAccountId } from '@/utils/auth';
 import { ProfileData } from '../types/profile';
 import { createFormDataWithJson } from '@/utils/formData';
-import { fetchApi } from '@/utils/api';
 
 export const updateProfile = async (formData: FormData): Promise<void> => {
-    await fetchApi('/api/member', {
+    await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
         method: 'PATCH',
         body: formData,
     });

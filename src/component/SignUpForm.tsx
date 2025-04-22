@@ -9,7 +9,6 @@ import FormInput from '../components/form/FormInput';
 import BreedCombobox from '../components/form/BreedCombobox';
 import GenderRadioGroup from '../components/form/GenderRadioGroup';
 import { createFormDataWithJson } from '@/utils/formData';
-import { fetchApi } from '@/utils/api';
 import { setToken, setAccountId } from '@/utils/auth';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
@@ -104,14 +103,16 @@ const SignUpForm = () => {
                 files: profileImage ? [{ key: 'profileImage', files: [profileImage] }] : undefined,
             });
 
-            const response = await fetchApi<{ accessToken: string; accountId: string }>(`/api/auth/sign-up`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
                 method: 'POST',
                 body: formData,
             });
 
-            if (response.accessToken && response.accountId) {
-                setToken(response.accessToken);
-                setAccountId(response.accountId);
+            const data = await response.json();
+
+            if (data.accessToken && data.accountId) {
+                setToken(data.accessToken);
+                setAccountId(data.accountId);
                 showToastMessage('회원가입이 완료되었습니다.', 'success');
                 navigate('/');
             } else {
