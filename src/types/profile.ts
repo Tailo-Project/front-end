@@ -1,14 +1,14 @@
 export type Gender = 'MALE' | 'FEMALE';
 
 export interface PetInfo {
-    petType: string;
-    petAge: string;
-    petGender: Gender;
+    type: string;
+    age: number;
+    gender: Gender;
 }
 
 export interface ProfileInfo {
     nickname: string;
-    bio: string;
+    breed: string;
     address: string;
 }
 
