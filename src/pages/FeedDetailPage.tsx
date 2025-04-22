@@ -10,7 +10,7 @@ import { ApiError } from '@/types/error';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import AuthRequiredView from '@/components/common/AuthRequiredView';
 import tailogo from '../assets/tailogo.svg';
-import { getToken } from '@/utils/auth';
+import { getToken, getAccountId } from '@/utils/auth';
 
 interface Comment {
     commentId: number;
@@ -24,6 +24,11 @@ interface Comment {
     // };
 }
 
+interface UserProfile {
+    nickname: string;
+    profileImageUrl: string;
+}
+
 const FeedDetailPage = () => {
     const { feedId } = useParams<{ feedId: string }>();
     const navigate = useNavigate();
@@ -34,6 +39,24 @@ const FeedDetailPage = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<ApiError | null>(null);
     const [replyToId, setReplyToId] = useState<number | null>(null);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+    // 현재 사용자 프로필 정보 조회
+    useEffect(() => {
+        const fetchUserProfile = async () => {
+            const accountId = getAccountId();
+            if (!accountId) return;
+
+            try {
+                const profileData = await fetchApi<UserProfile>(`/api/member/profile/${accountId}`);
+                setUserProfile(profileData);
+            } catch (error) {
+                console.error('프로필 정보 조회 실패:', error);
+            }
+        };
+
+        fetchUserProfile();
+    }, []);
 
     // 피드 상세 정보 조회
     useEffect(() => {
@@ -79,12 +102,12 @@ const FeedDetailPage = () => {
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!newComment.trim() || isSubmitting || !feedId) return;
+        if (!newComment.trim() || isSubmitting || !feedId || !userProfile) return;
 
         try {
             setIsSubmitting(true);
 
-            await fetchApi(`/api/feed/${feedId}/comments`, {
+            const response = await fetchApi<Comment>(`/api/feed/${feedId}/comments`, {
                 method: 'POST',
                 body: JSON.stringify({
                     parentId: replyToId,
@@ -94,10 +117,9 @@ const FeedDetailPage = () => {
 
             // 새로운 댓글을 목록 맨 앞에 추가
             const newCommentObj: Comment = {
-                commentId: Date.now(),
-                content: newComment.trim(),
-                authorNickname: feed?.authorNickname || '',
-                authorProfile: typeof feed?.authorProfile === 'string' ? feed.authorProfile : '',
+                ...response,
+                authorNickname: userProfile.nickname,
+                authorProfile: userProfile.profileImageUrl,
                 createdAt: new Date().toISOString(),
             };
 
