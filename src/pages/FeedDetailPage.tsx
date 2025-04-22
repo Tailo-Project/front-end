@@ -4,29 +4,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import FeedHeader from '@/components/feed/FeedHeader';
 import FeedImages from '@/components/feed/FeedImages';
 import FeedActions from '@/components/feed/FeedActions';
-import { FeedPost } from '@/types/feed';
+import { CommentsResponse, FeedPost } from '@/types/feed';
 import { ApiError } from '@/types/error';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import AuthRequiredView from '@/components/common/AuthRequiredView';
 import tailogo from '../assets/tailogo.svg';
 import { getToken, getAccountId } from '@/utils/auth';
 import Layout from '@/components/pages/layout';
-
-interface Comment {
-    commentId: number;
-    content: string;
-    authorNickname: string;
-    authorProfile: string | null;
-    createdAt: string;
-    replies: {
-        replies: Comment[];
-        totalCount: number;
-    };
-}
-
-interface CommentsResponse {
-    comments: Comment[];
-}
 
 interface UserProfile {
     nickname: string;
