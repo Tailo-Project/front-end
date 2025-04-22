@@ -122,6 +122,11 @@ const EditProfile = () => {
 
     const onSubmit = async (data: ProfileData) => {
         try {
+            const { nickname, breed, type, age, gender, address } = data;
+            if (!nickname || !breed || !type || !age || !gender || !address) {
+                showToast('모든 필드를 입력해주세요.', 'error');
+                return;
+            }
             const formData = createProfileFormData({ ...data, profileImage });
             await updateProfile(formData);
             showToast('프로필 수정 완료', 'success');
@@ -132,7 +137,7 @@ const EditProfile = () => {
 
             return () => clearTimeout(navigationTimeout);
         } catch {
-            showToast('프로필 수정에 실패했습니다.', 'error');
+            showToast('프로필 수정에 실패했습니다. 다시 시도해주세요.', 'error');
         }
     };
 
