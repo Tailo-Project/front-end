@@ -6,7 +6,6 @@ import defaultProfileImage from '../assets/defaultImage.png';
 import Layout from './layout';
 import Toast from './Toast';
 import { getAccountId, getToken, removeAccountId, removeToken } from '@/utils/auth';
-import { fetchApi } from '@/utils/api';
 
 interface ProfileData {
     nickname: string;
@@ -65,7 +64,7 @@ const Profile = () => {
             try {
                 setIsLoading(true);
 
-                const profileData = await fetchApi<ProfileData>(`/api/member/profile/${accountId}`, {
+                const profileData = await fetch(`${import.meta.env.VITE_API_URL}/api/member/profile/${accountId}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -73,7 +72,9 @@ const Profile = () => {
                     },
                 });
 
-                const { nickname, countFollower, countFollowing, profileImageUrl, isFollow } = profileData;
+                const data = await profileData.json();
+
+                const { nickname, countFollower, countFollowing, profileImageUrl, isFollow } = data.data;
 
                 setProfileData({
                     data: {
