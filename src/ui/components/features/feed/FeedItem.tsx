@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FeedPost } from '@/types/feed';
+import { FeedPost } from '@/shared/types/feed';
 import FeedHeader from './FeedHeader';
 import FeedImages from './FeedImages';
 import FeedActions from './FeedActions';
