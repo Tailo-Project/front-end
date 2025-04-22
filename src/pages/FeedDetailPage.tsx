@@ -153,6 +153,34 @@ const FeedDetailPage = () => {
         }
     };
 
+    // 댓글 삭제 처리
+    const handleDeleteComment = async (commentId: number) => {
+        if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+
+            if (response.ok) {
+                // 댓글 목록에서 삭제
+                setComments((prevComments) => prevComments.filter((comment) => comment.commentId !== commentId));
+                // 댓글 수 감소
+                if (feed) {
+                    setFeed({
+                        ...feed,
+                        commentsCount: feed.commentsCount - 1,
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('댓글 삭제 실패:', error);
+        }
+    };
+
     if (isLoading) {
         return (
             <Layout>
@@ -296,7 +324,19 @@ const FeedDetailPage = () => {
                                         <div className="ml-3 flex-1">
                                             <div className="flex items-center justify-between">
                                                 <h3 className="font-medium text-sm">{comment.authorNickname}</h3>
-                                                <span className="text-xs text-gray-500">{comment.createdAt}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-500">{comment.createdAt}</span>
+                                                    {comment.authorNickname === feed?.authorNickname && (
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() => handleDeleteComment(comment.commentId)}
+                                                                className="text-xs text-red-500 hover:text-red-600"
+                                                            >
+                                                                삭제
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                             <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
                                             <button
@@ -311,8 +351,6 @@ const FeedDetailPage = () => {
                             ))}
                     </div>
                 </div>
-
-                {/* 댓글 입력 */}
             </div>
         </Layout>
     );
