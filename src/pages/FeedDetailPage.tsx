@@ -5,7 +5,6 @@ import FeedHeader from '@/components/feed/FeedHeader';
 import FeedImages from '@/components/feed/FeedImages';
 import FeedActions from '@/components/feed/FeedActions';
 import { FeedPost } from '@/types/feed';
-import { fetchApi } from '@/utils/api';
 import { ApiError } from '@/types/error';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import AuthRequiredView from '@/components/common/AuthRequiredView';
@@ -16,12 +15,16 @@ interface Comment {
     commentId: number;
     content: string;
     authorNickname: string;
-    authorProfile: string;
+    authorProfile: string | null;
     createdAt: string;
-    // replies: {
-    //     replies: Comment[];
-    //     totalCount: number;
-    // };
+    replies: {
+        replies: Comment[];
+        totalCount: number;
+    };
+}
+
+interface CommentsResponse {
+    comments: Comment[];
 }
 
 interface UserProfile {
@@ -33,7 +36,7 @@ const FeedDetailPage = () => {
     const { feedId } = useParams<{ feedId: string }>();
     const navigate = useNavigate();
     const [feed, setFeed] = useState<FeedPost | null>(null);
-    const [comments, setComments] = useState<Comment[]>([]);
+    const [comments, setComments] = useState<CommentsResponse | null>(null);
     const [newComment, setNewComment] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -48,8 +51,13 @@ const FeedDetailPage = () => {
             if (!accountId) return;
 
             try {
-                const profileData = await fetchApi<UserProfile>(`/api/member/profile/${accountId}`);
-                setUserProfile(profileData);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/member/profile/${accountId}`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                    },
+                });
+                const data = await response.json();
+                setUserProfile(data.data);
             } catch (error) {
                 console.error('프로필 정보 조회 실패:', error);
             }
@@ -67,11 +75,22 @@ const FeedDetailPage = () => {
             setError(null);
 
             try {
-                const response = await fetchApi<FeedPost>(`/api/feed/${feedId}`);
-                setFeed(response);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                    },
+                });
+                const data = await response.json();
+                setFeed(data.data);
+
                 // 피드 조회 후 댓글 목록도 함께 조회
-                const commentsResponse = await fetchApi<{ comments: Comment[] }>(`/api/feed/${feedId}/comments`);
-                setComments(commentsResponse.comments);
+                const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                    },
+                });
+                const commentsData = await commentsResponse.json();
+                setComments(commentsData.data);
             } catch (error) {
                 const apiError = error as ApiError;
                 setError(apiError);
@@ -85,7 +104,22 @@ const FeedDetailPage = () => {
 
     const handleLike = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        await fetchApi<FeedPost>(`/api/feed/${feedId}/likes`);
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/likes`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error('좋아요 처리에 실패했습니다.');
+            }
+            const data = await response.json();
+            console.log(data, 'data');
+            // TODO: 좋아요 상태 업데이트
+        } catch (error) {
+            console.error('좋아요 처리 실패:', error);
+        }
     };
 
     const handleShare = (e: React.MouseEvent) => {
@@ -107,23 +141,31 @@ const FeedDetailPage = () => {
         try {
             setIsSubmitting(true);
 
-            const response = await fetchApi<Comment>(`/api/feed/${feedId}/comments`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${getToken()}`,
+                },
                 body: JSON.stringify({
                     parentId: replyToId,
                     content: newComment.trim(),
                 }),
             });
 
-            // 새로운 댓글을 목록 맨 앞에 추가
-            const newCommentObj: Comment = {
-                ...response,
-                authorNickname: userProfile.nickname,
-                authorProfile: userProfile.profileImageUrl,
-                createdAt: new Date().toISOString(),
-            };
+            if (!response.ok) {
+                throw new Error('댓글 등록에 실패했습니다.');
+            }
 
-            setComments((prevComments) => [newCommentObj, ...prevComments]);
+            // 댓글 목록 새로 조회
+            const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            const commentsData = await commentsResponse.json();
+
+            setComments(commentsData.data);
 
             // 피드의 댓글 수 업데이트
             if (feed) {
@@ -138,6 +180,7 @@ const FeedDetailPage = () => {
             setReplyToId(null);
         } catch (error) {
             console.error('댓글 등록 실패:', error);
+            alert(error instanceof Error ? error.message : '댓글 등록에 실패했습니다.');
         } finally {
             setIsSubmitting(false);
         }
@@ -167,8 +210,6 @@ const FeedDetailPage = () => {
         }
     };
 
-    console.log(replyToId, 'replyToId');
-
     // 댓글 삭제 처리
     const handleDeleteComment = async (commentId: number) => {
         if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
@@ -181,19 +222,29 @@ const FeedDetailPage = () => {
                 },
             });
 
-            if (response.ok) {
-                // 댓글 목록에서 삭제
-                setComments((prevComments) => prevComments.filter((comment) => comment.commentId !== commentId));
-                // 댓글 수 감소
-                if (feed) {
-                    setFeed({
-                        ...feed,
-                        commentsCount: feed.commentsCount - 1,
-                    });
-                }
+            if (!response.ok) {
+                throw new Error('댓글 삭제에 실패했습니다.');
+            }
+
+            // 댓글 목록에서 삭제
+            setComments(
+                comments
+                    ? {
+                          comments: comments.comments.filter((comment) => comment.commentId !== commentId),
+                      }
+                    : null,
+            );
+
+            // 댓글 수 감소
+            if (feed) {
+                setFeed({
+                    ...feed,
+                    commentsCount: feed.commentsCount - 1,
+                });
             }
         } catch (error) {
             console.error('댓글 삭제 실패:', error);
+            alert(error instanceof Error ? error.message : '댓글 삭제에 실패했습니다.');
         }
     };
 
@@ -285,7 +336,7 @@ const FeedDetailPage = () => {
                         <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
                         <FeedActions
                             likesCount={feed.likesCount}
-                            commentsCount={comments.length}
+                            commentsCount={comments?.comments?.length || 0}
                             onLike={handleLike}
                             onComment={handleComment}
                             onShare={handleShare}
@@ -328,43 +379,48 @@ const FeedDetailPage = () => {
 
                     {/* 댓글 목록 */}
                     <div className="px-4 border-t border-gray-200">
-                        {comments &&
-                            comments.map((comment) => (
-                                <div key={comment.commentId} className="py-4 border-b border-gray-100">
-                                    <div className="flex items-start">
-                                        <img
-                                            src={comment.authorProfile || tailogo}
-                                            alt="프로필"
-                                            className="w-8 h-8 rounded-full object-cover"
-                                        />
-                                        <div className="ml-3 flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <h3 className="font-medium text-sm">{userProfile?.nickname}</h3>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs text-gray-500">{comment.createdAt}</span>
-                                                    {comment.authorNickname === userProfile?.nickname && (
-                                                        <div className="flex gap-2">
-                                                            <button
-                                                                onClick={() => handleDeleteComment(comment.commentId)}
-                                                                className="text-xs text-red-500 hover:text-red-600"
-                                                            >
-                                                                삭제
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
+                        {comments?.comments.map((comment) => (
+                            <div key={comment.commentId} className="py-4 border-b border-gray-100">
+                                <div className="flex items-start">
+                                    <img
+                                        src={comment.authorProfile || tailogo}
+                                        alt="프로필"
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                    <div className="ml-3 flex-1">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="font-medium text-sm">{comment.authorNickname}</h3>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-xs text-gray-500">
+                                                    {new Date(comment.createdAt).toLocaleString()}
+                                                </span>
+                                                {comment.authorNickname === userProfile?.nickname && (
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                handleDeleteComment(comment.commentId);
+                                                            }}
+                                                            className="text-xs text-red-500 hover:text-red-600"
+                                                        >
+                                                            삭제
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
-                                            <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
-                                            <button
-                                                onClick={() => handleReply(comment.commentId)}
-                                                className="text-xs text-gray-500 mt-2 hover:text-blue-500"
-                                            >
-                                                답글 달기
-                                            </button>
                                         </div>
+                                        <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
+                                        <button
+                                            onClick={() => handleReply(comment.commentId)}
+                                            className="text-xs text-gray-500 mt-2 hover:text-blue-500"
+                                        >
+                                            답글 달기
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>

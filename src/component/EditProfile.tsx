@@ -10,8 +10,9 @@ import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 import FormInput from '@/components/form/FormInput';
 import { Gender, ProfileData } from '../types/profile';
 import { updateProfile, createProfileFormData } from '../api/profile';
-import { fetchApi } from '@/utils/api';
+
 import BreedCombobox from '@/components/form/BreedCombobox';
+import { getToken } from '@/utils/auth';
 
 interface ProfileResponse {
     nickname: string;
@@ -87,9 +88,13 @@ const EditProfile = () => {
         const fetchProfile = async () => {
             try {
                 setIsLoading(true);
-                const profileData = await fetchApi<ProfileResponse>('/api/member');
-
-                const profileImageUrl = updateFormFields(profileData);
+                const profileData = await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                    },
+                });
+                const data = await profileData.json();
+                const profileImageUrl = updateFormFields(data.data);
 
                 if (profileImageUrl) {
                     await updateProfileImage(profileImageUrl);

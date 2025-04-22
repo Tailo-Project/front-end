@@ -4,9 +4,9 @@ import FeedItem from './FeedItem';
 import { FeedPost } from '@/types/feed';
 import AuthRequiredView from '@/components/common/AuthRequiredView';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import { fetchApi } from '@/utils/api';
 import { ApiError } from '@/types/error';
 import { useNavigate } from 'react-router-dom';
+import { getToken } from '@/utils/auth';
 
 const FeedList = () => {
     const [feeds, setFeeds] = useState<FeedPost[]>([]);
@@ -21,8 +21,13 @@ const FeedList = () => {
             setError(null);
 
             try {
-                const feedPosts = await fetchApi<{ feedPosts: FeedPost[] }>('/api/feed?page=0&size=10');
-                setFeeds(feedPosts.feedPosts);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed?page=0&size=10`, {
+                    headers: {
+                        Authorization: `Bearer ${getToken()}`,
+                    },
+                });
+                const data = await response.json();
+                setFeeds(data.data.feedPosts);
             } catch (error) {
                 const apiError = error as ApiError;
                 setError(apiError);
