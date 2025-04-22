@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createFormDataWithJson } from '@/utils/formData';
+import { getToken } from '@/utils/auth';
 
 interface PostForm {
     content: string;
@@ -61,7 +62,7 @@ export const usePostForm = () => {
                 method: 'POST',
                 body: formData,
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+                    Authorization: `Bearer ${getToken()}`,
                 },
             });
 
