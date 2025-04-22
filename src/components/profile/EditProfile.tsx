@@ -129,8 +129,9 @@ const EditProfile = () => {
         try {
             const formData = createProfileFormData({ ...data, profileImage });
             await updateProfile(formData);
-            showToast('프로필 수정 완료', 'success');
-            navigate('/profile');
+            navigate('/profile', {
+                state: { toast: { message: '프로필이 성공적으로 수정되었습니다.', type: 'success' } },
+            });
         } catch {
             showToast('프로필 수정에 실패했습니다.', 'error');
         }

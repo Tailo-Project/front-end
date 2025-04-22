@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 
 import defaultProfileImage from '@/assets/defaultImage.png';
 import Layout from '@/components/pages/layout';
 import Toast from '@/components/ui/Toast';
+import { useToast } from '@/hooks/useToast';
 import { getAccountId, getToken, removeAccountId, removeToken } from '@/utils/auth';
 
 interface ProfileData {
@@ -18,7 +19,8 @@ interface ProfileData {
 
 const Profile = () => {
     const navigate = useNavigate();
-    const [showToast, setShowToast] = useState(false);
+    const location = useLocation();
+    const { toast, showToast } = useToast();
     const [profileData, setProfileData] = useState<{ data: ProfileData }>({
         data: {
             nickname: '',
@@ -29,7 +31,6 @@ const Profile = () => {
             isFollow: false,
         },
     });
-    const [toastMessage, setToastMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
 
     // 임시 게시물 데이터
@@ -48,15 +49,13 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfileData = async () => {
             if (!accountId) {
-                setToastMessage('로그인이 필요한 서비스입니다.');
-                setShowToast(true);
+                showToast('로그인이 필요한 서비스입니다.', 'error');
                 navigate('/login');
                 return;
             }
 
             if (!token) {
-                setToastMessage('로그인이 필요한 서비스입니다.');
-                setShowToast(true);
+                showToast('로그인이 필요한 서비스입니다.', 'error');
                 navigate('/login');
                 return;
             }
@@ -88,26 +87,33 @@ const Profile = () => {
                 });
             } catch (error) {
                 console.error('프로필 정보 조회 중 오류:', error);
-                setShowToast(true);
+                showToast('프로필 정보 조회 중 오류가 발생했습니다.', 'error');
             } finally {
                 setIsLoading(false);
             }
         };
 
         fetchProfileData();
-    }, [accountId, token, navigate]);
+    }, [accountId, token, navigate, showToast]);
+
+    useEffect(() => {
+        if (location.state?.toast) {
+            const { message, type } = location.state.toast;
+            showToast(message, type);
+            // Clear the state after showing toast
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [location, navigate, showToast]);
 
     const handleLogout = async () => {
         try {
             removeToken();
             removeAccountId();
             navigate('/login');
-            setToastMessage('로그아웃 중 오류가 발생했습니다.');
-            setShowToast(true);
+            showToast('로그아웃되었습니다.', 'success');
         } catch (error) {
             console.error('로그아웃 중 오류가 발생했습니다:', error);
-            setToastMessage('로그아웃 중 오류가 발생했습니다.');
-            setShowToast(true);
+            showToast('로그아웃 중 오류가 발생했습니다.', 'error');
         }
     };
 
@@ -181,7 +187,9 @@ const Profile = () => {
                     ))}
                 </div>
 
-                {showToast && <Toast message={toastMessage} type="error" onClose={() => setShowToast(false)} />}
+                {toast.show && (
+                    <Toast message={toast.message} type={toast.type} onClose={() => showToast('', toast.type, 0)} />
+                )}
             </div>
         </Layout>
     );
