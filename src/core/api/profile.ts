@@ -24,7 +24,7 @@ export const updateProfile = async (formData: FormData) => {
 
 export const createProfileFormData = (data: ProfileData): FormData => {
     const accountId = getAccountId();
-    const { nickname, type, age, gender, address, profileImage } = data;
+    const { nickname, type, age, gender, address, profileImage, breed } = data;
 
     return createFormDataWithJson({
         requestKey: 'request',
@@ -35,7 +35,8 @@ export const createProfileFormData = (data: ProfileData): FormData => {
             gender,
             address,
             accountId,
+            breed,
         },
-        files: profileImage instanceof File ? [{ key: 'file', files: [profileImage] }] : undefined,
+        files: profileImage instanceof File ? [{ key: 'profileImage', files: [profileImage] }] : undefined,
     });
 };
