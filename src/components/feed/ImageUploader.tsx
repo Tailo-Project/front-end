@@ -9,17 +9,12 @@ interface ImageUploaderProps {
 
 const MAX_IMAGES = 4;
 const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
 
 export const ImageUploader = ({ images, onImagesChange, error, onError }: ImageUploaderProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
     const validateImage = (file: File): boolean => {
-        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-            onError('지원하지 않는 이미지 형식입니다. (JPG, PNG, GIF만 가능)');
-            return false;
-        }
         if (file.size > MAX_IMAGE_SIZE) {
             onError(`이미지 크기는 ${MAX_IMAGE_SIZE / 1024 / 1024}MB를 초과할 수 없습니다.`);
             return false;
@@ -68,7 +63,7 @@ export const ImageUploader = ({ images, onImagesChange, error, onError }: ImageU
                 <input
                     ref={fileInputRef}
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg, image/png"
                     multiple
                     onChange={handleImageUpload}
                     className="hidden"
