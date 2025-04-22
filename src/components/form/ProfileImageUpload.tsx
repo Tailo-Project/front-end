@@ -24,7 +24,7 @@ const ProfileImageUpload = ({ profileImage, setProfileImage, setValue }: Profile
             reader.onloadend = () => {
                 if (typeof reader.result === 'string') {
                     setProfileImage(reader.result);
-                    setValue('file', file);
+                    setValue('profileImage', file);
                 }
             };
             reader.readAsDataURL(file);

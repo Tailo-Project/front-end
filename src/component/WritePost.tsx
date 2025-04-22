@@ -112,9 +112,6 @@ const WritePost = () => {
                 throw new Error('게시글 등록에 실패했습니다.');
             }
 
-            const responseData = await response.json();
-            console.log('서버 응답:', responseData);
-
             navigate('/');
         } catch (error) {
             console.error('게시글 생성 실패:', error);

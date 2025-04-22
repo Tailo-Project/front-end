@@ -7,7 +7,7 @@ export interface SignUpFormData {
     breed: string;
     gender: 'MALE' | 'FEMALE';
     address: string;
-    file?: File;
+    profileImage?: File;
 }
 
 export interface ToastState {

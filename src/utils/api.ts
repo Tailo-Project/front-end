@@ -6,12 +6,13 @@ interface FetchOptions extends RequestInit {
 }
 
 export const fetchApi = async <T>(endpoint: string, options: FetchOptions = {}): Promise<T> => {
-    const { requiresAuth = true, ...fetchOptions } = options;
+    const { requiresAuth = true, headers: customHeaders, ...fetchOptions } = options;
 
-    const headers = new Headers({
-        'Content-Type': 'application/json',
-        ...(options.headers as Record<string, string>),
-    });
+    const headers = new Headers(customHeaders);
+
+    if (!headers.has('Content-Type') && !(options.body instanceof FormData)) {
+        headers.set('Content-Type', 'application/json');
+    }
 
     if (requiresAuth) {
         const token = getToken();
@@ -26,19 +27,21 @@ export const fetchApi = async <T>(endpoint: string, options: FetchOptions = {}):
     });
 
     if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+
         if (response.status === 401) {
-            throw createApiError('AUTH');
+            throw createApiError('AUTH', errorData.message);
         }
         if (response.status === 404) {
-            throw createApiError('NOT_FOUND');
+            throw createApiError('NOT_FOUND', errorData.message);
         }
         if (response.status === 400) {
-            throw createApiError('BAD_REQUEST');
+            throw createApiError('BAD_REQUEST', errorData.message);
         }
         if (response.status === 500) {
-            throw createApiError('NETWORK');
+            throw createApiError('NETWORK', errorData.message);
         }
-        throw createApiError('UNKNOWN');
+        throw createApiError('UNKNOWN', errorData.message);
     }
 
     const data = await response.json();

@@ -6,11 +6,14 @@ import AuthRequiredView from '@/components/common/AuthRequiredView';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { fetchApi } from '@/utils/api';
 import { ApiError } from '@/types/error';
+import { useNavigate } from 'react-router-dom';
 
 const FeedList = () => {
     const [feeds, setFeeds] = useState<FeedPost[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<ApiError | null>(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchFeeds = async () => {
@@ -41,7 +44,10 @@ const FeedList = () => {
                 <div className="text-center p-4">
                     <p className="text-gray-600 mb-4">{error.message}</p>
                     <button
-                        onClick={() => setError(null)}
+                        onClick={() => {
+                            setError(null);
+                            navigate('/login');
+                        }}
                         className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                     >
                         다시 시도

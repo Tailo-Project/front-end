@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useLocation } from 'react-router-dom';
-import tailoLogo from '../assets/tailogo.svg';
+import { useLocation, useNavigate } from 'react-router-dom';
+import defaultProfileImage from '../assets/defaultImage.png';
 import Toast from './Toast';
 import { SignUpFormData, ToastState } from '../components/form/types';
 import ProfileImageUpload from '../components/form/ProfileImageUpload';
@@ -9,6 +9,8 @@ import FormInput from '../components/form/FormInput';
 import BreedCombobox from '../components/form/BreedCombobox';
 import GenderRadioGroup from '../components/form/GenderRadioGroup';
 import { createFormDataWithJson } from '@/utils/formData';
+import { fetchApi } from '@/utils/api';
+import { setToken, setAccountId } from '@/utils/auth';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
@@ -30,9 +32,7 @@ const SignUpForm = () => {
         type: 'success',
         show: false,
     });
-
     const navigate = useNavigate();
-
     const {
         register,
         handleSubmit,
@@ -91,6 +91,7 @@ const SignUpForm = () => {
     };
 
     const onSubmit = async (data: SignUpFormData) => {
+        const { email, nickname, accountId, type, breed, gender, age, address, profileImage } = data;
         if (idCheckStatus !== 200) {
             showToastMessage('아이디 중복 확인을 해주세요.', 'error');
             return;
@@ -99,24 +100,23 @@ const SignUpForm = () => {
         try {
             const formData = createFormDataWithJson({
                 requestKey: 'request',
-                jsonData: {
-                    email: data.email,
-                    nickname: data.nickname,
-                    accountId: data.accountId,
-                    type: data.type,
-                    breed: data.breed,
-                    gender: data.gender,
-                    age: data.age,
-                    address: data.address,
-                },
-                files: data.file ? [{ key: 'profileImage', files: [data.file] }] : undefined,
+                jsonData: { email, nickname, accountId, type, breed, gender, age, address },
+                files: profileImage ? [{ key: 'profileImage', files: [profileImage] }] : undefined,
             });
 
-            await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
+            const response = await fetchApi<{ accessToken: string; accountId: string }>(`/api/auth/sign-up`, {
                 method: 'POST',
                 body: formData,
             });
-            navigate('/login');
+
+            if (response.accessToken && response.accountId) {
+                setToken(response.accessToken);
+                setAccountId(response.accountId);
+                showToastMessage('회원가입이 완료되었습니다.', 'success');
+                navigate('/');
+            } else {
+                throw new Error('회원가입 응답에 필요한 데이터가 없습니다.');
+            }
         } catch (error) {
             if (error instanceof Error) {
                 showToastMessage(error.message, 'error');
@@ -143,7 +143,7 @@ const SignUpForm = () => {
 
             <div className="w-full max-w-[320px] mx-auto">
                 <div className="mb-8">
-                    <img src={tailoLogo} alt="Tailo Logo" className="w-[140px] h-[140px] mx-auto" />
+                    <img src={defaultProfileImage} alt="Tailo Logo" className="w-[140px] h-[140px] mx-auto" />
                 </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
