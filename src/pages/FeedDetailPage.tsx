@@ -45,6 +45,8 @@ const FeedDetailPage = () => {
     const [replyToId, setReplyToId] = useState<number | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
+    console.log(comments?.comments, 'comments');
+
     // 현재 사용자 프로필 정보 조회
     useEffect(() => {
         const fetchUserProfile = async () => {
