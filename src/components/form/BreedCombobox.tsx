@@ -1,7 +1,5 @@
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
-import { UseFormSetValue } from 'react-hook-form';
-import { SignUpFormData } from './types';
 import { useState } from 'react';
 
 interface BreedComboboxProps {
@@ -9,10 +7,9 @@ interface BreedComboboxProps {
     onChange: (value: string) => void;
     breeds: string[];
     onAddBreed?: (breed: string) => void;
-    setValue: UseFormSetValue<SignUpFormData>;
 }
 
-const BreedCombobox = ({ value, onChange, breeds, onAddBreed, setValue }: BreedComboboxProps) => {
+const BreedCombobox = ({ value, onChange, breeds, onAddBreed }: BreedComboboxProps) => {
     const [query, setQuery] = useState('');
     const [showAddBreed, setShowAddBreed] = useState(false);
 
@@ -23,7 +20,6 @@ const BreedCombobox = ({ value, onChange, breeds, onAddBreed, setValue }: BreedC
         if (query && !breeds.includes(query) && onAddBreed) {
             onAddBreed(query);
             onChange(query);
-            setValue('breed', query);
             setShowAddBreed(false);
         }
     };
@@ -39,7 +35,6 @@ const BreedCombobox = ({ value, onChange, breeds, onAddBreed, setValue }: BreedC
                     value={value}
                     onChange={(newValue: string) => {
                         onChange(newValue || '');
-                        setValue('breed', newValue || '');
                     }}
                 >
                     <div className="relative">
