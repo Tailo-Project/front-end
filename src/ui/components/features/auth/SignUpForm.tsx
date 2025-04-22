@@ -11,6 +11,7 @@ import { createFormDataWithJson } from '@/shared/utils/formData';
 import { setToken, setAccountId } from '@/shared/utils/auth';
 import Toast from '@/ui/components/ui/Toast';
 import { SignUpFormData, ToastState } from '@/ui/components/form/types';
+import { useToast } from '@/shared/hooks/useToast';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
@@ -22,16 +23,11 @@ const SignUpForm = () => {
     const location = useLocation();
     const email = (location.state as LocationState)?.email;
 
-    const [breeds, setBreeds] = useState(INITIAL_BREEDS);
     const [selectedBreed, setSelectedBreed] = useState('');
     const [profileImage, setProfileImage] = useState<string | null>(null);
     const [isCheckingId, setIsCheckingId] = useState(false);
     const [idCheckStatus, setIdCheckStatus] = useState<number | null>(null);
-    const [toast, setToast] = useState<ToastState>({
-        message: '',
-        type: 'success',
-        show: false,
-    });
+    const { toast, showToast } = useToast();
     const navigate = useNavigate();
     const {
         register,
@@ -44,6 +40,7 @@ const SignUpForm = () => {
         defaultValues: {
             email,
             gender: 'MALE',
+            breed: '',
         },
     });
 
@@ -53,12 +50,14 @@ const SignUpForm = () => {
         setIdCheckStatus(null);
     }, [accountId]);
 
+    useEffect(() => {
+        if (selectedBreed) {
+            setValue('breed', selectedBreed);
+        }
+    }, [selectedBreed, setValue]);
+
     const showToastMessage = (message: string, type: ToastState['type']) => {
-        setToast({
-            message,
-            type,
-            show: true,
-        });
+        showToast(message, type);
     };
 
     const checkAccountIdDuplicate = async () => {
@@ -110,35 +109,24 @@ const SignUpForm = () => {
             });
 
             const data = await response.json();
+            console.log(data, 'data');
 
             if (data.accessToken && data.accountId) {
                 setToken(data.accessToken);
                 setAccountId(data.accountId);
-                showToastMessage('회원가입이 완료되었습니다.', 'success');
+                showToast('회원가입이 완료되었습니다.', 'success');
                 navigate('/');
-            } else {
-                throw new Error('회원가입 응답에 필요한 데이터가 없습니다.');
             }
         } catch (error) {
             if (error instanceof Error) {
-                showToastMessage(error.message, 'error');
+                showToast(error.message, 'error');
             }
         }
     };
 
-    const handleAddBreed = (newBreed: string) => {
-        setBreeds((prev) => [...prev, newBreed]);
-    };
-
     return (
         <div className="flex flex-col items-start justify-start min-h-screen bg-white px-4 py-6">
-            {toast.show && (
-                <Toast
-                    message={toast.message}
-                    type={toast.type}
-                    onClose={() => setToast((prev) => ({ ...prev, show: false }))}
-                />
-            )}
+            {toast.show && <Toast message={toast.message} type={toast.type} onClose={() => showToast('', 'success')} />}
             <h1 className="text-xl font-medium mb-8 flex items-center gap-2 mx-auto">
                 회원가입 | <span className="text-blue-500">추가 정보를 입력해주세요.</span>
             </h1>
@@ -206,9 +194,14 @@ const SignUpForm = () => {
 
                         <BreedCombobox
                             value={selectedBreed}
-                            onChange={setSelectedBreed}
-                            breeds={breeds}
-                            onAddBreed={handleAddBreed}
+                            onChange={(breed) => {
+                                setSelectedBreed(breed);
+                                setValue('breed', breed);
+                            }}
+                            breeds={INITIAL_BREEDS}
+                            onAddBreed={(newBreed) => {
+                                setValue('breed', newBreed);
+                            }}
                         />
 
                         <GenderRadioGroup register={register} name="gender" />
