@@ -65,7 +65,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
                 ))}
             </div>
 
-            <FeedImages images={feed.imageUrls} authorNickname={feed.authorNickname} />
+            <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
             <FeedActions
                 likesCount={feed.likesCount}
                 commentsCount={feed.commentsCount}
