@@ -339,7 +339,7 @@ const FeedDetailPage = () => {
                                         />
                                         <div className="ml-3 flex-1">
                                             <div className="flex items-center justify-between">
-                                                <h3 className="font-medium text-sm">{comment.authorNickname}</h3>
+                                                <h3 className="font-medium text-sm">{userProfile?.nickname}</h3>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-xs text-gray-500">{comment.createdAt}</span>
                                                     {comment.authorNickname === userProfile?.nickname && (
