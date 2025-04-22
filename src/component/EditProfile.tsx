@@ -36,30 +36,16 @@ const EditProfile = () => {
         const fetchProfile = async () => {
             try {
                 const response = await fetchApi<ProfileResponse>(`/api/member`);
-                const { nickname, breed, type, age, gender, address, profileImageUrl, accountId } = response;
 
-                const updatedProfileData = {
-                    nickname,
-                    profileImage: profileImageUrl || defaultProfileImage,
-                    type,
-                    breed,
-                    age,
-                    gender,
-                    address,
-                    accountId,
-                };
+                reset({
+                    ...response,
+                    profileImage: response.profileImageUrl || defaultProfileImage,
+                });
 
-                reset(updatedProfileData);
-
-                if (profileImageUrl) {
-                    try {
-                        const response = await fetch(profileImageUrl);
-                        const blob = await response.blob();
-                        const file = new File([blob], 'profile.jpg', { type: 'image/jpeg' });
-                        handleImageChange(file);
-                    } catch (error) {
-                        console.error('프로필 이미지 로드 실패', error);
-                    }
+                if (response.profileImageUrl) {
+                    const imageResponse = await fetch(response.profileImageUrl);
+                    const blob = await imageResponse.blob();
+                    handleImageChange(new File([blob], 'profile.jpg', { type: 'image/jpeg' }));
                 }
             } catch (error) {
                 console.error('프로필 조회 실패', error);
