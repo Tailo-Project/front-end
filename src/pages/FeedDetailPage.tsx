@@ -9,14 +9,33 @@ import { fetchApi } from '@/utils/api';
 import { ApiError } from '@/types/error';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import AuthRequiredView from '@/components/common/AuthRequiredView';
+import tailogo from '../assets/tailogo.svg';
+import { getToken } from '@/utils/auth';
+
+interface Comment {
+    commentId: number;
+    content: string;
+    authorNickname: string;
+    authorProfile: string;
+    createdAt: string;
+    // replies: {
+    //     replies: Comment[];
+    //     totalCount: number;
+    // };
+}
 
 const FeedDetailPage = () => {
     const { feedId } = useParams<{ feedId: string }>();
     const navigate = useNavigate();
     const [feed, setFeed] = useState<FeedPost | null>(null);
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [newComment, setNewComment] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<ApiError | null>(null);
+    const [replyToId, setReplyToId] = useState<number | null>(null);
 
+    // 피드 상세 정보 조회
     useEffect(() => {
         const fetchFeedDetail = async () => {
             if (!feedId) return;
@@ -27,6 +46,9 @@ const FeedDetailPage = () => {
             try {
                 const response = await fetchApi<FeedPost>(`/api/feed/${feedId}`);
                 setFeed(response);
+                // 피드 조회 후 댓글 목록도 함께 조회
+                const commentsResponse = await fetchApi<{ comments: Comment[] }>(`/api/feed/${feedId}/comments`);
+                setComments(commentsResponse.comments);
             } catch (error) {
                 const apiError = error as ApiError;
                 setError(apiError);
@@ -39,20 +61,11 @@ const FeedDetailPage = () => {
     }, [feedId]);
 
     const handleLike = async (e: React.MouseEvent) => {
-        console.log(e, 'like');
         e.stopPropagation();
-        // 좋아요 기능 구현
         await fetchApi<FeedPost>(`/api/feed/${feedId}/likes`);
     };
 
-    const handleComment = (e: React.MouseEvent) => {
-        console.log(e, 'comment');
-        e.stopPropagation();
-        // 댓글 기능 구현
-    };
-
     const handleShare = (e: React.MouseEvent) => {
-        console.log(e, 'share');
         e.stopPropagation();
         // 공유 기능 구현
     };
@@ -60,6 +73,84 @@ const FeedDetailPage = () => {
     const handleMoreClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         // 추가 메뉴 기능 구현
+    };
+
+    // 댓글 작성 처리
+    const handleCommentSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!newComment.trim() || isSubmitting || !feedId) return;
+
+        try {
+            setIsSubmitting(true);
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    parentId: replyToId,
+                    content: newComment.trim(),
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+
+            const result = await response.json();
+
+            if (result.statusCode === 201) {
+                // 새로운 댓글을 목록 맨 앞에 추가
+                const newCommentObj: Comment = {
+                    commentId: Date.now(),
+                    content: newComment.trim(),
+                    authorNickname: feed?.authorNickname || '',
+                    authorProfile: typeof feed?.authorProfile === 'string' ? feed.authorProfile : '',
+                    createdAt: new Date().toISOString(),
+                };
+
+                setComments((prevComments) => [newCommentObj, ...prevComments]);
+
+                // 피드의 댓글 수 업데이트
+                if (feed) {
+                    setFeed({
+                        ...feed,
+                        commentsCount: feed.commentsCount + 1,
+                    });
+                }
+
+                // 입력 필드 초기화
+                setNewComment('');
+                setReplyToId(null);
+            }
+        } catch (error) {
+            console.error('댓글 등록 실패:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // 답글 작성 모드 설정
+    const handleReply = (commentId: number) => {
+        setReplyToId(commentId);
+        // 댓글 입력 필드로 포커스 이동
+        const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement;
+        if (inputElement) {
+            inputElement.focus();
+        }
+    };
+
+    // 답글 작성 취소
+    const handleCancelReply = () => {
+        setReplyToId(null);
+        setNewComment('');
+    };
+
+    const handleComment = () => {
+        // 댓글 입력 필드로 포커스 이동
+        const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement;
+        if (inputElement) {
+            inputElement.focus();
+        }
     };
 
     if (isLoading) {
@@ -106,8 +197,8 @@ const FeedDetailPage = () => {
 
     return (
         <Layout>
-            <div className="bg-white min-h-screen">
-                <header className="flex items-center px-4 h-[52px] border-b border-gray-200">
+            <div className="bg-white min-h-screen flex flex-col">
+                <header className="flex items-center px-4 h-[52px] border-b border-gray-200 flex-shrink-0">
                     <button onClick={() => navigate('/feeds')} className="p-2 -ml-2">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                             <path
@@ -128,7 +219,7 @@ const FeedDetailPage = () => {
                 </header>
 
                 {/* 스크롤 가능한 컨텐츠 */}
-                <div className="overflow-y-auto pb-16">
+                <div className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
                     <div className="p-4">
                         <FeedHeader
                             authorNickname={feed.authorNickname}
@@ -150,13 +241,78 @@ const FeedDetailPage = () => {
                         <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
                         <FeedActions
                             likesCount={feed.likesCount}
-                            commentsCount={feed.commentsCount}
+                            commentsCount={comments.length}
                             onLike={handleLike}
                             onComment={handleComment}
                             onShare={handleShare}
                         />
                     </div>
+
+                    <div className="flex-shrink-0 bg-white border-t border-gray-200 p-2">
+                        <form onSubmit={handleCommentSubmit}>
+                            {replyToId && (
+                                <div className="flex justify-between items-center mb-2 px-4 py-2 bg-gray-50 rounded-lg">
+                                    <span className="text-sm text-gray-600">답글 작성 중</span>
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelReply}
+                                        className="text-xs text-gray-500 hover:text-red-500"
+                                    >
+                                        취소
+                                    </button>
+                                </div>
+                            )}
+                            <div className="flex items-center">
+                                <input
+                                    type="text"
+                                    value={newComment}
+                                    onChange={(e) => setNewComment(e.target.value)}
+                                    placeholder={replyToId ? '답글을 입력하세요...' : '댓글을 입력하세요...'}
+                                    className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!newComment.trim() || isSubmitting}
+                                    className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium
+                                         hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    {isSubmitting ? '등록 중...' : '게시'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {/* 댓글 목록 */}
+                    <div className="px-4 border-t border-gray-200">
+                        {comments &&
+                            comments.map((comment) => (
+                                <div key={comment.commentId} className="py-4 border-b border-gray-100">
+                                    <div className="flex items-start">
+                                        <img
+                                            src={comment.authorProfile || tailogo}
+                                            alt="프로필"
+                                            className="w-8 h-8 rounded-full object-cover"
+                                        />
+                                        <div className="ml-3 flex-1">
+                                            <div className="flex items-center justify-between">
+                                                <h3 className="font-medium text-sm">{comment.authorNickname}</h3>
+                                                <span className="text-xs text-gray-500">{comment.createdAt}</span>
+                                            </div>
+                                            <p className="text-sm text-gray-700 mt-1">{comment.content}</p>
+                                            <button
+                                                onClick={() => handleReply(comment.commentId)}
+                                                className="text-xs text-gray-500 mt-2 hover:text-blue-500"
+                                            >
+                                                답글 달기
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                    </div>
                 </div>
+
+                {/* 댓글 입력 */}
             </div>
         </Layout>
     );

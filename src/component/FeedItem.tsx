@@ -22,7 +22,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
 
     const handleComment = (e: React.MouseEvent) => {
         e.stopPropagation();
-        // 댓글 기능 구현
+        navigate(`/feeds/${feed.feedId}`);
     };
 
     const handleShare = (e: React.MouseEvent) => {
