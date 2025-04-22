@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import defaultProfileImage from '../assets/defaultImage.png';
 import Toast from './Toast';
 import { SignUpFormData, ToastState } from '../components/form/types';
@@ -31,7 +31,7 @@ const SignUpForm = () => {
         type: 'success',
         show: false,
     });
-
+    const navigate = useNavigate();
     const {
         register,
         handleSubmit,
@@ -107,6 +107,7 @@ const SignUpForm = () => {
                 method: 'POST',
                 body: formData,
             });
+            navigate('/');
         } catch (error) {
             if (error instanceof Error) {
                 showToastMessage(error.message, 'error');

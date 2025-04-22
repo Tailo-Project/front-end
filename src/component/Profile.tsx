@@ -73,8 +73,6 @@ const Profile = () => {
                     },
                 });
 
-                console.log('서버 응답 데이터:', profileData);
-
                 const { nickname, countFollower, countFollowing, profileImageUrl, isFollow } = profileData;
 
                 setProfileData({
@@ -131,7 +129,6 @@ const Profile = () => {
     return (
         <Layout>
             <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen pb-16">
-                {/* 프로필 헤더 */}
                 <header className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between mb-4">
                         <h1 className="text-xl font-bold">마이페이지</h1>
@@ -146,7 +143,6 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {/* 프로필 정보 */}
                     <div className="flex items-center mb-6">
                         <img
                             src={profileData.data?.profileImageUrl || defaultProfileImage}
@@ -156,13 +152,9 @@ const Profile = () => {
                         <div className="ml-6">
                             <h2 className="text-lg font-semibold mb-1">{profileData.data?.nickname}</h2>
                             <h3 className="text-gray-600 text-sm">{profileData.data.id}</h3>
-                            <p className="text-gray-600 text-sm">
-                                {profileData.data?.profileImageUrl || '반려동물 과 함께하는 일상을 공유해요 🐶'}
-                            </p>
                         </div>
                     </div>
 
-                    {/* 통계 */}
                     <div className="flex justify-around mb-6">
                         <div className="text-center">
                             <div className="font-semibold">{profileData.data?.countFollower}</div>
@@ -178,7 +170,6 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {/* 프로필 수정 버튼 */}
                     <button
                         onClick={() => navigate('/profile/edit')}
                         className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors"
@@ -187,7 +178,6 @@ const Profile = () => {
                     </button>
                 </header>
 
-                {/* 게시물 그리드 */}
                 <div className="grid grid-cols-3 gap-0.5">
                     {posts.map((post) => (
                         <div key={post.id} className="aspect-square">
@@ -196,7 +186,6 @@ const Profile = () => {
                     ))}
                 </div>
 
-                {/* 토스트 메시지 */}
                 {showToast && <Toast message={toastMessage} type="error" onClose={() => setShowToast(false)} />}
             </div>
         </Layout>
