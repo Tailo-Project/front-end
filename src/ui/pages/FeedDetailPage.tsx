@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import FeedHeader from '@/ui/components/features/feed/FeedHeader';
 import FeedImages from '@/ui/components/features/feed/FeedImages';
@@ -13,6 +13,10 @@ import { ApiError } from '@/shared/types/error';
 import Layout from './layout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AuthRequiredView from '../components/AuthRequiredView';
+import BackButton from '../components/BackButton';
+import FeedContent from '../components/features/feed/FeedContent';
+
+import CommentInput from '../components/features/feed/CommentInput';
 
 interface UserProfile {
     nickname: string;
@@ -21,7 +25,7 @@ interface UserProfile {
 
 const FeedDetailPage = () => {
     const { feedId } = useParams<{ feedId: string }>();
-    const navigate = useNavigate();
+
     const [feed, setFeed] = useState<FeedPost | null>(null);
     const [comments, setComments] = useState<CommentsResponse | null>(null);
     const [newComment, setNewComment] = useState('');
@@ -175,6 +179,10 @@ const FeedDetailPage = () => {
         }
     };
 
+    const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewComment(e.target.value);
+    };
+
     // 답글 작성 모드 설정
     const handleReply = (commentId: number) => {
         setReplyToId(commentId);
@@ -251,165 +259,89 @@ const FeedDetailPage = () => {
         return <AuthRequiredView />;
     }
 
-    if (error) {
-        return (
-            <Layout>
-                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
-                    <div className="text-center p-4">
-                        <p className="text-gray-600 mb-4">{error.message}</p>
-                        <button
-                            onClick={() => setError(null)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                        >
-                            다시 시도
-                        </button>
-                    </div>
-                </div>
-            </Layout>
-        );
-    }
-
-    if (!feed) {
-        return (
-            <Layout>
-                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
-                    <p className="text-gray-600">피드를 찾을 수 없습니다.</p>
-                </div>
-            </Layout>
-        );
-    }
-
     return (
         <Layout>
-            <div className="bg-white min-h-screen flex flex-col">
-                <header className="flex items-center px-4 h-[52px] border-b border-gray-200 flex-shrink-0">
-                    <button onClick={() => navigate('/feeds')} className="p-2 -ml-2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path
-                                d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z"
-                                fill="currentColor"
-                            />
-                        </svg>
-                    </button>
-                    <h1 className="flex-1 text-center font-medium">게시물</h1>
-                    <button className="p-2 -mr-2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path
-                                d="M12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16Z"
-                                fill="currentColor"
-                            />
-                        </svg>
-                    </button>
-                </header>
+            {feed && (
+                <div className="bg-white min-h-screen flex flex-col">
+                    <header className="flex items-center px-4 h-[52px] border-b border-gray-200 flex-shrink-0">
+                        <BackButton />
+                        <h1 className="flex-1 text-center font-medium">게시물</h1>
+                    </header>
 
-                {/* 스크롤 가능한 컨텐츠 */}
-                <div className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
-                    <div className="p-4">
-                        <FeedHeader
-                            authorNickname={feed.authorNickname}
-                            authorProfile={feed.authorProfile}
-                            createdAt={feed.createdAt}
-                            onMoreClick={handleMoreClick}
-                        />
-                        <div className="mt-4 mb-6">
-                            <p className="text-gray-800 text-[15px] leading-[22px] whitespace-pre-wrap">
-                                {feed.content}
-                            </p>
+                    {/* 스크롤 가능한 컨텐츠 */}
+                    <div className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
+                        <div className="p-4">
+                            <FeedHeader
+                                authorNickname={feed.authorNickname}
+                                authorProfile={feed.authorProfile}
+                                createdAt={feed.createdAt}
+                                onMoreClick={handleMoreClick}
+                            />
+                            <FeedContent feed={feed} />
+                            <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
+                            <FeedActions
+                                likesCount={feed.likesCount}
+                                commentsCount={comments?.comments?.length || 0}
+                                onLike={handleLike}
+                                onComment={handleComment}
+                                onShare={handleShare}
+                            />
                         </div>
 
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {feed.hashtags.map((hashtag) => (
-                                <div key={hashtag}>#{hashtag}</div>
-                            ))}
-                        </div>
-                        <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
-                        <FeedActions
-                            likesCount={feed.likesCount}
-                            commentsCount={comments?.comments?.length || 0}
-                            onLike={handleLike}
-                            onComment={handleComment}
-                            onShare={handleShare}
+                        <CommentInput
+                            newComment={newComment}
+                            onCommentChange={handleCommentChange}
+                            onCommentSubmit={handleCommentSubmit}
+                            isSubmitting={isSubmitting}
+                            replyToId={replyToId}
+                            onCancelReply={handleCancelReply}
                         />
-                    </div>
 
-                    <div className="flex-shrink-0 bg-white border-t border-gray-200 p-2">
-                        <form onSubmit={handleCommentSubmit}>
-                            {replyToId && (
-                                <div className="flex justify-between items-center mb-2 px-4 py-2 bg-gray-50 rounded-lg">
-                                    <span className="text-sm text-gray-600">답글 작성 중</span>
-                                    <button
-                                        type="button"
-                                        onClick={handleCancelReply}
-                                        className="text-xs text-gray-500 hover:text-red-500"
-                                    >
-                                        취소
-                                    </button>
-                                </div>
-                            )}
-                            <div className="flex items-center">
-                                <input
-                                    type="text"
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                    placeholder={replyToId ? '답글을 입력하세요...' : '댓글을 입력하세요...'}
-                                    className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={!newComment.trim() || isSubmitting}
-                                    className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium
-                                         hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                                >
-                                    {isSubmitting ? '등록 중...' : '게시'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    {/* 댓글 목록 */}
-                    <div className="px-4 border-t border-gray-200">
-                        {comments?.comments.map((comment) => (
-                            <div key={comment.commentId} className="py-4 border-b border-gray-100">
-                                <FeedHeader
-                                    authorNickname={comment.authorNickname}
-                                    authorProfile={comment.authorProfile || tailogo}
-                                    createdAt={comment.createdAt}
-                                    rightElement={
-                                        comment.authorNickname === userProfile?.nickname ? (
-                                            <div className="flex items-center gap-2">
+                        {/* 댓글 목록 */}
+                        <div className="px-4 border-t border-gray-200">
+                            {comments?.comments.map((comment) => (
+                                <div key={comment.commentId} className="py-4 border-b border-gray-100">
+                                    <FeedHeader
+                                        authorNickname={comment.authorNickname}
+                                        authorProfile={comment.authorProfile || tailogo}
+                                        createdAt={comment.createdAt}
+                                        rightElement={
+                                            comment.authorNickname === userProfile?.nickname ? (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-500">
+                                                        {new Date(comment.createdAt).toLocaleString()}
+                                                    </span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleDeleteComment(comment.commentId);
+                                                        }}
+                                                        className="text-xs text-red-500 hover:text-red-600"
+                                                    >
+                                                        삭제
+                                                    </button>
+                                                </div>
+                                            ) : (
                                                 <span className="text-xs text-gray-500">
                                                     {new Date(comment.createdAt).toLocaleString()}
                                                 </span>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        handleDeleteComment(comment.commentId);
-                                                    }}
-                                                    className="text-xs text-red-500 hover:text-red-600"
-                                                >
-                                                    삭제
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <span className="text-xs text-gray-500">
-                                                {new Date(comment.createdAt).toLocaleString()}
-                                            </span>
-                                        )
-                                    }
-                                />
-                                <p className="text-sm text-gray-700 mt-1 ml-[52px]">{comment.content}</p>
-                                <button
-                                    onClick={() => handleReply(comment.commentId)}
-                                    className="text-xs text-gray-500 mt-2 ml-[52px] hover:text-blue-500"
-                                >
-                                    답글 달기
-                                </button>
-                            </div>
-                        ))}
+                                            )
+                                        }
+                                    />
+                                    <p className="text-sm text-gray-700 mt-1 ml-[52px]">{comment.content}</p>
+                                    <button
+                                        onClick={() => handleReply(comment.commentId)}
+                                        className="text-xs text-gray-500 mt-2 ml-[52px] hover:text-blue-500"
+                                    >
+                                        답글 달기
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </Layout>
     );
 };
