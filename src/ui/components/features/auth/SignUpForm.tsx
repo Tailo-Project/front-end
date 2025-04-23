@@ -12,6 +12,8 @@ import { setToken, setAccountId } from '@/shared/utils/auth';
 import Toast from '@/ui/components/ui/Toast';
 import { SignUpFormData, ToastState } from '@/ui/components/form/types';
 import { useToast } from '@/shared/hooks/useToast';
+import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { fetchWithToken } from '@/token';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
@@ -68,12 +70,7 @@ const SignUpForm = () => {
 
         setIsCheckingId(true);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/member/duplicate/${accountId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const response = await fetchWithToken(`${BASE_API_URL}/member/duplicate/${accountId}`, {});
 
             const data = await response.json();
             setIdCheckStatus(data.statusCode);
@@ -103,7 +100,7 @@ const SignUpForm = () => {
                 files: profileImage ? [{ key: 'profileImage', files: [profileImage] }] : undefined,
             });
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-up`, {
+            const response = await fetchWithToken(`${BASE_API_URL}/auth/sign-up`, {
                 method: 'POST',
                 body: formData,
             });
