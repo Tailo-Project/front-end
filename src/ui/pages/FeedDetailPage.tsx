@@ -22,6 +22,7 @@ import { useFeedDetail } from '@/shared/hooks/useFeedDetail';
 import { useFeedComments } from '@/shared/hooks/useFeedComments';
 import { useFeedDelete } from '@/shared/hooks/useFeedDelete';
 import { FEED_API_URL } from '@/shared/constants/apiUrl';
+import ReplyBox from '../components/features/feed/ReplyBox';
 
 interface UserProfile {
     nickname: string;
@@ -181,15 +182,10 @@ const FeedDetailPage = () => {
 
     const isAuthor = feed?.authorNickname === userProfile?.nickname;
 
-    const totalComments =
-        comments &&
-        comments.comments.reduce((acc, comment) => {
-            const replyCount = comment.replies?.totalCount || 0;
-            const commentCount = 1;
-            return acc + commentCount + replyCount;
-        }, 0);
-
-    console.log(totalComments, 'totalComments');
+    const totalComments = (comments?.comments ?? []).reduce((acc, comment) => {
+        const replyCount = comment.replies?.totalCount || 0;
+        return acc + 1 + replyCount;
+    }, 0);
 
     if (isFeedLoading || isCommentsLoading) {
         return (
@@ -329,16 +325,8 @@ const FeedDetailPage = () => {
                                     >
                                         답글 달기
                                     </button>
-                                    {/* 답글 렌더링 */}
-                                    {comment.replies?.totalCount > 0 && (
-                                        <div className="flex flex-col gap-2 w-full rounded-md mt-2 bg-gray-300 p-2">
-                                            {comment.replies.replies.map((reply) => (
-                                                <div className="flex items-center gap-2" key={reply.commentId}>
-                                                    <p>{reply.content}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
+
+                                    <ReplyBox comment={comment} />
                                 </div>
                             ))}
                         </div>
