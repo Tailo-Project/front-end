@@ -20,6 +20,7 @@ import LikeAction from '../components/features/feed/LikeAction';
 import CommentAction from '../components/features/feed/CommentAction';
 import ShareAction from '../components/features/feed/ShareAction';
 import { useFeedLike } from '@/shared/hooks/useFeedLike';
+import { HashtagInput } from '../components/features/feed/HashtagInput';
 
 interface UserProfile {
     nickname: string;
@@ -34,6 +35,7 @@ const FeedDetailPage = () => {
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState('');
+    const [editHashtags, setEditHashtags] = useState<{ hashtag: string }[]>([]);
 
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -172,6 +174,7 @@ const FeedDetailPage = () => {
     const handleEdit = () => {
         if (!feed) return;
         setEditContent(feed.content);
+        setEditHashtags(feed.hashtags.map((tag) => ({ hashtag: tag })));
         setIsEditing(true);
     };
 
@@ -184,7 +187,7 @@ const FeedDetailPage = () => {
             // feedUpdateRequest JSON 데이터 추가
             const feedUpdateRequest = {
                 content: editContent.trim(),
-                hashtags: (editContent.match(/#[^\s#]+/g) || []).map((tag) => tag.slice(1)),
+                hashtags: editHashtags.map((tag) => tag.hashtag),
                 imageUrls: feed.imageUrls || [],
             };
 
@@ -228,6 +231,7 @@ const FeedDetailPage = () => {
     const handleEditCancel = () => {
         setIsEditing(false);
         setEditContent('');
+        setEditHashtags([]);
     };
 
     const handleDelete = async () => {
@@ -403,21 +407,22 @@ const FeedDetailPage = () => {
                                 </div>
                             )}
                             {isEditing ? (
-                                <div className="mt-4">
+                                <div className="mt-4 space-y-4">
                                     <textarea
                                         value={editContent}
                                         onChange={(e) => setEditContent(e.target.value)}
                                         className="w-full p-2 border border-gray-300 rounded-md"
                                         rows={4}
-                                        placeholder="내용을 입력하세요. 해시태그는 #으로 시작합니다."
+                                        placeholder="내용을 입력하세요"
                                     />
+                                    <HashtagInput hashtags={editHashtags} onHashtagsChange={setEditHashtags} />
                                 </div>
                             ) : (
                                 <FeedContent feed={feed} />
                             )}
 
                             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
-                            <div className="flex items-center justify-between px-2">
+                            <div className="flex items-center justify-between px-2 mt-2">
                                 <div className="flex items-center space-x-4">
                                     <LikeAction
                                         count={feed.likesCount}
