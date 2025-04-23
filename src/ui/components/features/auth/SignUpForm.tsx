@@ -70,9 +70,7 @@ const SignUpForm = () => {
 
         setIsCheckingId(true);
         try {
-            const response = await fetchWithToken(`${BASE_API_URL}/member/duplicate/${accountId}`, {
-                method: 'GET',
-            });
+            const response = await fetchWithToken(`${BASE_API_URL}/member/duplicate/${accountId}`, {});
 
             const data = await response.json();
             setIdCheckStatus(data.statusCode);
