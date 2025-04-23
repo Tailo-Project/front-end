@@ -1,13 +1,23 @@
-interface ActionButtonProps {
-    icon: React.ReactNode;
+import { MouseEvent, ReactNode } from 'react';
+
+export interface ActionButtonProps {
+    icon: ReactNode;
     count?: number;
-    onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+    onClick: (e: MouseEvent<HTMLButtonElement>) => void;
+    isLiked?: boolean;
+    disabled?: boolean;
 }
 
-const ActionButton = ({ icon, count, onClick }: ActionButtonProps) => (
-    <button className="flex items-center space-x-1" onClick={onClick}>
+const ActionButton = ({ icon, count, onClick, disabled }: ActionButtonProps) => (
+    <button
+        onClick={onClick}
+        className={`flex items-center gap-1 text-gray-500 transition-colors ${
+            disabled ? 'opacity-50 cursor-not-allowed' : 'hover:text-gray-700'
+        }`}
+        disabled={disabled}
+    >
         {icon}
-        {count !== undefined && <span className="text-sm">{count}</span>}
+        {<span className="text-sm">{count}</span>}
     </button>
 );
 

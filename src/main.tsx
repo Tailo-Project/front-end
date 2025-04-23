@@ -4,6 +4,8 @@ import { registerSW } from 'virtual:pwa-register';
 
 import App from '@/App';
 import '@/index.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const updateSW = registerSW({
     immediate: true,
@@ -31,8 +33,25 @@ const updateSW = registerSW({
     },
 });
 
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            retry: 1, // 실패 시 1번만 재시도
+            staleTime: 10 * 1000, // 10초 동안 데이터를 fresh 상태로 유지
+            gcTime: 5 * 60 * 1000, // 5분 동안 캐시 유지
+            refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
+        },
+        mutations: {
+            retry: 1, // 실패 시 1번만 재시도
+        },
+    },
+});
+
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
-        <App />
+        <QueryClientProvider client={queryClient}>
+            <App />
+            <ReactQueryDevtools initialIsOpen={false} />
+        </QueryClientProvider>
     </BrowserRouter>,
 );

@@ -1,18 +1,25 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import FeedHeader from '@/ui/components/features/feed/FeedHeader';
 import FeedImages from '@/ui/components/features/feed/FeedImages';
-import FeedActions from '@/ui/components/features/feed/FeedActions';
 import { getToken } from '@/lib/token';
 import { getAccountId } from '@/shared/utils/auth';
 
 import tailogo from '@/assets/tailogo.svg';
-import { CommentsResponse, FeedPost } from '@/shared/types/feed';
-import { ApiError } from '@/shared/types/error';
+import { CommentsResponse, FeedListResponse, FeedPost } from '@/shared/types/feed';
 import Layout from './layout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AuthRequiredView from '../components/AuthRequiredView';
+import BackButton from '../components/BackButton';
+import FeedContent from '../components/features/feed/FeedContent';
+
+import CommentInput from '../components/features/feed/CommentInput';
+import LikeAction from '../components/features/feed/LikeAction';
+import CommentAction from '../components/features/feed/CommentAction';
+import ShareAction from '../components/features/feed/ShareAction';
+import { useFeedLike } from '@/shared/hooks/useFeedLike';
 
 interface UserProfile {
     nickname: string;
@@ -21,17 +28,67 @@ interface UserProfile {
 
 const FeedDetailPage = () => {
     const { feedId } = useParams<{ feedId: string }>();
-    const navigate = useNavigate();
-    const [feed, setFeed] = useState<FeedPost | null>(null);
-    const [comments, setComments] = useState<CommentsResponse | null>(null);
     const [newComment, setNewComment] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<ApiError | null>(null);
     const [replyToId, setReplyToId] = useState<number | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editContent, setEditContent] = useState('');
 
-    console.log(comments?.comments, 'comments');
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+
+    const {
+        data: feed,
+        isLoading: isFeedLoading,
+        isError,
+    } = useQuery<FeedPost>({
+        queryKey: ['feed', Number(feedId)],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error('피드 조회에 실패했습니다.');
+            }
+            const data = await response.json();
+            return data.data;
+        },
+        enabled: !!feedId,
+        staleTime: 10 * 1000,
+        gcTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
+
+    const { data: comments, isLoading: isCommentsLoading } = useQuery<CommentsResponse>({
+        queryKey: ['feedComments', Number(feedId)],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error('댓글 조회에 실패했습니다.');
+            }
+            const data = await response.json();
+            return data.data;
+        },
+        enabled: !!feedId,
+        staleTime: 10 * 1000, // 10초 동안 데이터를 fresh 상태로 유지
+        gcTime: 5 * 60 * 1000, // 5분 동안 캐시 유지
+        refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
+    });
+
+    const { handleLike } = useFeedLike(Number(feedId));
+
+    const handleLikeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (!feed) return;
+        handleLike(e);
+    };
 
     // 현재 사용자 프로필 정보 조회
     useEffect(() => {
@@ -55,70 +112,9 @@ const FeedDetailPage = () => {
         fetchUserProfile();
     }, []);
 
-    // 피드 상세 정보 조회
-    useEffect(() => {
-        const fetchFeedDetail = async () => {
-            if (!feedId) return;
-
-            setIsLoading(true);
-            setError(null);
-
-            try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                });
-                const data = await response.json();
-                setFeed(data.data);
-
-                // 피드 조회 후 댓글 목록도 함께 조회
-                const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                });
-                const commentsData = await commentsResponse.json();
-                setComments(commentsData.data);
-            } catch (error) {
-                const apiError = error as ApiError;
-                setError(apiError);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchFeedDetail();
-    }, [feedId]);
-
-    const handleLike = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/likes`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
-            });
-            if (!response.ok) {
-                throw new Error('좋아요 처리에 실패했습니다.');
-            }
-            const data = await response.json();
-            console.log(data, 'data');
-            // TODO: 좋아요 상태 업데이트
-        } catch (error) {
-            console.error('좋아요 처리 실패:', error);
-        }
-    };
-
     const handleShare = (e: React.MouseEvent) => {
         e.stopPropagation();
         // 공유 기능 구현
-    };
-
-    const handleMoreClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        // 추가 메뉴 기능 구현
     };
 
     // 댓글 작성 처리
@@ -146,23 +142,11 @@ const FeedDetailPage = () => {
                 throw new Error('댓글 등록에 실패했습니다.');
             }
 
-            // 댓글 목록 새로 조회
-            const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
-            });
-            const commentsData = await commentsResponse.json();
-
-            setComments(commentsData.data);
-
-            // 피드의 댓글 수 업데이트
-            if (feed) {
-                setFeed({
-                    ...feed,
-                    commentsCount: feed.commentsCount + 1,
-                });
-            }
+            // 댓글 목록과 피드 데이터 갱신
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
+                queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] }),
+            ]);
 
             // 입력 필드 초기화
             setNewComment('');
@@ -172,6 +156,110 @@ const FeedDetailPage = () => {
             alert(error instanceof Error ? error.message : '댓글 등록에 실패했습니다.');
         } finally {
             setIsSubmitting(false);
+        }
+    };
+
+    const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewComment(e.target.value);
+    };
+
+    const handleEdit = () => {
+        if (!feed) return;
+        setEditContent(feed.content);
+        setIsEditing(true);
+    };
+
+    const handleEditSubmit = async () => {
+        if (!feed || !feedId || !editContent.trim()) return;
+
+        try {
+            const formData = new FormData();
+
+            // feedUpdateRequest JSON 데이터 추가
+            const feedUpdateRequest = {
+                content: editContent.trim(),
+                hashtags: (editContent.match(/#[^\s#]+/g) || []).map((tag) => tag.slice(1)),
+                imageUrls: feed.imageUrls || [],
+            };
+
+            formData.append(
+                'feedUpdateRequest',
+                new Blob([JSON.stringify(feedUpdateRequest)], { type: 'application/json' }),
+            );
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || '피드 수정에 실패했습니다.');
+            }
+
+            const updatedFeed = await response.json();
+
+            if (updatedFeed.statusCode === 200) {
+                queryClient.setQueryData(['feed', Number(feedId)], (prevFeed: FeedPost | undefined) => {
+                    if (!prevFeed) return prevFeed;
+                    return {
+                        ...prevFeed,
+                        content: editContent.trim(),
+                        hashtags: feedUpdateRequest.hashtags,
+                        imageUrls: feedUpdateRequest.imageUrls,
+                    };
+                });
+                setIsEditing(false);
+            }
+        } catch (error) {
+            console.error('피드 수정 실패:', error);
+        }
+    };
+
+    const handleEditCancel = () => {
+        setIsEditing(false);
+        setEditContent('');
+    };
+
+    const handleDelete = async () => {
+        if (!confirm('피드를 삭제하시겠습니까?')) return;
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || '피드 삭제에 실패했습니다.');
+            }
+
+            // 피드 삭제 후 캐시 업데이트
+            queryClient.setQueryData<FeedListResponse>(['feeds'], (old) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    feedPosts: old.feedPosts.filter((feed) => feed.feedId !== Number(feedId)),
+                };
+            });
+
+            // 삭제된 피드의 캐시 제거
+            queryClient.removeQueries({ queryKey: ['feed', Number(feedId)] });
+
+            // 피드 목록 페이지로 이동
+            navigate('/');
+
+            // 성공 메시지 표시
+            alert('피드가 삭제되었습니다.');
+        } catch (error) {
+            console.error('피드 삭제 실패:', error);
+            alert(error instanceof Error ? error.message : '피드 삭제에 실패했습니다.');
         }
     };
 
@@ -215,29 +303,28 @@ const FeedDetailPage = () => {
                 throw new Error('댓글 삭제에 실패했습니다.');
             }
 
-            // 댓글 목록에서 삭제
-            setComments(
-                comments
-                    ? {
-                          comments: comments.comments.filter((comment) => comment.commentId !== commentId),
-                      }
-                    : null,
-            );
-
-            // 댓글 수 감소
-            if (feed) {
-                setFeed({
-                    ...feed,
-                    commentsCount: feed.commentsCount - 1,
-                });
-            }
+            // 댓글 목록과 피드 데이터 갱신
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
+                queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] }),
+            ]);
         } catch (error) {
             console.error('댓글 삭제 실패:', error);
             alert(error instanceof Error ? error.message : '댓글 삭제에 실패했습니다.');
         }
     };
 
-    if (isLoading) {
+    const isAuthor = feed?.authorNickname === userProfile?.nickname;
+
+    const totalComments = comments
+        ? comments.comments.reduce((acc, comment) => {
+              const replyCount = comment.replies?.replies?.length || 0;
+              const commentCount = 1;
+              return acc + commentCount + replyCount;
+          }, 0)
+        : 0;
+
+    if (isFeedLoading || isCommentsLoading) {
         return (
             <Layout>
                 <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
@@ -247,169 +334,144 @@ const FeedDetailPage = () => {
         );
     }
 
-    if (error?.type === 'AUTH') {
+    if (isError) {
         return <AuthRequiredView />;
-    }
-
-    if (error) {
-        return (
-            <Layout>
-                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
-                    <div className="text-center p-4">
-                        <p className="text-gray-600 mb-4">{error.message}</p>
-                        <button
-                            onClick={() => setError(null)}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                        >
-                            다시 시도
-                        </button>
-                    </div>
-                </div>
-            </Layout>
-        );
-    }
-
-    if (!feed) {
-        return (
-            <Layout>
-                <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
-                    <p className="text-gray-600">피드를 찾을 수 없습니다.</p>
-                </div>
-            </Layout>
-        );
     }
 
     return (
         <Layout>
-            <div className="bg-white min-h-screen flex flex-col">
-                <header className="flex items-center px-4 h-[52px] border-b border-gray-200 flex-shrink-0">
-                    <button onClick={() => navigate('/feeds')} className="p-2 -ml-2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path
-                                d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z"
-                                fill="currentColor"
+            {feed && (
+                <div className="bg-white min-h-screen flex flex-col">
+                    <header className="flex items-center px-4 h-[52px] border-b border-gray-200 flex-shrink-0">
+                        <BackButton />
+                        <h1 className="flex-1 text-center font-medium">게시물</h1>
+                    </header>
+
+                    {/* 스크롤 가능한 컨텐츠 */}
+                    <div className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
+                        <div className="p-4">
+                            <FeedHeader
+                                authorNickname={feed.authorNickname}
+                                authorProfile={feed.authorProfile}
+                                createdAt={feed.createdAt}
                             />
-                        </svg>
-                    </button>
-                    <h1 className="flex-1 text-center font-medium">게시물</h1>
-                    <button className="p-2 -mr-2">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                            <path
-                                d="M12 8C13.1 8 14 7.1 14 6C14 4.9 13.1 4 12 4C10.9 4 10 4.9 10 6C10 7.1 10.9 8 12 8ZM12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10ZM12 16C10.9 16 10 16.9 10 18C10 19.1 10.9 20 12 20C13.1 20 14 19.1 14 18C14 16.9 13.1 16 12 16Z"
-                                fill="currentColor"
-                            />
-                        </svg>
-                    </button>
-                </header>
-
-                {/* 스크롤 가능한 컨텐츠 */}
-                <div className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
-                    <div className="p-4">
-                        <FeedHeader
-                            authorNickname={feed.authorNickname}
-                            authorProfile={feed.authorProfile}
-                            createdAt={feed.createdAt}
-                            onMoreClick={handleMoreClick}
-                        />
-                        <div className="mt-4 mb-6">
-                            <p className="text-gray-800 text-[15px] leading-[22px] whitespace-pre-wrap">
-                                {feed.content}
-                            </p>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2 mb-4">
-                            {feed.hashtags.map((hashtag) => (
-                                <div key={hashtag}>#{hashtag}</div>
-                            ))}
-                        </div>
-                        <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
-                        <FeedActions
-                            likesCount={feed.likesCount}
-                            commentsCount={comments?.comments?.length || 0}
-                            onLike={handleLike}
-                            onComment={handleComment}
-                            onShare={handleShare}
-                        />
-                    </div>
-
-                    <div className="flex-shrink-0 bg-white border-t border-gray-200 p-2">
-                        <form onSubmit={handleCommentSubmit}>
-                            {replyToId && (
-                                <div className="flex justify-between items-center mb-2 px-4 py-2 bg-gray-50 rounded-lg">
-                                    <span className="text-sm text-gray-600">답글 작성 중</span>
-                                    <button
-                                        type="button"
-                                        onClick={handleCancelReply}
-                                        className="text-xs text-gray-500 hover:text-red-500"
-                                    >
-                                        취소
-                                    </button>
+                            {isAuthor && (
+                                <div className="flex items-center justify-end gap-2">
+                                    {isEditing ? (
+                                        <>
+                                            <button
+                                                onClick={handleEditSubmit}
+                                                className="text-xs text-blue-500 hover:text-blue-600"
+                                            >
+                                                완료
+                                            </button>
+                                            <button
+                                                onClick={handleEditCancel}
+                                                className="text-xs text-gray-500 hover:text-gray-600"
+                                            >
+                                                취소
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                onClick={handleEdit}
+                                                className="text-xs text-gray-500 hover:text-blue-500"
+                                            >
+                                                수정
+                                            </button>
+                                            <button
+                                                onClick={handleDelete}
+                                                className="text-xs text-red-500 hover:text-red-600"
+                                            >
+                                                삭제
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                             )}
-                            <div className="flex items-center">
-                                <input
-                                    type="text"
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                    placeholder={replyToId ? '답글을 입력하세요...' : '댓글을 입력하세요...'}
-                                    className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={!newComment.trim() || isSubmitting}
-                                    className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium
-                                         hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                                >
-                                    {isSubmitting ? '등록 중...' : '게시'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                            {isEditing ? (
+                                <div className="mt-4">
+                                    <textarea
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                        className="w-full p-2 border border-gray-300 rounded-md"
+                                        rows={4}
+                                        placeholder="내용을 입력하세요. 해시태그는 #으로 시작합니다."
+                                    />
+                                </div>
+                            ) : (
+                                <FeedContent feed={feed} />
+                            )}
 
-                    {/* 댓글 목록 */}
-                    <div className="px-4 border-t border-gray-200">
-                        {comments?.comments.map((comment) => (
-                            <div key={comment.commentId} className="py-4 border-b border-gray-100">
-                                <FeedHeader
-                                    authorNickname={comment.authorNickname}
-                                    authorProfile={comment.authorProfile || tailogo}
-                                    createdAt={comment.createdAt}
-                                    rightElement={
-                                        comment.authorNickname === userProfile?.nickname ? (
-                                            <div className="flex items-center gap-2">
+                            <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
+                            <div className="flex items-center justify-between px-2">
+                                <div className="flex items-center space-x-4">
+                                    <LikeAction
+                                        count={feed.likesCount}
+                                        isLiked={feed.isLiked}
+                                        onToggle={handleLikeClick}
+                                    />
+                                    <CommentAction count={totalComments} onClick={handleComment} />
+                                </div>
+                                <ShareAction onClick={handleShare} />
+                            </div>
+                        </div>
+
+                        <CommentInput
+                            newComment={newComment}
+                            onCommentChange={handleCommentChange}
+                            onCommentSubmit={handleCommentSubmit}
+                            isSubmitting={isSubmitting}
+                            replyToId={replyToId}
+                            onCancelReply={handleCancelReply}
+                        />
+
+                        {/* 댓글 목록 */}
+                        <div className="px-4 border-t border-gray-200">
+                            {comments?.comments.map((comment) => (
+                                <div key={comment.commentId} className="py-4 border-b border-gray-100">
+                                    <FeedHeader
+                                        authorNickname={comment.authorNickname}
+                                        authorProfile={comment.authorProfile || tailogo}
+                                        createdAt={comment.createdAt}
+                                        rightElement={
+                                            comment.authorNickname === userProfile?.nickname ? (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-gray-500">
+                                                        {new Date(comment.createdAt).toLocaleString()}
+                                                    </span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            handleDeleteComment(comment.commentId);
+                                                        }}
+                                                        className="text-xs text-red-500 hover:text-red-600"
+                                                    >
+                                                        삭제
+                                                    </button>
+                                                </div>
+                                            ) : (
                                                 <span className="text-xs text-gray-500">
                                                     {new Date(comment.createdAt).toLocaleString()}
                                                 </span>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        handleDeleteComment(comment.commentId);
-                                                    }}
-                                                    className="text-xs text-red-500 hover:text-red-600"
-                                                >
-                                                    삭제
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <span className="text-xs text-gray-500">
-                                                {new Date(comment.createdAt).toLocaleString()}
-                                            </span>
-                                        )
-                                    }
-                                />
-                                <p className="text-sm text-gray-700 mt-1 ml-[52px]">{comment.content}</p>
-                                <button
-                                    onClick={() => handleReply(comment.commentId)}
-                                    className="text-xs text-gray-500 mt-2 ml-[52px] hover:text-blue-500"
-                                >
-                                    답글 달기
-                                </button>
-                            </div>
-                        ))}
+                                            )
+                                        }
+                                    />
+                                    <p className="text-sm text-gray-700 mt-1 ml-[52px]">{comment.content}</p>
+                                    <button
+                                        onClick={() => handleReply(comment.commentId)}
+                                        className="text-xs text-gray-500 mt-2 ml-[52px] hover:text-blue-500"
+                                    >
+                                        답글 달기
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </Layout>
     );
 };
