@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
 import FeedHeader from '@/ui/components/features/feed/FeedHeader';
@@ -15,7 +15,6 @@ import FeedContent from '../components/features/feed/FeedContent';
 import CommentInput from '../components/features/feed/CommentInput';
 import LikeAction from '../components/features/feed/LikeAction';
 import CommentAction from '../components/features/feed/CommentAction';
-import ShareAction from '../components/features/feed/ShareAction';
 import { useFeedLike } from '@/shared/hooks/useFeedLike';
 import { fetchWithToken } from '@/token';
 import { useFeedDetail } from '@/shared/hooks/useFeedDetail';
@@ -31,6 +30,7 @@ interface UserProfile {
 
 const FeedDetailPage = () => {
     const { feedId } = useParams<{ feedId: string }>();
+
     const [newComment, setNewComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [replyToId, setReplyToId] = useState<number | null>(null);
@@ -41,7 +41,7 @@ const FeedDetailPage = () => {
     const queryClient = useQueryClient();
     const { data: feed, isLoading: isFeedLoading, isError } = useFeedDetail(feedId);
     const { comments, isLoading: isCommentsLoading, addComment, deleteComment } = useFeedComments(feedId);
-    console.log(comments, 'cccc');
+
     const { handleLike } = useFeedLike(Number(feedId));
     const { deleteFeed } = useFeedDelete(feedId);
 
@@ -66,10 +66,9 @@ const FeedDetailPage = () => {
         fetchUserProfile();
     }, []);
 
-    const handleShare = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        // 공유 기능 구현
-    };
+    if (!feedId) {
+        return <Navigate to="/" />;
+    }
 
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -274,7 +273,6 @@ const FeedDetailPage = () => {
                                     <LikeAction count={feed.likesCount} isLiked={feed.isLiked} onToggle={handleLike} />
                                     <CommentAction count={totalComments || 0} onClick={handleComment} />
                                 </div>
-                                <ShareAction onClick={handleShare} />
                             </div>
                         </div>
 
