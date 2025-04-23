@@ -1,5 +1,5 @@
+import { CommentProps } from '@/types';
 import ActionButton from '../../ActionButton';
-import { CommentProps } from './types';
 
 const CommentAction = ({ count, onClick }: CommentProps) => (
     <ActionButton
