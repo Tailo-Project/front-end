@@ -245,6 +245,14 @@ const FeedDetailPage = () => {
         }
     };
 
+    const totalComments = comments
+        ? comments.comments.reduce((acc, comment) => {
+              const replyCount = comment.replies?.replies?.length || 0;
+              const commentCount = 1;
+              return acc + commentCount + replyCount;
+          }, 0)
+        : 0;
+
     if (isLoading) {
         return (
             <Layout>
@@ -281,7 +289,7 @@ const FeedDetailPage = () => {
                             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
                             <FeedActions
                                 likesCount={feed.likesCount}
-                                commentsCount={comments?.comments?.length || 0}
+                                commentsCount={totalComments}
                                 onLike={handleLike}
                                 onComment={handleComment}
                                 onShare={handleShare}
