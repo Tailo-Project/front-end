@@ -7,6 +7,8 @@ import Layout from '@/ui/pages/layout';
 import Toast from '@/ui/components/ui/Toast';
 import { useToast } from '@/shared/hooks/useToast';
 import { getAccountId, getToken, removeAccountId, removeToken } from '@/shared/utils/auth';
+import { fetchWithToken } from '@/token';
+import { BASE_API_URL } from '@/shared/constants/apiUrl';
 
 interface ProfileData {
     nickname: string;
@@ -48,13 +50,7 @@ const Profile = () => {
 
     useEffect(() => {
         const fetchProfileData = async () => {
-            if (!accountId) {
-                showToast('로그인이 필요한 서비스입니다.', 'error');
-                navigate('/login');
-                return;
-            }
-
-            if (!token) {
+            if (!accountId || !token) {
                 showToast('로그인이 필요한 서비스입니다.', 'error');
                 navigate('/login');
                 return;
@@ -63,13 +59,7 @@ const Profile = () => {
             try {
                 setIsLoading(true);
 
-                const profileData = await fetch(`${import.meta.env.VITE_API_URL}/api/member/profile/${accountId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+                const profileData = await fetchWithToken(`${BASE_API_URL}/member/profile/${accountId}`, {});
 
                 const data = await profileData.json();
 

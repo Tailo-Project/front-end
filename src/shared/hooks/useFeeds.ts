@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { getToken } from '@/lib/token';
 import { FeedPost } from '@/shared/types/feed';
+import { FEED_API_URL } from '../constants/apiUrl';
+import { fetchWithToken } from '@/token';
 
 interface FeedListResponse {
     feedPosts: FeedPost[];
@@ -12,11 +13,7 @@ export const useFeeds = () => {
     return useQuery<FeedListResponse>({
         queryKey: ['feeds'],
         queryFn: async () => {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed`, {
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
-            });
+            const response = await fetchWithToken(`${FEED_API_URL}`, {});
 
             if (!response.ok) {
                 throw new Error('피드 목록을 불러오는데 실패했습니다.');

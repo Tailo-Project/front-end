@@ -11,8 +11,10 @@ import FormInput from '@/ui/components/form/FormInput';
 import { Gender, ProfileData } from '@/shared/types/profile';
 
 import BreedCombobox from '@/ui/components/form/BreedCombobox';
-import { getToken } from '@/shared/utils/auth';
+
 import { createProfileFormData, updateProfile } from '@/core/api/profile';
+import { fetchWithToken } from '@/token';
+import { BASE_API_URL } from '@/shared/constants/apiUrl';
 
 interface ProfileResponse {
     nickname: string;
@@ -88,11 +90,7 @@ const EditProfile = () => {
         const fetchProfile = async () => {
             try {
                 setIsLoading(true);
-                const profileData = await fetch(`${import.meta.env.VITE_API_URL}/api/member`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                });
+                const profileData = await fetchWithToken(`${BASE_API_URL}/member`, {});
                 const data = await profileData.json();
                 const profileImageUrl = updateFormFields(data.data);
 

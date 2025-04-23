@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getToken } from '@/lib/token';
 import { FeedListResponse, FeedPost } from '@/shared/types/feed';
+import { FEED_API_URL } from '../constants/apiUrl';
+import { fetchWithToken } from '@/token';
 
 interface ToggleLikeResponse {
     isLiked: boolean;
@@ -32,11 +33,8 @@ export const useFeedLike = (feedId: number) => {
 
     const toggleLikeMutation = useMutation({
         mutationFn: async () => {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/likes`, {
+            const response = await fetchWithToken(`${FEED_API_URL}/${feedId}/likes`, {
                 method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
             });
 
             if (!response.ok) {
