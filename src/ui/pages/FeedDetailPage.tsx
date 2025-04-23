@@ -146,7 +146,6 @@ const FeedDetailPage = () => {
     const handleEditCancel = () => {
         setIsEditing(false);
         setEditContent('');
-        setEditHashtags([]);
     };
 
     const handleReply = (commentId: number) => {

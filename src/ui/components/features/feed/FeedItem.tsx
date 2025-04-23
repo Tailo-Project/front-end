@@ -6,8 +6,6 @@ import LikeButton from './LikeButton';
 import CommentAction from './CommentAction';
 import { useFeedLike } from '@/shared/hooks/useFeedLike';
 import HashtagList from './HashtagList';
-import { cn } from '@/ui/styles/utils';
-import { commonStyles } from '@/ui/styles/common';
 
 interface FeedItemProps {
     feed: FeedPost;
@@ -24,7 +22,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
 
     return (
         <article
-            className={cn('border-b border-gray-200', commonStyles.p4, 'cursor-pointer')}
+            className="border-b border-gray-200 p-4 cursor-pointer"
             onClick={() => navigate(`/feeds/${feed.feedId}`)}
         >
             <FeedHeader
