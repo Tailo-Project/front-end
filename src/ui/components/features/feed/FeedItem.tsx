@@ -5,6 +5,9 @@ import FeedImages from './FeedImages';
 import LikeButton from './LikeButton';
 import CommentAction from './CommentAction';
 import { useFeedLike } from '@/shared/hooks/useFeedLike';
+import HashtagList from './HashtagList';
+import { cn } from '@/ui/styles/utils';
+import { commonStyles } from '@/ui/styles/common';
 
 interface FeedItemProps {
     feed: FeedPost;
@@ -21,7 +24,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
 
     return (
         <article
-            className="border-b border-gray-200 p-4 cursor-pointer"
+            className={cn('border-b border-gray-200', commonStyles.p4, 'cursor-pointer')}
             onClick={() => navigate(`/feeds/${feed.feedId}`)}
         >
             <FeedHeader
@@ -31,9 +34,10 @@ const FeedItem = ({ feed }: FeedItemProps) => {
             />
             <div className="mt-4 mb-6">
                 <p className="text-gray-800 text-[15px] leading-[22px] whitespace-pre-wrap">{feed.content}</p>
+                <HashtagList hashtags={feed.hashtags} className="mt-2" />
             </div>
 
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2">
                 <LikeButton count={feed.likesCount} isLiked={feed.isLiked} onToggle={handleLike} />
                 <CommentAction count={feed.commentsCount} onClick={handleComment} />
             </div>
