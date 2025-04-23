@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createFormDataWithJson } from '@/shared/utils/formData';
-import { getToken } from '@/shared/utils/auth';
+import { fetchWithToken } from '@/token';
+import { FEED_API_URL } from '../constants/apiUrl';
 
 interface PostForm {
     content: string;
@@ -58,12 +59,9 @@ export const usePostForm = () => {
         });
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed`, {
+            const response = await fetchWithToken(`${FEED_API_URL}`, {
                 method: 'POST',
                 body: formData,
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
             });
 
             if (!response.ok) {
