@@ -33,3 +33,7 @@ export interface Comment {
 export interface CommentsResponse {
     comments: Comment[];
 }
+
+export interface FeedLikesResponse {
+    isLiked: boolean;
+}

@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 
 import FeedHeader from '@/ui/components/features/feed/FeedHeader';
 import FeedImages from '@/ui/components/features/feed/FeedImages';
-import FeedActions from '@/ui/components/features/feed/FeedActions';
 import { getToken } from '@/lib/token';
 import { getAccountId } from '@/shared/utils/auth';
 
@@ -17,6 +16,9 @@ import BackButton from '../components/BackButton';
 import FeedContent from '../components/features/feed/FeedContent';
 
 import CommentInput from '../components/features/feed/CommentInput';
+import LikeAction from '../components/features/feed/LikeAction';
+import CommentAction from '../components/features/feed/CommentAction';
+import ShareAction from '../components/features/feed/ShareAction';
 
 interface UserProfile {
     nickname: string;
@@ -27,6 +29,7 @@ const FeedDetailPage = () => {
     const { feedId } = useParams<{ feedId: string }>();
 
     const [feed, setFeed] = useState<FeedPost | null>(null);
+    const [isLiked, setIsLiked] = useState(false);
     const [comments, setComments] = useState<CommentsResponse | null>(null);
     const [newComment, setNewComment] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -34,8 +37,6 @@ const FeedDetailPage = () => {
     const [error, setError] = useState<ApiError | null>(null);
     const [replyToId, setReplyToId] = useState<number | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-
-    console.log(comments?.comments, 'comments');
 
     // 현재 사용자 프로필 정보 조회
     useEffect(() => {
@@ -68,13 +69,23 @@ const FeedDetailPage = () => {
             setError(null);
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                });
-                const data = await response.json();
-                setFeed(data.data);
+                const [feedResponse, likesResponse] = await Promise.all([
+                    fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+                        headers: {
+                            Authorization: `Bearer ${getToken()}`,
+                        },
+                    }),
+                    fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/likes`, {
+                        headers: {
+                            Authorization: `Bearer ${getToken()}`,
+                        },
+                    }),
+                ]);
+
+                const [feedData, likesData] = await Promise.all([feedResponse.json(), likesResponse.json()]);
+
+                setFeed(feedData.data);
+                setIsLiked(likesData.message.isLiked);
 
                 // 피드 조회 후 댓글 목록도 함께 조회
                 const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
@@ -97,6 +108,8 @@ const FeedDetailPage = () => {
 
     const handleLike = async (e: React.MouseEvent) => {
         e.stopPropagation();
+        if (!feed) return;
+
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/likes`, {
                 method: 'POST',
@@ -104,14 +117,33 @@ const FeedDetailPage = () => {
                     Authorization: `Bearer ${getToken()}`,
                 },
             });
+
             if (!response.ok) {
                 throw new Error('좋아요 처리에 실패했습니다.');
             }
-            const data = await response.json();
-            console.log(data, 'data');
-            // TODO: 좋아요 상태 업데이트
+
+            // 낙관적 업데이트
+            setIsLiked((prev) => !prev);
+            setFeed((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          likesCount: prev.likesCount + (isLiked ? -1 : 1),
+                      }
+                    : null,
+            );
         } catch (error) {
             console.error('좋아요 처리 실패:', error);
+            // 에러 발생 시 상태 롤백
+            setIsLiked((prev) => !prev);
+            setFeed((prev) =>
+                prev
+                    ? {
+                          ...prev,
+                          likesCount: prev.likesCount + (isLiked ? 1 : -1),
+                      }
+                    : null,
+            );
         }
     };
 
@@ -287,13 +319,13 @@ const FeedDetailPage = () => {
                             />
                             <FeedContent feed={feed} />
                             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
-                            <FeedActions
-                                likesCount={feed.likesCount}
-                                commentsCount={totalComments}
-                                onLike={handleLike}
-                                onComment={handleComment}
-                                onShare={handleShare}
-                            />
+                            <div className="flex items-center justify-between px-2">
+                                <div className="flex items-center space-x-4">
+                                    <LikeAction count={feed.likesCount} isLiked={isLiked} onToggle={handleLike} />
+                                    <CommentAction count={totalComments} onClick={handleComment} />
+                                </div>
+                                <ShareAction onClick={handleShare} />
+                            </div>
                         </div>
 
                         <CommentInput
