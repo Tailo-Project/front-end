@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import FeedHeader from '@/ui/components/features/feed/FeedHeader';
 import FeedImages from '@/ui/components/features/feed/FeedImages';
@@ -8,7 +9,6 @@ import { getAccountId } from '@/shared/utils/auth';
 
 import tailogo from '@/assets/tailogo.svg';
 import { CommentsResponse, FeedPost } from '@/shared/types/feed';
-import { ApiError } from '@/shared/types/error';
 import Layout from './layout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AuthRequiredView from '../components/AuthRequiredView';
@@ -19,6 +19,7 @@ import CommentInput from '../components/features/feed/CommentInput';
 import LikeAction from '../components/features/feed/LikeAction';
 import CommentAction from '../components/features/feed/CommentAction';
 import ShareAction from '../components/features/feed/ShareAction';
+import { useFeedLike } from '@/shared/hooks/useFeedLike';
 
 interface UserProfile {
     nickname: string;
@@ -27,16 +28,60 @@ interface UserProfile {
 
 const FeedDetailPage = () => {
     const { feedId } = useParams<{ feedId: string }>();
-
-    const [feed, setFeed] = useState<FeedPost | null>(null);
-    const [isLiked, setIsLiked] = useState(false);
-    const [comments, setComments] = useState<CommentsResponse | null>(null);
     const [newComment, setNewComment] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<ApiError | null>(null);
     const [replyToId, setReplyToId] = useState<number | null>(null);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editContent, setEditContent] = useState('');
+
+    const queryClient = useQueryClient();
+
+    const {
+        data: feed,
+        isLoading: isFeedLoading,
+        isError,
+    } = useQuery<FeedPost>({
+        queryKey: ['feed', Number(feedId)],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error('피드 조회에 실패했습니다.');
+            }
+            const data = await response.json();
+            return data.data;
+        },
+        enabled: !!feedId,
+        staleTime: 10 * 1000,
+        gcTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
+    });
+
+    const { data: comments, isLoading: isCommentsLoading } = useQuery<CommentsResponse>({
+        queryKey: ['feedComments', Number(feedId)],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error('댓글 조회에 실패했습니다.');
+            }
+            const data = await response.json();
+            return data.data;
+        },
+        enabled: !!feedId,
+        staleTime: 10 * 1000, // 10초 동안 데이터를 fresh 상태로 유지
+        gcTime: 5 * 60 * 1000, // 5분 동안 캐시 유지
+        refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
+    });
+
+    const { handleLike } = useFeedLike(Number(feedId));
 
     // 현재 사용자 프로필 정보 조회
     useEffect(() => {
@@ -60,101 +105,9 @@ const FeedDetailPage = () => {
         fetchUserProfile();
     }, []);
 
-    // 피드 상세 정보 조회
-    useEffect(() => {
-        const fetchFeedDetail = async () => {
-            if (!feedId) return;
-
-            setIsLoading(true);
-            setError(null);
-
-            try {
-                const [feedResponse, likesResponse] = await Promise.all([
-                    fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`,
-                        },
-                    }),
-                    fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/likes`, {
-                        headers: {
-                            Authorization: `Bearer ${getToken()}`,
-                        },
-                    }),
-                ]);
-
-                const [feedData, likesData] = await Promise.all([feedResponse.json(), likesResponse.json()]);
-
-                setFeed(feedData.data);
-                setIsLiked(likesData.message.isLiked);
-
-                // 피드 조회 후 댓글 목록도 함께 조회
-                const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
-                    headers: {
-                        Authorization: `Bearer ${getToken()}`,
-                    },
-                });
-                const commentsData = await commentsResponse.json();
-                setComments(commentsData.data);
-            } catch (error) {
-                const apiError = error as ApiError;
-                setError(apiError);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchFeedDetail();
-    }, [feedId]);
-
-    const handleLike = async (e: React.MouseEvent) => {
-        e.stopPropagation();
-        if (!feed) return;
-
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/likes`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('좋아요 처리에 실패했습니다.');
-            }
-
-            // 낙관적 업데이트
-            setIsLiked((prev) => !prev);
-            setFeed((prev) =>
-                prev
-                    ? {
-                          ...prev,
-                          likesCount: prev.likesCount + (isLiked ? -1 : 1),
-                      }
-                    : null,
-            );
-        } catch (error) {
-            console.error('좋아요 처리 실패:', error);
-            // 에러 발생 시 상태 롤백
-            setIsLiked((prev) => !prev);
-            setFeed((prev) =>
-                prev
-                    ? {
-                          ...prev,
-                          likesCount: prev.likesCount + (isLiked ? 1 : -1),
-                      }
-                    : null,
-            );
-        }
-    };
-
     const handleShare = (e: React.MouseEvent) => {
         e.stopPropagation();
         // 공유 기능 구현
-    };
-
-    const handleMoreClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        // 추가 메뉴 기능 구현
     };
 
     // 댓글 작성 처리
@@ -182,23 +135,11 @@ const FeedDetailPage = () => {
                 throw new Error('댓글 등록에 실패했습니다.');
             }
 
-            // 댓글 목록 새로 조회
-            const commentsResponse = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
-            });
-            const commentsData = await commentsResponse.json();
-
-            setComments(commentsData.data);
-
-            // 피드의 댓글 수 업데이트
-            if (feed) {
-                setFeed({
-                    ...feed,
-                    commentsCount: feed.commentsCount + 1,
-                });
-            }
+            // 댓글 목록과 피드 데이터 갱신
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
+                queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] }),
+            ]);
 
             // 입력 필드 초기화
             setNewComment('');
@@ -213,6 +154,71 @@ const FeedDetailPage = () => {
 
     const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewComment(e.target.value);
+    };
+
+    const handleEdit = () => {
+        if (!feed) return;
+        setEditContent(feed.content);
+        setIsEditing(true);
+    };
+
+    const handleEditSubmit = async () => {
+        if (!feed || !feedId || !editContent.trim()) return;
+
+        try {
+            const formData = new FormData();
+
+            // feedUpdateRequest JSON 데이터 추가
+            const feedUpdateRequest = {
+                content: editContent.trim(),
+                hashtags: (editContent.match(/#[^\s#]+/g) || []).map((tag) => tag.slice(1)),
+                imageUrls: feed.imageUrls || [],
+            };
+
+            formData.append(
+                'feedUpdateRequest',
+                new Blob([JSON.stringify(feedUpdateRequest)], { type: 'application/json' }),
+            );
+
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || '피드 수정에 실패했습니다.');
+            }
+
+            const updatedFeed = await response.json();
+
+            if (updatedFeed.statusCode === 200) {
+                queryClient.setQueryData(['feed', Number(feedId)], (prevFeed: FeedPost | undefined) => {
+                    if (!prevFeed) return prevFeed;
+                    return {
+                        ...prevFeed,
+                        content: editContent.trim(),
+                        hashtags: feedUpdateRequest.hashtags,
+                        imageUrls: feedUpdateRequest.imageUrls,
+                    };
+                });
+                setIsEditing(false);
+            }
+        } catch (error) {
+            console.error('피드 수정 실패:', error);
+        }
+    };
+
+    const handleEditCancel = () => {
+        setIsEditing(false);
+        setEditContent('');
+    };
+
+    const handleDelete = () => {
+        // 피드 삭제 기능 구현
     };
 
     // 답글 작성 모드 설정
@@ -255,27 +261,18 @@ const FeedDetailPage = () => {
                 throw new Error('댓글 삭제에 실패했습니다.');
             }
 
-            // 댓글 목록에서 삭제
-            setComments(
-                comments
-                    ? {
-                          comments: comments.comments.filter((comment) => comment.commentId !== commentId),
-                      }
-                    : null,
-            );
-
-            // 댓글 수 감소
-            if (feed) {
-                setFeed({
-                    ...feed,
-                    commentsCount: feed.commentsCount - 1,
-                });
-            }
+            // 댓글 목록과 피드 데이터 갱신
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
+                queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] }),
+            ]);
         } catch (error) {
             console.error('댓글 삭제 실패:', error);
             alert(error instanceof Error ? error.message : '댓글 삭제에 실패했습니다.');
         }
     };
+
+    const isAuthor = feed?.authorNickname === userProfile?.nickname;
 
     const totalComments = comments
         ? comments.comments.reduce((acc, comment) => {
@@ -285,7 +282,7 @@ const FeedDetailPage = () => {
           }, 0)
         : 0;
 
-    if (isLoading) {
+    if (isFeedLoading || isCommentsLoading) {
         return (
             <Layout>
                 <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
@@ -295,7 +292,7 @@ const FeedDetailPage = () => {
         );
     }
 
-    if (error?.type === 'AUTH') {
+    if (isError) {
         return <AuthRequiredView />;
     }
 
@@ -315,13 +312,60 @@ const FeedDetailPage = () => {
                                 authorNickname={feed.authorNickname}
                                 authorProfile={feed.authorProfile}
                                 createdAt={feed.createdAt}
-                                onMoreClick={handleMoreClick}
                             />
-                            <FeedContent feed={feed} />
+                            {isAuthor && (
+                                <div className="flex items-center justify-end gap-2">
+                                    {isEditing ? (
+                                        <>
+                                            <button
+                                                onClick={handleEditSubmit}
+                                                className="text-xs text-blue-500 hover:text-blue-600"
+                                            >
+                                                완료
+                                            </button>
+                                            <button
+                                                onClick={handleEditCancel}
+                                                className="text-xs text-gray-500 hover:text-gray-600"
+                                            >
+                                                취소
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <button
+                                                onClick={handleEdit}
+                                                className="text-xs text-gray-500 hover:text-blue-500"
+                                            >
+                                                수정
+                                            </button>
+                                            <button
+                                                onClick={handleDelete}
+                                                className="text-xs text-red-500 hover:text-red-600"
+                                            >
+                                                삭제
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                            {isEditing ? (
+                                <div className="mt-4">
+                                    <textarea
+                                        value={editContent}
+                                        onChange={(e) => setEditContent(e.target.value)}
+                                        className="w-full p-2 border border-gray-300 rounded-md"
+                                        rows={4}
+                                        placeholder="내용을 입력하세요. 해시태그는 #으로 시작합니다."
+                                    />
+                                </div>
+                            ) : (
+                                <FeedContent feed={feed} />
+                            )}
+
                             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
                             <div className="flex items-center justify-between px-2">
                                 <div className="flex items-center space-x-4">
-                                    <LikeAction count={feed.likesCount} isLiked={isLiked} onToggle={handleLike} />
+                                    <LikeAction count={feed.likesCount} isLiked={feed.isLiked} onToggle={handleLike} />
                                     <CommentAction count={totalComments} onClick={handleComment} />
                                 </div>
                                 <ShareAction onClick={handleShare} />

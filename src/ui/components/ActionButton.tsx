@@ -1,14 +1,16 @@
-interface ActionButtonProps {
-    icon: React.ReactNode;
-    count?: number;
-    onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+import { MouseEvent, ReactNode } from 'react';
+
+export interface ActionButtonProps {
+    icon: ReactNode;
+    count: number;
+    onClick: (e: MouseEvent<HTMLButtonElement>) => void;
     isLiked?: boolean;
 }
 
-const ActionButton = ({ icon, count, onClick, isLiked }: ActionButtonProps) => (
-    <button className={`flex items-center space-x-1 ${isLiked ? 'text-red-500' : ''}`} onClick={onClick}>
+const ActionButton = ({ icon, count, onClick }: ActionButtonProps) => (
+    <button onClick={onClick} className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors">
         {icon}
-        {count !== undefined && <span className="text-sm">{count}</span>}
+        {count > 0 && <span className="text-sm">{count}</span>}
     </button>
 );
 

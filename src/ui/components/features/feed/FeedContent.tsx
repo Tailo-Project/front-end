@@ -1,6 +1,7 @@
 import { FeedPost } from '@/shared/types/feed';
 
 const FeedContent = ({ feed }: { feed: FeedPost }) => {
+    console.log(feed, 'feed');
     return (
         <div className="mt-4 mb-6">
             <p className="text-gray-800 text-[15px] leading-[22px] whitespace-pre-wrap">{feed.content}</p>

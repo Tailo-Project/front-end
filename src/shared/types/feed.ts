@@ -5,17 +5,15 @@ export interface Author {
 
 export interface FeedPost {
     feedId: number;
+    authorNickname: string;
+    authorProfile: string;
     content: string;
-    id: number;
-    createdAt: string;
-    updatedAt: string;
+    imageUrls: string[];
+    hashtags: string[];
     likesCount: number;
     commentsCount: number;
-    likes: number;
-    imageUrls?: string[];
-    authorNickname: string;
-    authorProfile: string | File;
-    hashtags: string[];
+    createdAt: string;
+    isLiked: boolean;
 }
 
 export interface Comment {

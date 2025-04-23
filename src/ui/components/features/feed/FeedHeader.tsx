@@ -6,11 +6,11 @@ interface FeedHeaderProps {
     authorNickname: string;
     authorProfile: string | File;
     createdAt: string;
-    onMoreClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+
     rightElement?: React.ReactNode;
 }
 
-const FeedHeader = ({ authorNickname, authorProfile, createdAt, onMoreClick, rightElement }: FeedHeaderProps) => {
+const FeedHeader = ({ authorNickname, authorProfile, createdAt, rightElement }: FeedHeaderProps) => {
     const navigate = useNavigate();
     const [objectUrl, setObjectUrl] = useState<string | null>(null);
     const getProfileUrl = (profile: string | File): string => {
@@ -49,13 +49,7 @@ const FeedHeader = ({ authorNickname, authorProfile, createdAt, onMoreClick, rig
                 <h3 className="font-semibold text-gray-900">{authorNickname}</h3>
                 <time className="text-sm text-gray-500">{new Date(createdAt).toLocaleDateString()}</time>
             </div>
-            {onMoreClick && (
-                <button className="ml-auto p-2" onClick={onMoreClick} aria-label="더보기" type="button">
-                    <svg className="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 3c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 14c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-7c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                    </svg>
-                </button>
-            )}
+
             {rightElement && <div className="ml-auto">{rightElement}</div>}
         </div>
     );
