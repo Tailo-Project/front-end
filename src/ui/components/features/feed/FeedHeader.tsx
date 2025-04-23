@@ -32,7 +32,6 @@ const FeedHeader = ({ authorNickname, authorProfile, createdAt, rightElement }: 
     }, [objectUrl]);
 
     const handleProfileClick = () => {
-        // console.log('profile clicked');
         navigate(`/profile`);
     };
 

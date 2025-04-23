@@ -109,7 +109,6 @@ const SignUpForm = () => {
             });
 
             const data = await response.json();
-            console.log(data, 'data');
 
             if (data.accessToken && data.accountId) {
                 setToken(data.accessToken);
