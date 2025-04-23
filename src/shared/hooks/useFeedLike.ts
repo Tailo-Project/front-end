@@ -28,83 +28,72 @@ export const useFeedLike = (feedId: number) => {
                 throw new Error('좋아요 처리에 실패했습니다.');
             }
 
-            const result = (await response.json()) as ToggleLikeResponse;
-            return result;
+            const responseData = await response.json();
+
+            if (response.status === 200) {
+                const currentFeed = queryClient.getQueryData<FeedPost>(['feed', feedId]);
+                return { isLiked: currentFeed ? !currentFeed.isLiked : true } as ToggleLikeResponse;
+            }
+
+            return responseData.data as ToggleLikeResponse;
         },
         onMutate: async () => {
-            // 진행 중인 피드 관련 요청들을 취소
-            await queryClient.cancelQueries({ queryKey: ['feed', feedId] });
             await queryClient.cancelQueries({ queryKey: ['feeds'] });
+            await queryClient.cancelQueries({ queryKey: ['feed', feedId] });
 
-            // 이전 피드 데이터를 캐시에서 가져옴
-            const previousFeed = queryClient.getQueryData<FeedPost>(['feed', feedId]);
             const previousFeeds = queryClient.getQueryData<FeedListResponse>(['feeds']);
+            const previousFeed = queryClient.getQueryData<FeedPost>(['feed', feedId]);
 
-            // 낙관적 업데이트: 단일 피드
-            if (previousFeed) {
-                const newLikeState = !previousFeed.isLiked;
-                const newLikeCount = previousFeed.likesCount + (newLikeState ? 1 : -1);
-
-                queryClient.setQueryData<FeedPost>(['feed', feedId], {
-                    ...previousFeed,
-                    isLiked: newLikeState,
-                    likesCount: newLikeCount,
-                });
-            }
-
-            // 낙관적 업데이트: 피드 목록
+            // 피드 목록 업데이트
             if (previousFeeds) {
-                queryClient.setQueryData<FeedListResponse>(['feeds'], {
-                    ...previousFeeds,
-                    feedPosts: previousFeeds.feedPosts.map((feed) =>
-                        feed.feedId === feedId
-                            ? {
-                                  ...feed,
-                                  isLiked: !feed.isLiked,
-                                  likesCount: feed.likesCount + (!feed.isLiked ? 1 : -1),
-                              }
-                            : feed,
-                    ),
+                queryClient.setQueryData<FeedListResponse>(['feeds'], (old) => {
+                    if (!old) return previousFeeds;
+                    return {
+                        ...old,
+                        feedPosts: old.feedPosts.map((feed) => {
+                            if (feed.feedId === feedId) {
+                                const willLike = !feed.isLiked;
+                                const newCount = willLike ? feed.likesCount + 1 : Math.max(0, feed.likesCount - 1);
+                                return {
+                                    ...feed,
+                                    isLiked: willLike,
+                                    likesCount: newCount,
+                                };
+                            }
+                            return feed;
+                        }),
+                    };
                 });
             }
 
-            return { previousFeed, previousFeeds };
+            // 단일 피드 업데이트
+            if (previousFeed) {
+                queryClient.setQueryData<FeedPost>(['feed', feedId], (old) => {
+                    if (!old) return previousFeed;
+                    const willLike = !old.isLiked;
+                    const newCount = willLike ? old.likesCount + 1 : Math.max(0, old.likesCount - 1);
+                    return {
+                        ...old,
+                        isLiked: willLike,
+                        likesCount: newCount,
+                    };
+                });
+            }
+
+            return { previousFeeds, previousFeed };
         },
         onError: (_, __, context) => {
-            // 에러 발생 시 이전 상태로 롤백
-            if (context?.previousFeed) {
-                queryClient.setQueryData(['feed', feedId], context.previousFeed);
-            }
             if (context?.previousFeeds) {
                 queryClient.setQueryData(['feeds'], context.previousFeeds);
             }
+            if (context?.previousFeed) {
+                queryClient.setQueryData(['feed', feedId], context.previousFeed);
+            }
         },
-        onSuccess: (response) => {
-            // 서버 응답을 기반으로 캐시 업데이트
-            queryClient.setQueryData<FeedPost>(['feed', feedId], (old) => {
-                if (!old) return old;
-                return {
-                    ...old,
-                    isLiked: response.isLiked,
-                    likesCount: old.likesCount + (response.isLiked ? 1 : -1),
-                };
-            });
-
-            queryClient.setQueryData<FeedListResponse>(['feeds'], (old) => {
-                if (!old) return old;
-                return {
-                    ...old,
-                    feedPosts: old.feedPosts.map((feed) =>
-                        feed.feedId === feedId
-                            ? {
-                                  ...feed,
-                                  isLiked: response.isLiked,
-                                  likesCount: feed.likesCount + (response.isLiked ? 1 : -1),
-                              }
-                            : feed,
-                    ),
-                };
-            });
+        onSettled: () => {
+            // mutation이 완료되면 관련 쿼리들을 무효화하지 않음
+            // queryClient.invalidateQueries({ queryKey: ['feeds'] });
+            // queryClient.invalidateQueries({ queryKey: ['feed', feedId] });
         },
     });
 
@@ -119,5 +108,6 @@ export const useFeedLike = (feedId: number) => {
 
     return {
         handleLike,
+        isPending: toggleLikeMutation.isPending,
     };
 };

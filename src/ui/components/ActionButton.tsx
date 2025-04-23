@@ -5,12 +5,19 @@ export interface ActionButtonProps {
     count: number;
     onClick: (e: MouseEvent<HTMLButtonElement>) => void;
     isLiked?: boolean;
+    disabled?: boolean;
 }
 
-const ActionButton = ({ icon, count, onClick }: ActionButtonProps) => (
-    <button onClick={onClick} className="flex items-center gap-1 text-gray-500 hover:text-gray-700 transition-colors">
+const ActionButton = ({ icon, count, onClick, disabled }: ActionButtonProps) => (
+    <button
+        onClick={onClick}
+        className={`flex items-center gap-1 text-gray-500 transition-colors ${
+            disabled ? 'opacity-50 cursor-not-allowed' : 'hover:text-gray-700'
+        }`}
+        disabled={disabled}
+    >
         {icon}
-        {count > 0 && <span className="text-sm">{count}</span>}
+        {<span className="text-sm">{count}</span>}
     </button>
 );
 

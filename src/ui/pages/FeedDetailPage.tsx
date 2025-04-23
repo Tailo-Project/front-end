@@ -83,6 +83,12 @@ const FeedDetailPage = () => {
 
     const { handleLike } = useFeedLike(Number(feedId));
 
+    const handleLikeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        if (!feed) return;
+        handleLike(e);
+    };
+
     // 현재 사용자 프로필 정보 조회
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -365,7 +371,11 @@ const FeedDetailPage = () => {
                             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
                             <div className="flex items-center justify-between px-2">
                                 <div className="flex items-center space-x-4">
-                                    <LikeAction count={feed.likesCount} isLiked={feed.isLiked} onToggle={handleLike} />
+                                    <LikeAction
+                                        count={feed.likesCount}
+                                        isLiked={feed.isLiked}
+                                        onToggle={handleLikeClick}
+                                    />
                                     <CommentAction count={totalComments} onClick={handleComment} />
                                 </div>
                                 <ShareAction onClick={handleShare} />
