@@ -12,8 +12,29 @@ interface FeedListResponse {
     page: number;
 }
 
+interface MutationContext {
+    previousFeeds: FeedListResponse | undefined;
+    previousFeed: FeedPost | undefined;
+}
+
 export const useFeedLike = (feedId: number) => {
     const queryClient = useQueryClient();
+
+    const updateLikeState = (feed: FeedPost): FeedPost => {
+        const willLike = !feed.isLiked;
+        return {
+            ...feed,
+            isLiked: willLike,
+            likesCount: willLike ? feed.likesCount + 1 : Math.max(0, feed.likesCount - 1),
+        };
+    };
+
+    const updateFeedsList = (feeds: FeedListResponse): FeedListResponse => {
+        return {
+            ...feeds,
+            feedPosts: feeds.feedPosts.map((feed) => (feed.feedId === feedId ? updateLikeState(feed) : feed)),
+        };
+    };
 
     const toggleLikeMutation = useMutation({
         mutationFn: async () => {
@@ -37,63 +58,36 @@ export const useFeedLike = (feedId: number) => {
 
             return responseData.data as ToggleLikeResponse;
         },
-        onMutate: async () => {
-            await queryClient.cancelQueries({ queryKey: ['feeds'] });
-            await queryClient.cancelQueries({ queryKey: ['feed', feedId] });
+        onMutate: async (): Promise<MutationContext> => {
+            await Promise.all([
+                queryClient.cancelQueries({ queryKey: ['feeds'] }),
+                queryClient.cancelQueries({ queryKey: ['feed', feedId] }),
+            ]);
 
             const previousFeeds = queryClient.getQueryData<FeedListResponse>(['feeds']);
             const previousFeed = queryClient.getQueryData<FeedPost>(['feed', feedId]);
 
-            // 피드 목록 업데이트
             if (previousFeeds) {
-                queryClient.setQueryData<FeedListResponse>(['feeds'], (old) => {
-                    if (!old) return previousFeeds;
-                    return {
-                        ...old,
-                        feedPosts: old.feedPosts.map((feed) => {
-                            if (feed.feedId === feedId) {
-                                const willLike = !feed.isLiked;
-                                const newCount = willLike ? feed.likesCount + 1 : Math.max(0, feed.likesCount - 1);
-                                return {
-                                    ...feed,
-                                    isLiked: willLike,
-                                    likesCount: newCount,
-                                };
-                            }
-                            return feed;
-                        }),
-                    };
-                });
+                queryClient.setQueryData<FeedListResponse>(['feeds'], (old) =>
+                    old ? updateFeedsList(old) : previousFeeds,
+                );
             }
 
-            // 단일 피드 업데이트
             if (previousFeed) {
-                queryClient.setQueryData<FeedPost>(['feed', feedId], (old) => {
-                    if (!old) return previousFeed;
-                    const willLike = !old.isLiked;
-                    const newCount = willLike ? old.likesCount + 1 : Math.max(0, old.likesCount - 1);
-                    return {
-                        ...old,
-                        isLiked: willLike,
-                        likesCount: newCount,
-                    };
-                });
+                queryClient.setQueryData<FeedPost>(['feed', feedId], (old) =>
+                    old ? updateLikeState(old) : previousFeed,
+                );
             }
 
             return { previousFeeds, previousFeed };
         },
-        onError: (_, __, context) => {
+        onError: (_, __, context: MutationContext | undefined) => {
             if (context?.previousFeeds) {
                 queryClient.setQueryData(['feeds'], context.previousFeeds);
             }
             if (context?.previousFeed) {
                 queryClient.setQueryData(['feed', feedId], context.previousFeed);
             }
-        },
-        onSettled: () => {
-            // mutation이 완료되면 관련 쿼리들을 무효화하지 않음
-            // queryClient.invalidateQueries({ queryKey: ['feeds'] });
-            // queryClient.invalidateQueries({ queryKey: ['feed', feedId] });
         },
     });
 
