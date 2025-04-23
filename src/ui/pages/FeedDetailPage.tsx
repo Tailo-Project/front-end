@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import FeedHeader from '@/ui/components/features/feed/FeedHeader';
@@ -8,7 +8,7 @@ import { getToken } from '@/lib/token';
 import { getAccountId } from '@/shared/utils/auth';
 
 import tailogo from '@/assets/tailogo.svg';
-import { CommentsResponse, FeedPost } from '@/shared/types/feed';
+import { CommentsResponse, FeedListResponse, FeedPost } from '@/shared/types/feed';
 import Layout from './layout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AuthRequiredView from '../components/AuthRequiredView';
@@ -36,6 +36,7 @@ const FeedDetailPage = () => {
     const [editContent, setEditContent] = useState('');
 
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
 
     const {
         data: feed,
@@ -223,8 +224,43 @@ const FeedDetailPage = () => {
         setEditContent('');
     };
 
-    const handleDelete = () => {
-        // 피드 삭제 기능 구현
+    const handleDelete = async () => {
+        if (!confirm('피드를 삭제하시겠습니까?')) return;
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${getToken()}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || '피드 삭제에 실패했습니다.');
+            }
+
+            // 피드 삭제 후 캐시 업데이트
+            queryClient.setQueryData<FeedListResponse>(['feeds'], (old) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    feedPosts: old.feedPosts.filter((feed) => feed.feedId !== Number(feedId)),
+                };
+            });
+
+            // 삭제된 피드의 캐시 제거
+            queryClient.removeQueries({ queryKey: ['feed', Number(feedId)] });
+
+            // 피드 목록 페이지로 이동
+            navigate('/');
+
+            // 성공 메시지 표시
+            alert('피드가 삭제되었습니다.');
+        } catch (error) {
+            console.error('피드 삭제 실패:', error);
+            alert(error instanceof Error ? error.message : '피드 삭제에 실패했습니다.');
+        }
     };
 
     // 답글 작성 모드 설정

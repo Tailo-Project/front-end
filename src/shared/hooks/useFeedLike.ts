@@ -1,15 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getToken } from '@/lib/token';
-import { FeedPost } from '@/shared/types/feed';
+import { FeedListResponse, FeedPost } from '@/shared/types/feed';
 
 interface ToggleLikeResponse {
     isLiked: boolean;
-}
-
-interface FeedListResponse {
-    feedPosts: FeedPost[];
-    hasNext: boolean;
-    page: number;
 }
 
 interface MutationContext {

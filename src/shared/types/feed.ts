@@ -32,6 +32,9 @@ export interface CommentsResponse {
     comments: Comment[];
 }
 
-export interface FeedLikesResponse {
-    isLiked: boolean;
+export interface FeedListResponse {
+    isLiked?: boolean;
+    feedPosts: FeedPost[];
+    hasNext: boolean;
+    page: number;
 }
