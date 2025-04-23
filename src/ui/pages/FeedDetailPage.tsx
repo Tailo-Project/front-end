@@ -142,11 +142,17 @@ const FeedDetailPage = () => {
                 throw new Error('댓글 등록에 실패했습니다.');
             }
 
-            // 댓글 목록과 피드 데이터 갱신
-            await Promise.all([
-                queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
-                queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] }),
-            ]);
+            // 댓글 목록만 갱신하고, 피드 데이터는 commentsCount만 업데이트
+            await queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] });
+
+            // 피드 데이터의 commentsCount만 업데이트
+            queryClient.setQueryData(['feed', Number(feedId)], (oldData: FeedPost | undefined) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    commentsCount: (oldData.commentsCount || 0) + 1,
+                };
+            });
 
             // 입력 필드 초기화
             setNewComment('');
@@ -303,11 +309,17 @@ const FeedDetailPage = () => {
                 throw new Error('댓글 삭제에 실패했습니다.');
             }
 
-            // 댓글 목록과 피드 데이터 갱신
-            await Promise.all([
-                queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
-                queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] }),
-            ]);
+            // 댓글 목록만 갱신하고, 피드 데이터는 commentsCount만 업데이트
+            await queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] });
+
+            // 피드 데이터의 commentsCount만 업데이트
+            queryClient.setQueryData(['feed', Number(feedId)], (oldData: FeedPost | undefined) => {
+                if (!oldData) return oldData;
+                return {
+                    ...oldData,
+                    commentsCount: Math.max(0, (oldData.commentsCount || 0) - 1),
+                };
+            });
         } catch (error) {
             console.error('댓글 삭제 실패:', error);
             alert(error instanceof Error ? error.message : '댓글 삭제에 실패했습니다.');
