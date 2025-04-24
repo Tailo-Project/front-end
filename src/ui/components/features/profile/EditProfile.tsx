@@ -12,18 +12,20 @@ import BreedCombobox from '@/ui/components/form/BreedCombobox';
 import { createProfileFormData, updateProfile } from '@/core/api/profile';
 import { fetchWithToken } from '@/token';
 import { BASE_API_URL } from '@/shared/constants/apiUrl';
-import { FormInput } from '../../form/FormInput';
+import { FormInput } from '@/ui/components/form/FormInput';
 
 interface ProfileResponse {
-    nickname: string;
-    breed: string;
-    type: string;
-    age: number;
-    gender: Gender;
-    address: string;
-    profileImageUrl: string | null;
-    isFollow: boolean;
-    accountId: string;
+    data: {
+        nickname: string;
+        breed: string;
+        type: string;
+        age: number;
+        gender: Gender;
+        address: string;
+        profileImageUrl: string | null;
+        isFollow: boolean;
+        accountId: string;
+    };
 }
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -98,8 +100,11 @@ const EditProfile = () => {
                     throw new Error('프로필 조회에 실패했습니다');
                 }
 
-                const { nickname, breed, type, age, gender, address, profileImageUrl }: ProfileResponse =
-                    await response.json();
+                const profileData: ProfileResponse = await response.json();
+
+                const {
+                    data: { nickname, breed, type, age, gender, address, profileImageUrl },
+                } = profileData;
 
                 reset({ nickname, breed, type, age, gender, address });
 
