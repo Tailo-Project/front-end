@@ -105,7 +105,7 @@ const SignUpForm = () => {
                 body: formData,
             });
 
-            const data = await response.json();
+            const { data } = await response.json();
 
             if (data.accessToken && data.accountId) {
                 setToken(data.accessToken);
