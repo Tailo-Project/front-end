@@ -1,5 +1,5 @@
+import { LikeProps } from '@/types';
 import LikeButton from './LikeButton';
-import { LikeProps } from './types';
 
 const LikeAction = ({ count, isLiked, onToggle }: LikeProps) => (
     <div className="flex items-center">
