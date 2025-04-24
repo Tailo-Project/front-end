@@ -59,10 +59,7 @@ const EditProfile = () => {
 
     const handleBreedChange = (breed: string) => {
         setSelectedBreed(breed);
-        setValue('breed', breed, {
-            shouldValidate: true,
-            shouldDirty: true,
-        });
+        setValue('breed', breed);
     };
 
     const handleAddBreed = (newBreed: string) => {
