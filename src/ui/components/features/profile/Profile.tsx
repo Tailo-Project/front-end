@@ -48,19 +48,21 @@ const Profile = () => {
     const accountId = getAccountId();
     const token = getToken();
 
+    // 인증 체크
+    useEffect(() => {
+        if (!accountId || !token) {
+            showToast('로그인이 필요한 서비스입니다.', 'error');
+            navigate('/login');
+            return;
+        }
+    }, [accountId, token, navigate, showToast]);
+
     useEffect(() => {
         const fetchProfileData = async () => {
-            if (!accountId || !token) {
-                showToast('로그인이 필요한 서비스입니다.', 'error');
-                navigate('/login');
-                return;
-            }
-
             try {
                 setIsLoading(true);
 
                 const profileData = await fetchWithToken(`${BASE_API_URL}/member/profile/${accountId}`, {});
-
                 const data = await profileData.json();
 
                 const { nickname, countFollower, countFollowing, profileImageUrl, isFollow } = data.data;
@@ -83,8 +85,10 @@ const Profile = () => {
             }
         };
 
-        fetchProfileData();
-    }, [accountId, token, navigate, showToast]);
+        if (accountId && token) {
+            fetchProfileData();
+        }
+    }, [accountId, token, showToast]);
 
     useEffect(() => {
         if (location.state?.toast) {
