@@ -1,4 +1,3 @@
-import React from 'react';
 import { FieldValues } from 'react-hook-form';
 import { FormInputProps } from '@/shared/types/profile';
 
