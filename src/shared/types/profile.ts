@@ -1,3 +1,6 @@
+import { UseFormRegister, FieldValues, Path } from 'react-hook-form';
+import React from 'react';
+
 export type Gender = 'MALE' | 'FEMALE';
 
 export interface GenderOption {
@@ -22,12 +25,24 @@ export interface ProfileData extends ProfileInfo, PetInfo {
     profileImage: string | File;
 }
 
-export interface FormFieldProps {
-    label: string;
-    value: string;
-    onChange: (value: string) => void;
-    placeholder: string;
+export interface BaseInputProps {
+    label?: string;
+    placeholder?: string;
     maxLength?: number;
     type?: string;
-    min?: string;
+    min?: number;
+    errorMessage?: string;
+    disabled?: boolean;
+    required?: boolean;
+    rightElement?: React.ReactNode;
+}
+
+export interface FormInputProps<T extends FieldValues = FieldValues> extends BaseInputProps {
+    name: Path<T>;
+    register: UseFormRegister<T>;
+}
+
+export interface FormFieldProps<T extends FieldValues = FieldValues> extends BaseInputProps {
+    name: Path<T>;
+    register: UseFormRegister<T>;
 }

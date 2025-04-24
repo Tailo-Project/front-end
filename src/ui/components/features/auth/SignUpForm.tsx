@@ -4,7 +4,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import defaultProfileImage from '@/assets/defaultImage.png';
 
 import ProfileImageUpload from '@/ui/components/form/ProfileImageUpload';
-import FormInput from '@/ui/components/form/FormInput';
 import BreedCombobox from '@/ui/components/form/BreedCombobox';
 import GenderRadioGroup from '@/ui/components/form/GenderRadioGroup';
 import { createFormDataWithJson } from '@/shared/utils/formData';
@@ -14,6 +13,7 @@ import { SignUpFormData, ToastState } from '@/ui/components/form/types';
 import { useToast } from '@/shared/hooks/useToast';
 import { BASE_API_URL } from '@/shared/constants/apiUrl';
 import { fetchWithToken } from '@/token';
+import { FormInput } from '@/ui/components/form/FormInput';
 
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
@@ -208,7 +208,7 @@ const SignUpForm = () => {
                             register={register}
                             required
                             placeholder="나이를 입력해주세요."
-                            suffix="세"
+                            rightElement={<span className="text-gray-500">세</span>}
                         />
 
                         <FormInput
