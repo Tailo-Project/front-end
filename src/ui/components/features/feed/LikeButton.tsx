@@ -1,5 +1,5 @@
+import { LikeProps } from '@/types';
 import ActionButton from '../../ActionButton';
-import { LikeProps } from './types';
 
 const LikeButton = ({ count, isLiked, onToggle }: LikeProps) => (
     <ActionButton
