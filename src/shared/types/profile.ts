@@ -1,4 +1,4 @@
-export type Gender = 'MALE' | 'FEMALE' | 'OTHER' | 'PREFER_NOT_TO_SAY';
+export type Gender = 'MALE' | 'FEMALE';
 
 export interface GenderOption {
     value: Gender;
