@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 interface UseProfileImageReturn {
     imageUrl: string | null;
     profileImage: string | File;
-    handleImageChange: (file: File | null) => void;
+    handleImageChange: (file: File | string) => void;
 }
 
 export const useProfileImage = (initialImage: string | File): UseProfileImageReturn => {
@@ -20,14 +20,14 @@ export const useProfileImage = (initialImage: string | File): UseProfileImageRet
         }
     }, [profileImage]);
 
-    const handleImageChange = (file: File | null) => {
-        if (file) {
+    const handleImageChange = (file: File | string) => {
+        if (file instanceof File) {
             const maxSize = 1024 * 1024 * 5;
             if (file.size > maxSize) {
                 throw new Error('최대 5MB의 이미지를 업로드할 수 있습니다.');
             }
-            setProfileImage(file);
         }
+        setProfileImage(file);
     };
 
     return { imageUrl, profileImage, handleImageChange };
