@@ -1,5 +1,5 @@
 // External dependencies
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Pages
 import FeedDetailPage from '@/ui/pages/FeedDetailPage';
@@ -22,7 +22,14 @@ import '@/App.css';
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<FeedList />} />
+            <Route
+                path="/"
+                element={
+                    <ProtectedRoute>
+                        <Navigate to="/feeds" replace />
+                    </ProtectedRoute>
+                }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUpForm />} />
             <Route path="/oauth/kakao" element={<KakaoCallback />} />

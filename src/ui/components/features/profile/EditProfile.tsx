@@ -5,9 +5,8 @@ import defaultProfileImage from '@/assets/defaultImage.png';
 import TabBar from '@/ui/components/ui/TabBar';
 import Toast from '@/ui/components/ui/Toast';
 import { useToast } from '@/shared/hooks/useToast';
-import { useProfileImage } from '@/shared/hooks/useProfileImage';
 import GenderRadioGroup from '@/ui/components/form/GenderRadioGroup';
-import FormInput from '@/ui/components/form/FormInput';
+
 import { Gender, ProfileData } from '@/shared/types/profile';
 
 import BreedCombobox from '@/ui/components/form/BreedCombobox';
@@ -15,6 +14,7 @@ import BreedCombobox from '@/ui/components/form/BreedCombobox';
 import { createProfileFormData, updateProfile } from '@/core/api/profile';
 import { fetchWithToken } from '@/token';
 import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { FormInput } from '../../form/FormInput';
 
 interface ProfileResponse {
     nickname: string;
@@ -32,10 +32,10 @@ const EditProfile = () => {
     const navigate = useNavigate();
     const { toast, showToast } = useToast();
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { imageUrl, profileImage, handleImageChange } = useProfileImage(defaultProfileImage);
     const [isLoading, setIsLoading] = useState(true);
     const [breeds, setBreeds] = useState<string[]>(['말티즈', '비숑', '푸들', '치와와', '포메라니안']); // 임시 데이터
     const [selectedBreed, setSelectedBreed] = useState('');
+    const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
 
     const {
         register,
@@ -63,18 +63,8 @@ const EditProfile = () => {
         setBreeds((prev) => [...prev, newBreed]);
     };
 
-    const updateProfileImage = async (imageUrl: string) => {
-        try {
-            const response = await fetch(imageUrl);
-            const blob = await response.blob();
-            handleImageChange(new File([blob], 'profile.jpg', { type: 'image/jpeg' }));
-        } catch {
-            showToast('프로필 이미지를 불러오는데 실패했습니다.', 'error');
-        }
-    };
-
     const updateFormFields = (profileData: ProfileResponse) => {
-        const { breed, profileImageUrl, ...otherFields } = profileData;
+        const { breed, ...otherFields } = profileData;
         (Object.entries(otherFields) as [keyof Omit<ProfileData, 'profileImage' | 'breed'>, string | number][]).forEach(
             ([key, value]) => {
                 setValue(key, value);
@@ -82,8 +72,6 @@ const EditProfile = () => {
         );
         setSelectedBreed(breed);
         setValue('breed', breed);
-        setValue('profileImage', profileImageUrl || defaultProfileImage);
-        return profileImageUrl;
     };
 
     useEffect(() => {
@@ -92,11 +80,7 @@ const EditProfile = () => {
                 setIsLoading(true);
                 const profileData = await fetchWithToken(`${BASE_API_URL}/member`, {});
                 const data = await profileData.json();
-                const profileImageUrl = updateFormFields(data.data);
-
-                if (profileImageUrl) {
-                    await updateProfileImage(profileImageUrl);
-                }
+                updateFormFields(data.data);
             } catch (error) {
                 console.error('프로필 조회 실패:', error);
                 showToast('프로필 정보를 불러오는데 실패했습니다.', 'error');
@@ -112,11 +96,21 @@ const EditProfile = () => {
         fileInputRef.current?.click();
     };
 
+    const checkImageSize = (file: File) => {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            showToast(`이미지 크기는 ${maxSize / 1024 / 1024}MB 이하여야 합니다.`, 'error');
+            return false;
+        }
+        return true;
+    };
+
     const handleImageInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         try {
             const file = event.target.files?.[0];
-            if (file) {
-                handleImageChange(file);
+
+            if (file && checkImageSize(file)) {
+                setNewProfileImage(file);
             }
         } catch {
             showToast('이미지 업로드에 실패했습니다.', 'error');
@@ -125,8 +119,12 @@ const EditProfile = () => {
 
     const onSubmit = async (data: ProfileData) => {
         try {
-            const formData = createProfileFormData({ ...data, profileImage });
-            await updateProfile(formData);
+            await updateProfile(
+                createProfileFormData({
+                    ...data,
+                    profileImage: newProfileImage || defaultProfileImage,
+                }),
+            );
             navigate('/profile', {
                 state: { toast: { message: '프로필이 성공적으로 수정되었습니다.', type: 'success' } },
             });
@@ -162,7 +160,7 @@ const EditProfile = () => {
                                 </svg>
                             </button>
                             <h1 className="text-lg font-semibold text-gray-900">프로필 수정</h1>
-                            <div className="w-6" /> {/* 헤더 중앙 정렬을 위한 더미 div */}
+                            <div className="w-6" />
                         </header>
 
                         <form onSubmit={handleFormSubmit(onSubmit)} className="p-6 space-y-6">
@@ -170,7 +168,11 @@ const EditProfile = () => {
                                 <div className="relative mb-3">
                                     <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 hover:border-blue-500 transition-colors">
                                         <img
-                                            src={imageUrl || defaultProfileImage}
+                                            src={
+                                                newProfileImage
+                                                    ? URL.createObjectURL(newProfileImage)
+                                                    : defaultProfileImage
+                                            }
                                             alt="프로필"
                                             className="w-full h-full object-cover cursor-pointer"
                                             onClick={handleImageClick}
@@ -223,7 +225,6 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="나이를 입력해주세요"
-                                    suffix="세"
                                 />
 
                                 <GenderRadioGroup register={register} name="gender" />

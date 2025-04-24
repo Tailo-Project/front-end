@@ -1,44 +1,48 @@
-import { InputHTMLAttributes } from 'react';
-import { UseFormRegister, Path, FieldValues } from 'react-hook-form';
+import React from 'react';
+import { FieldValues } from 'react-hook-form';
+import { FormInputProps } from '@/shared/types/profile';
 
-interface FormInputProps<T extends FieldValues> extends InputHTMLAttributes<HTMLInputElement> {
-    label: string;
-    name: Path<T>;
-    register: UseFormRegister<T>;
-    suffix?: string;
-    rightElement?: React.ReactNode;
-}
-
-const FormInput = <T extends FieldValues>({
+export const FormInput = <T extends FieldValues>({
     label,
     name,
     register,
-    suffix,
+    required,
+    placeholder,
+    type,
+    min,
+    maxLength,
+    errorMessage,
+    disabled,
     rightElement,
-    className = '',
-    ...props
 }: FormInputProps<T>) => {
     return (
-        <div className="space-y-1">
-            <label htmlFor={name.toString()} className="text-sm font-medium text-gray-700">
-                {label}
-            </label>
+        <div className="space-y-2">
+            {label && (
+                <label htmlFor={name} className="block text-sm font-medium text-gray-700">
+                    {label}
+                    {required && <span className="text-red-500 ml-1">*</span>}
+                </label>
+            )}
             <div className="relative">
                 <input
-                    id={name.toString()}
+                    id={name}
+                    className={`shadow appearance-none border ${
+                        errorMessage ? 'border-red-500' : 'border-gray-300'
+                    } rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
+                        disabled ? 'bg-gray-100' : ''
+                    }`}
                     {...register(name)}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 ${className}`}
-                    {...props}
+                    placeholder={placeholder}
+                    type={type}
+                    min={min}
+                    maxLength={maxLength}
+                    disabled={disabled}
                 />
-                {suffix && (
-                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">{suffix}</span>
-                )}
                 {rightElement && (
-                    <div className="absolute right-2 top-1/2 transform -translate-y-1/2">{rightElement}</div>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-2">{rightElement}</div>
                 )}
             </div>
+            {errorMessage && <p className="text-red-500 text-xs italic">{errorMessage}</p>}
         </div>
     );
 };
-
-export default FormInput;
