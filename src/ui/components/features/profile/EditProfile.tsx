@@ -96,10 +96,20 @@ const EditProfile = () => {
         fileInputRef.current?.click();
     };
 
+    const checkImageSize = (file: File) => {
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            showToast(`이미지 크기는 ${maxSize / 1024 / 1024}MB 이하여야 합니다.`, 'error');
+            return false;
+        }
+        return true;
+    };
+
     const handleImageInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         try {
             const file = event.target.files?.[0];
-            if (file) {
+
+            if (file && checkImageSize(file)) {
                 setNewProfileImage(file);
             }
         } catch {
