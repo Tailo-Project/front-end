@@ -1,14 +1,23 @@
-import './App.css';
+// External dependencies
 import { Routes, Route } from 'react-router-dom';
-import FeedList from './component/FeedList';
-import Login from './component/Login';
-import SignUpForm from './component/SignUpForm';
-import Profile from './component/Profile';
-import EditProfile from './component/EditProfile';
-import KakaoCallback from './component/KakaoCallback';
-import WritePost from './component/WritePost';
-import ProtectedRoute from './components/ProtectedRoute';
-import FeedDetailPage from '@/pages/FeedDetailPage';
+
+// Pages
+import FeedDetailPage from '@/ui/pages/FeedDetailPage';
+
+// Features
+import FeedList from '@/ui/components/features/feed/FeedList';
+import Login from '@/ui/components/features/auth/Login';
+import SignUpForm from '@/ui/components/features/auth/SignUpForm';
+import Profile from '@/ui/components/features/profile/Profile';
+import EditProfile from '@/ui/components/features/profile/EditProfile';
+import KakaoCallback from '@/ui/components/features/auth/KakaoCallback';
+import WritePost from '@/ui/components/features/feed/WritePost';
+
+// Common components
+import ProtectedRoute from '@/ui/components/common/ProtectedRoute';
+
+// Styles
+import '@/App.css';
 
 function App() {
     return (
