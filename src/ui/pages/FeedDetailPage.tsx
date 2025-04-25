@@ -9,7 +9,7 @@ import { getAccountId } from '@/shared/utils/auth';
 
 import tailogo from '@/assets/tailogo.svg';
 import { CommentsResponse, FeedListResponse, FeedPost } from '@/shared/types/feed';
-import Layout from './layout';
+import Layout from '../layouts/layout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AuthRequiredView from '../components/AuthRequiredView';
 import BackButton from '../components/BackButton';
