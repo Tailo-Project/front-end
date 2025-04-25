@@ -3,36 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import FeedItem from '@/ui/components/features/feed/FeedItem';
 import TabBar from '../../ui/TabBar';
 import { useFeeds } from '@/shared/hooks/useFeeds';
-import { useEffect, useRef } from 'react';
+import { useInfiniteScroll } from '@/shared/hooks/useInfiniteScroll';
 
 const FeedList = () => {
     const navigate = useNavigate();
     const { data, isLoading, error, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useFeeds();
-    const observerRef = useRef<IntersectionObserver | null>(null);
-    const loadMoreRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const loadMoreElement = loadMoreRef.current;
-
-        if (!loadMoreElement) return;
-
-        observerRef.current = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-                    fetchNextPage();
-                }
-            },
-            { threshold: 0.1 },
-        );
-
-        observerRef.current.observe(loadMoreElement);
-
-        return () => {
-            if (observerRef.current && loadMoreElement) {
-                observerRef.current.unobserve(loadMoreElement);
-            }
-        };
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+    const { bottomRef } = useInfiniteScroll({
+        loadMoreFunc: fetchNextPage,
+        shouldLoadMore: !!hasNextPage && !isFetchingNextPage,
+        threshold: 0.5,
+        rootMargin: '0px',
+    });
 
     if (isError) {
         return (
@@ -81,12 +63,13 @@ const FeedList = () => {
                         {allFeedPosts.map((feed) => (
                             <FeedItem key={feed.feedId} feed={feed} />
                         ))}
-                        <div ref={loadMoreRef} className="h-4 w-full">
-                            {isFetchingNextPage && (
-                                <div className="py-4 flex justify-center">
-                                    <LoadingSpinner />
-                                </div>
-                            )}
+                        {/* 무한 스크롤 타겟 */}
+                        <div
+                            ref={bottomRef}
+                            className="h-20 w-full flex items-center justify-center"
+                            style={{ minHeight: '100px' }}
+                        >
+                            {isFetchingNextPage && <LoadingSpinner />}
                         </div>
                     </>
                 )}
