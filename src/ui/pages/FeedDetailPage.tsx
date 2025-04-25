@@ -361,6 +361,7 @@ const FeedDetailPage = () => {
                                 authorNickname={feed.authorNickname}
                                 authorProfile={feed.authorProfile}
                                 createdAt={feed.createdAt}
+                                accountId={feed.accountId}
                             />
                             {isAuthor && (
                                 <div className="flex items-center justify-end gap-2">
@@ -441,6 +442,7 @@ const FeedDetailPage = () => {
                                         authorNickname={comment.authorNickname}
                                         authorProfile={comment.authorProfile || tailogo}
                                         createdAt={comment.createdAt}
+                                        accountId={comment.accountId}
                                         rightElement={
                                             comment.authorNickname === userProfile?.nickname ? (
                                                 <div className="flex items-center gap-2">

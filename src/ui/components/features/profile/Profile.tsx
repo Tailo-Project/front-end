@@ -6,9 +6,14 @@ import defaultProfileImage from '@/assets/defaultImage.png';
 import Layout from '@/ui/layouts/layout';
 import Toast from '@/ui/components/ui/Toast';
 import { useToast } from '@/shared/hooks/useToast';
-import { getAccountId, getToken, removeAccountId, removeToken } from '@/shared/utils/auth';
+import { getToken, removeAccountId, removeToken } from '@/shared/utils/auth';
 import { fetchWithToken } from '@/token';
 import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { useProfileFeeds } from '@/shared/hooks/useProfileFeeds';
+import { useInfiniteScroll } from '@/shared/hooks/useInfiniteScroll';
+import FeedItem from '../feed/FeedItem';
+
+import LoadingSpinner from '../../common/LoadingSpinner';
 
 interface ProfileData {
     nickname: string;
@@ -17,11 +22,16 @@ interface ProfileData {
     countFollowing: number;
     profileImageUrl: string;
     isFollow: boolean;
+    countFeed: number;
 }
 
 const Profile = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const accountId = location.state?.accountId;
+    const myAccountId = localStorage.getItem('accountId');
+    const isMyProfile = accountId === myAccountId;
+
     const { toast, showToast } = useToast();
     const [profileData, setProfileData] = useState<{ data: ProfileData }>({
         data: {
@@ -31,41 +41,57 @@ const Profile = () => {
             countFollowing: 0,
             profileImageUrl: '',
             isFollow: false,
+            countFeed: 0,
         },
     });
+
     const [isLoading, setIsLoading] = useState(true);
-
-    // 임시 게시물 데이터
-    const [posts] = useState([
-        { id: 1, imageUrl: defaultProfileImage },
-        { id: 2, imageUrl: defaultProfileImage },
-        { id: 3, imageUrl: defaultProfileImage },
-        { id: 4, imageUrl: defaultProfileImage },
-        { id: 5, imageUrl: defaultProfileImage },
-        { id: 6, imageUrl: defaultProfileImage },
-    ]);
-
-    const accountId = getAccountId();
     const token = getToken();
 
-    // 인증 체크
+    const {
+        data: feedsData,
+        isLoading: isFeedsLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useProfileFeeds({ accountId: accountId || '' });
+
+    const { bottomRef } = useInfiniteScroll({
+        loadMoreFunc: fetchNextPage,
+        shouldLoadMore: !!hasNextPage && !isFetchingNextPage,
+        threshold: 0.5,
+    });
+
+    // 인증 체크 및 accountId 체크
     useEffect(() => {
-        if (!accountId || !token) {
+        if (!token) {
             showToast('로그인이 필요한 서비스입니다.', 'error');
             navigate('/login');
             return;
         }
-    }, [accountId, token, navigate, showToast]);
+
+        if (!accountId) {
+            showToast('잘못된 접근입니다.', 'error');
+            navigate('/');
+            return;
+        }
+    }, [token, accountId, navigate, showToast]);
 
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
                 setIsLoading(true);
 
-                const profileData = await fetchWithToken(`${BASE_API_URL}/member/profile/${accountId}`, {});
+                const profileData = await fetchWithToken(`${BASE_API_URL}/api/member/profile/${accountId}`, {});
                 const data = await profileData.json();
 
-                const { nickname, countFollower, countFollowing, profileImageUrl, isFollow } = data.data;
+                if (!data.data) {
+                    showToast('프로필 정보를 찾을 수 없습니다.', 'error');
+                    navigate('/');
+                    return;
+                }
+
+                const { nickname, countFollower, countFollowing, profileImageUrl, isFollow, countFeed } = data.data;
 
                 setProfileData({
                     data: {
@@ -75,11 +101,13 @@ const Profile = () => {
                         countFollowing: countFollowing || 0,
                         profileImageUrl: profileImageUrl || '',
                         isFollow: isFollow || false,
+                        countFeed: countFeed || 0,
                     },
                 });
             } catch (error) {
                 console.error('프로필 정보 조회 중 오류:', error);
                 showToast('프로필 정보 조회 중 오류가 발생했습니다.', 'error');
+                navigate('/');
             } finally {
                 setIsLoading(false);
             }
@@ -88,16 +116,29 @@ const Profile = () => {
         if (accountId && token) {
             fetchProfileData();
         }
-    }, [accountId, token, showToast]);
+    }, [accountId, token, showToast, navigate]);
 
-    useEffect(() => {
-        if (location.state?.toast) {
-            const { message, type } = location.state.toast;
-            showToast(message, type);
-            // Clear the state after showing toast
-            navigate(location.pathname, { replace: true, state: {} });
+    const handleFollow = async () => {
+        try {
+            const response = await fetchWithToken(`${BASE_API_URL}/api/member/follow/${accountId}`, {
+                method: 'POST',
+            });
+
+            if (response.ok) {
+                setProfileData((prev) => ({
+                    data: {
+                        ...prev.data,
+                        isFollow: !prev.data.isFollow,
+                        countFollower: prev.data.isFollow ? prev.data.countFollower - 1 : prev.data.countFollower + 1,
+                    },
+                }));
+                showToast(profileData.data.isFollow ? '팔로우가 취소되었습니다.' : '팔로우하였습니다.', 'success');
+            }
+        } catch (error) {
+            console.error('팔로우 처리 중 오류:', error);
+            showToast('팔로우 처리 중 오류가 발생했습니다.', 'error');
         }
-    }, [location, navigate, showToast]);
+    };
 
     const handleLogout = async () => {
         try {
@@ -111,23 +152,27 @@ const Profile = () => {
         }
     };
 
-    if (isLoading) {
+    if (isLoading || isFeedsLoading) {
         return (
             <Layout>
                 <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
-                    <div className="text-gray-600">프로필을 불러오는 중...</div>
+                    <LoadingSpinner />
                 </div>
             </Layout>
         );
     }
+
+    const allFeedPosts = feedsData?.pages.flatMap((page) => page.data.feedPosts) ?? [];
 
     return (
         <Layout>
             <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen pb-16">
                 <header className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between mb-4">
-                        <h1 className="text-xl font-bold">마이페이지</h1>
-                        <div className="flex items-center gap-2">
+                        <h1 className="text-xl font-bold">
+                            {isMyProfile ? '마이페이지' : `${profileData.data.nickname}님의 프로필`}
+                        </h1>
+                        {isMyProfile && (
                             <button
                                 onClick={handleLogout}
                                 className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -135,7 +180,7 @@ const Profile = () => {
                             >
                                 <LogoutIcon className="w-6 h-6" />
                             </button>
-                        </div>
+                        )}
                     </div>
 
                     <div className="flex items-center mb-6">
@@ -152,7 +197,7 @@ const Profile = () => {
 
                     <div className="flex justify-around mb-6">
                         <div className="text-center">
-                            <div className="font-semibold">{profileData.data?.countFollower}</div>
+                            <div className="font-semibold">{profileData.data.countFeed}</div>
                             <div className="text-gray-500 text-sm">게시물</div>
                         </div>
                         <div className="text-center">
@@ -165,20 +210,50 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    <button
-                        onClick={() => navigate('/profile/edit')}
-                        className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors"
-                    >
-                        프로필 수정
-                    </button>
+                    {isMyProfile ? (
+                        <button
+                            onClick={() => navigate('/profile/edit')}
+                            className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors"
+                        >
+                            프로필 수정
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleFollow}
+                            className={`w-full py-2 rounded-md text-sm font-medium transition-colors ${
+                                profileData.data.isFollow
+                                    ? 'border border-gray-300 hover:bg-gray-50'
+                                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                            }`}
+                        >
+                            {profileData.data.isFollow ? '팔로잉' : '팔로우'}
+                        </button>
+                    )}
                 </header>
 
-                <div className="grid grid-cols-3 gap-0.5">
-                    {posts.map((post) => (
-                        <div key={post.id} className="aspect-square">
-                            <img src={post.imageUrl} alt={`게시물 ${post.id}`} className="w-full h-full object-cover" />
+                <div className="divide-y divide-gray-200">
+                    {allFeedPosts.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-10">
+                            <p className="text-gray-500 text-lg mb-2">아직 게시물이 없습니다</p>
+                            {isMyProfile && (
+                                <button
+                                    onClick={() => navigate('/write')}
+                                    className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                                >
+                                    첫 게시물 작성하기
+                                </button>
+                            )}
                         </div>
-                    ))}
+                    ) : (
+                        <>
+                            {allFeedPosts.map((feed) => (
+                                <FeedItem key={feed.feedId} feed={feed} />
+                            ))}
+                            <div ref={bottomRef} className="h-20 flex items-center justify-center">
+                                {isFetchingNextPage && <LoadingSpinner />}
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {toast.show && (
