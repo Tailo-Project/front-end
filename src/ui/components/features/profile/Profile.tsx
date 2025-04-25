@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 
 import defaultProfileImage from '@/assets/defaultImage.png';
-import Layout from '@/ui/pages/layout';
+import Layout from '@/ui/layouts/layout';
 import Toast from '@/ui/components/ui/Toast';
 import { useToast } from '@/shared/hooks/useToast';
 import { getAccountId, getToken, removeAccountId, removeToken } from '@/shared/utils/auth';
