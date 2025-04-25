@@ -6,7 +6,7 @@ import defaultProfileImage from '@/assets/defaultImage.png';
 import Layout from '@/ui/layouts/layout';
 import Toast from '@/ui/components/ui/Toast';
 import { useToast } from '@/shared/hooks/useToast';
-import { getToken, removeAccountId, removeToken } from '@/shared/utils/auth';
+import { clearAuth, getToken } from '@/shared/utils/auth';
 import { fetchWithToken } from '@/token';
 import { BASE_API_URL } from '@/shared/constants/apiUrl';
 
@@ -135,9 +135,9 @@ const Profile = () => {
 
     const handleLogout = async () => {
         try {
-            removeToken();
-            removeAccountId();
+            clearAuth();
             navigate('/login');
+
             showToast('로그아웃되었습니다.', 'success');
         } catch (error) {
             console.error('로그아웃 중 오류가 발생했습니다:', error);
@@ -197,13 +197,21 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {isMyProfile ? (
-                        <button
-                            onClick={() => navigate('/profile/edit')}
-                            className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors"
-                        >
-                            프로필 수정
-                        </button>
+                    {!isMyProfile ? (
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={() => navigate('/profile/edit')}
+                                className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors bg-blue-500 text-white"
+                            >
+                                프로필 수정
+                            </button>
+                            <button
+                                onClick={() => navigate('/profile/dm')}
+                                className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors bg-blue-500 text-white"
+                            >
+                                DM 보관함
+                            </button>
+                        </div>
                     ) : (
                         <button
                             onClick={handleFollow}

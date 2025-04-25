@@ -1,5 +1,5 @@
-import { getToken } from './lib/manageToken';
 import { BASE_API_URL } from './shared/constants/apiUrl';
+import { getToken, setToken } from './shared/utils/auth';
 
 const refreshToken = async () => {
     try {
@@ -26,7 +26,7 @@ export const fetchWithToken = async (url: string, options: RequestInit) => {
     if (response.status === 401) {
         try {
             const newToken = await refreshToken();
-            localStorage.setItem('accessToken', newToken);
+            setToken(newToken);
 
             const newHeaders = { ...options.headers, Authorization: `Bearer ${newToken}` };
             const retryResponse = await fetch(url, { ...options, headers: newHeaders });
