@@ -197,7 +197,7 @@ const Profile = () => {
                         </div>
                     </div>
 
-                    {!isMyProfile ? (
+                    {isMyProfile ? (
                         <div className="flex justify-center gap-4">
                             <button
                                 onClick={() => navigate('/profile/edit')}
