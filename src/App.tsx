@@ -12,6 +12,7 @@ import Profile from '@/ui/components/features/profile/Profile';
 import EditProfile from '@/ui/components/features/profile/EditProfile';
 import KakaoCallback from '@/ui/components/features/auth/KakaoCallback';
 import WritePost from '@/ui/components/features/feed/WritePost';
+import DMInbox from '@/ui/components/features/dm/DMInbox';
 
 // Common components
 import ProtectedRoute from '@/ui/components/common/ProtectedRoute';
@@ -86,6 +87,14 @@ function App() {
                 element={
                     <ProtectedRoute>
                         <EditProfile />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/profile/dm"
+                element={
+                    <ProtectedRoute>
+                        <DMInbox />
                     </ProtectedRoute>
                 }
             />
