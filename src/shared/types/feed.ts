@@ -5,6 +5,7 @@ export interface Author {
 
 export interface FeedPost {
     feedId: number;
+    accountId: string;
     authorNickname: string;
     authorProfile: string;
     content: string;
@@ -19,6 +20,7 @@ export interface FeedPost {
 export interface Comment {
     commentId: number;
     content: string;
+    accountId: string;
     authorNickname: string;
     authorProfile: string | null;
     createdAt: string;
