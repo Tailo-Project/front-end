@@ -4,8 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import FeedHeader from '@/ui/components/features/feed/FeedHeader';
 import FeedImages from '@/ui/components/features/feed/FeedImages';
-import { getToken } from '@/lib/manageToken';
-import { getAccountId } from '@/shared/utils/auth';
+
+import { getAccountId, getToken } from '@/shared/utils/auth';
 
 import tailogo from '@/assets/tailogo.svg';
 import { CommentsResponse, FeedListResponse, FeedPost } from '@/shared/types/feed';
