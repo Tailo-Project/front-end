@@ -97,7 +97,7 @@ const FeedDetailPage = () => {
             if (!accountId) return;
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/member/profile/${accountId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/member/profile/${accountId}`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
                     },

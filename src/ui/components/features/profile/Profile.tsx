@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 
 import defaultProfileImage from '@/assets/defaultImage.png';
@@ -9,9 +9,6 @@ import { useToast } from '@/shared/hooks/useToast';
 import { getToken, removeAccountId, removeToken } from '@/shared/utils/auth';
 import { fetchWithToken } from '@/token';
 import { BASE_API_URL } from '@/shared/constants/apiUrl';
-import { useProfileFeeds } from '@/shared/hooks/useProfileFeeds';
-import { useInfiniteScroll } from '@/shared/hooks/useInfiniteScroll';
-import FeedItem from '../feed/FeedItem';
 
 import LoadingSpinner from '../../common/LoadingSpinner';
 
@@ -26,11 +23,22 @@ interface ProfileData {
 }
 
 const Profile = () => {
+    const [posts] = useState([
+        { id: 1, imageUrl: defaultProfileImage },
+        { id: 2, imageUrl: defaultProfileImage },
+        { id: 3, imageUrl: defaultProfileImage },
+        { id: 4, imageUrl: defaultProfileImage },
+        { id: 5, imageUrl: defaultProfileImage },
+        { id: 6, imageUrl: defaultProfileImage },
+    ]);
     const navigate = useNavigate();
     const location = useLocation();
     const accountId = location.state?.accountId;
+
     const myAccountId = localStorage.getItem('accountId');
+
     const isMyProfile = accountId === myAccountId;
+    console.log(isMyProfile, 'isMyProfile');
 
     const { toast, showToast } = useToast();
     const [profileData, setProfileData] = useState<{ data: ProfileData }>({
@@ -48,20 +56,6 @@ const Profile = () => {
     const [isLoading, setIsLoading] = useState(true);
     const token = getToken();
 
-    const {
-        data: feedsData,
-        isLoading: isFeedsLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useProfileFeeds({ accountId: accountId || '' });
-
-    const { bottomRef } = useInfiniteScroll({
-        loadMoreFunc: fetchNextPage,
-        shouldLoadMore: !!hasNextPage && !isFetchingNextPage,
-        threshold: 0.5,
-    });
-
     // 인증 체크 및 accountId 체크
     useEffect(() => {
         if (!token) {
@@ -70,19 +64,20 @@ const Profile = () => {
             return;
         }
 
-        if (!accountId) {
+        if (!myAccountId) {
             showToast('잘못된 접근입니다.', 'error');
             navigate('/');
             return;
         }
-    }, [token, accountId, navigate, showToast]);
+    }, [token, myAccountId, navigate, showToast]);
 
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
                 setIsLoading(true);
 
-                const profileData = await fetchWithToken(`${BASE_API_URL}/api/member/profile/${accountId}`, {});
+                const profileData = await fetchWithToken(`${BASE_API_URL}/member/profile/${myAccountId}`, {});
+
                 const data = await profileData.json();
 
                 if (!data.data) {
@@ -96,7 +91,7 @@ const Profile = () => {
                 setProfileData({
                     data: {
                         nickname: nickname || '',
-                        id: accountId || '',
+                        id: myAccountId || '',
                         countFollower: countFollower || 0,
                         countFollowing: countFollowing || 0,
                         profileImageUrl: profileImageUrl || '',
@@ -113,14 +108,12 @@ const Profile = () => {
             }
         };
 
-        if (accountId && token) {
-            fetchProfileData();
-        }
-    }, [accountId, token, showToast, navigate]);
+        fetchProfileData();
+    }, [myAccountId, token, showToast, navigate]);
 
     const handleFollow = async () => {
         try {
-            const response = await fetchWithToken(`${BASE_API_URL}/api/member/follow/${accountId}`, {
+            const response = await fetchWithToken(`${BASE_API_URL}/member/follow/${myAccountId}`, {
                 method: 'POST',
             });
 
@@ -152,7 +145,7 @@ const Profile = () => {
         }
     };
 
-    if (isLoading || isFeedsLoading) {
+    if (isLoading) {
         return (
             <Layout>
                 <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
@@ -162,25 +155,19 @@ const Profile = () => {
         );
     }
 
-    const allFeedPosts = feedsData?.pages.flatMap((page) => page.data.feedPosts) ?? [];
-
     return (
         <Layout>
             <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen pb-16">
                 <header className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between mb-4">
-                        <h1 className="text-xl font-bold">
-                            {isMyProfile ? '마이페이지' : `${profileData.data.nickname}님의 프로필`}
-                        </h1>
-                        {isMyProfile && (
-                            <button
-                                onClick={handleLogout}
-                                className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
-                                aria-label="로그아웃"
-                            >
-                                <LogoutIcon className="w-6 h-6" />
-                            </button>
-                        )}
+                        <h1 className="text-xl font-bold">마이페이지</h1>
+                        <button
+                            onClick={handleLogout}
+                            className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
+                            aria-label="로그아웃"
+                        >
+                            <LogoutIcon className="w-6 h-6" />
+                        </button>
                     </div>
 
                     <div className="flex items-center mb-6">
@@ -231,29 +218,10 @@ const Profile = () => {
                     )}
                 </header>
 
-                <div className="divide-y divide-gray-200">
-                    {allFeedPosts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-10">
-                            <p className="text-gray-500 text-lg mb-2">아직 게시물이 없습니다</p>
-                            {isMyProfile && (
-                                <button
-                                    onClick={() => navigate('/write')}
-                                    className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                                >
-                                    첫 게시물 작성하기
-                                </button>
-                            )}
-                        </div>
-                    ) : (
-                        <>
-                            {allFeedPosts.map((feed) => (
-                                <FeedItem key={feed.feedId} feed={feed} />
-                            ))}
-                            <div ref={bottomRef} className="h-20 flex items-center justify-center">
-                                {isFetchingNextPage && <LoadingSpinner />}
-                            </div>
-                        </>
-                    )}
+                <div className="flex flex-col gap-4">
+                    {posts.map((post) => (
+                        <div key={post.id} className="w-full h-40 bg-gray-100 rounded-md"></div>
+                    ))}
                 </div>
 
                 {toast.show && (
