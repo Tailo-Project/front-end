@@ -3,10 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import FeedItem from '@/ui/components/features/feed/FeedItem';
 import TabBar from '../../ui/TabBar';
 import { useFeeds } from '@/shared/hooks/useFeeds';
+import { useInfiniteScroll } from '@/shared/hooks/useInfiniteScroll';
 
 const FeedList = () => {
     const navigate = useNavigate();
-    const { data, isLoading, error, isError } = useFeeds();
+    const { data, isLoading, error, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = useFeeds();
+
+    const { bottomRef } = useInfiniteScroll({
+        loadMoreFunc: fetchNextPage,
+        shouldLoadMore: !!hasNextPage && !isFetchingNextPage,
+        threshold: 0.5,
+        rootMargin: '0px',
+    });
 
     if (isError) {
         return (
@@ -34,10 +42,37 @@ const FeedList = () => {
         );
     }
 
+    const allFeedPosts = data?.pages.flatMap((page) => page.feedPosts) ?? [];
+
     return (
         <>
             <div className="w-full max-w-[375px] mx-auto bg-white pb-16 border border-gray-200">
-                {data?.feedPosts.map((feed) => <FeedItem key={feed.feedId} feed={feed} />)}
+                {allFeedPosts.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4">
+                        <p className="text-gray-500 text-lg mb-2">아직 게시물이 없습니다</p>
+                        <p className="text-gray-400 text-sm mb-4">첫 번째 게시물을 작성해보세요!</p>
+                        <button
+                            onClick={() => navigate('/write')}
+                            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                            글쓰기
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        {allFeedPosts.map((feed) => (
+                            <FeedItem key={feed.feedId} feed={feed} />
+                        ))}
+                        {/* 무한 스크롤 타겟 */}
+                        <div
+                            ref={bottomRef}
+                            className="h-20 w-full flex items-center justify-center"
+                            style={{ minHeight: '100px' }}
+                        >
+                            {isFetchingNextPage && <LoadingSpinner />}
+                        </div>
+                    </>
+                )}
             </div>
             <TabBar />
         </>

@@ -9,7 +9,7 @@ import { getAccountId } from '@/shared/utils/auth';
 
 import tailogo from '@/assets/tailogo.svg';
 import { CommentsResponse, FeedListResponse, FeedPost } from '@/shared/types/feed';
-import Layout from './layout';
+import Layout from '../layouts/layout';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AuthRequiredView from '../components/AuthRequiredView';
 import BackButton from '../components/BackButton';
@@ -97,7 +97,7 @@ const FeedDetailPage = () => {
             if (!accountId) return;
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/member/profile/${accountId}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/member/profile/${accountId}`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
                     },
@@ -361,6 +361,7 @@ const FeedDetailPage = () => {
                                 authorNickname={feed.authorNickname}
                                 authorProfile={feed.authorProfile}
                                 createdAt={feed.createdAt}
+                                accountId={feed.accountId}
                             />
                             {isAuthor && (
                                 <div className="flex items-center justify-end gap-2">
@@ -441,6 +442,7 @@ const FeedDetailPage = () => {
                                         authorNickname={comment.authorNickname}
                                         authorProfile={comment.authorProfile || tailogo}
                                         createdAt={comment.createdAt}
+                                        accountId={comment.accountId}
                                         rightElement={
                                             comment.authorNickname === userProfile?.nickname ? (
                                                 <div className="flex items-center gap-2">

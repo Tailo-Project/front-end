@@ -12,8 +12,9 @@ export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) 
         if (e.key === 'Enter') {
             e.preventDefault();
             const trimmedHashtag = hashtag.trim();
+            const isMatchHashtag = !hashtags.some((h) => h.hashtag === trimmedHashtag);
 
-            if (trimmedHashtag && !hashtags.some((h) => h.hashtag === trimmedHashtag)) {
+            if (trimmedHashtag && isMatchHashtag) {
                 onHashtagsChange([...hashtags, { hashtag: trimmedHashtag }]);
                 setHashtag('');
             }
