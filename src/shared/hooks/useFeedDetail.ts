@@ -3,7 +3,7 @@ import { FeedPost } from '@/shared/types/feed';
 import { fetchWithToken } from '@/token';
 import { FEED_API_URL } from '../constants/apiUrl';
 
-export const useFeedDetail = (feedId: string | undefined) => {
+const useFeedDetail = (feedId: string | undefined) => {
     return useQuery<FeedPost>({
         queryKey: ['feed', Number(feedId)],
         queryFn: async () => {
@@ -20,3 +20,5 @@ export const useFeedDetail = (feedId: string | undefined) => {
         refetchOnWindowFocus: false,
     });
 };
+
+export default useFeedDetail;

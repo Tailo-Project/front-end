@@ -4,7 +4,7 @@ import FeedHeader from './FeedHeader';
 import FeedImages from './FeedImages';
 import LikeButton from './LikeButton';
 import CommentAction from './CommentAction';
-import { useFeedLike } from '@/shared/hooks/useFeedLike';
+import useFeedLike from '@/shared/hooks/useFeedLike';
 import HashtagList from './HashtagList';
 
 interface FeedItemProps {

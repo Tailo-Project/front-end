@@ -5,7 +5,7 @@ interface UseBreedSearchOptions {
     onAddBreed?: (breed: string) => void;
 }
 
-export const useBreedSearch = ({ breeds, onAddBreed }: UseBreedSearchOptions) => {
+const useBreedSearch = ({ breeds, onAddBreed }: UseBreedSearchOptions) => {
     const [query, setQuery] = useState('');
     const [showAddBreed, setShowAddBreed] = useState(false);
 
@@ -37,3 +37,5 @@ export const useBreedSearch = ({ breeds, onAddBreed }: UseBreedSearchOptions) =>
         handleAddBreed,
     };
 };
+
+export default useBreedSearch;

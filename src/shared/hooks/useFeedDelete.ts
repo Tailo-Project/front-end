@@ -4,7 +4,7 @@ import { FeedListResponse } from '@/shared/types/feed';
 import { fetchWithToken } from '@/token';
 import { FEED_API_URL } from '../constants/apiUrl';
 
-export const useFeedDelete = (feedId: string | undefined) => {
+const useFeedDelete = (feedId: string | undefined) => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
 
@@ -46,3 +46,5 @@ export const useFeedDelete = (feedId: string | undefined) => {
 
     return { deleteFeed };
 };
+
+export default useFeedDelete;

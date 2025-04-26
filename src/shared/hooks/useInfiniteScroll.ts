@@ -7,7 +7,7 @@ interface UseInfiniteScrollProps {
     rootMargin?: string;
 }
 
-export const useInfiniteScroll = ({
+const useInfiniteScroll = ({
     loadMoreFunc,
     shouldLoadMore,
     threshold = 1,
@@ -48,3 +48,5 @@ export const useInfiniteScroll = ({
 
     return { bottomRef, inView };
 };
+
+export default useInfiniteScroll;

@@ -12,7 +12,7 @@ interface PostForm {
 
 const MAX_CONTENT_LENGTH = 2000;
 
-export const usePostForm = () => {
+const usePostForm = () => {
     const navigate = useNavigate();
     const [form, setForm] = useState<PostForm>({
         content: '',
@@ -89,3 +89,5 @@ export const usePostForm = () => {
         MAX_CONTENT_LENGTH,
     };
 };
+
+export default usePostForm;

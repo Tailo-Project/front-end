@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchWithToken } from '@/token';
 import { FOLLOW_API_URL, MEMBER_API_URL } from '@/shared/constants/apiUrl';
 import Toast from '@/ui/components/ui/Toast';
-import { useToast } from '@/shared/hooks/useToast';
+import useToast from '@/shared/hooks/useToast';
 
 interface Friend {
     id: number;
@@ -12,7 +12,7 @@ interface Friend {
     isFollow: boolean;
 }
 
-const FriendList: React.FC = () => {
+const FriendList = () => {
     const [friends, setFriends] = useState<Friend[]>([]);
     const [blockedIds, setBlockedIds] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(true);

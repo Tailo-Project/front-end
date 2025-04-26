@@ -15,7 +15,7 @@ interface FeedListResponse {
 
 const PAGE_SIZE = 10;
 
-export const useFeeds = () => {
+const useFeeds = () => {
     return useInfiniteQuery<FeedListResponse>({
         queryKey: ['feeds'],
         queryFn: async ({ pageParam = 0 }) => {
@@ -33,3 +33,5 @@ export const useFeeds = () => {
         retry: 1, // 한 번만 재시도
     });
 };
+
+export default useFeeds;

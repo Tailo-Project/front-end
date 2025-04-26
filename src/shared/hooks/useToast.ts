@@ -14,7 +14,7 @@ interface UseToastReturn {
     hideToast: () => void;
 }
 
-export const useToast = (defaultDuration = 1500): UseToastReturn => {
+const useToast = (defaultDuration = 1500): UseToastReturn => {
     const [toast, setToast] = useState<ToastState>({
         message: '',
         type: 'success',
@@ -55,3 +55,5 @@ export const useToast = (defaultDuration = 1500): UseToastReturn => {
 
     return { toast, showToast, hideToast };
 };
+
+export default useToast;

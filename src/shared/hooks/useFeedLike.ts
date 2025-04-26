@@ -12,7 +12,7 @@ interface MutationContext {
     previousFeed: FeedPost | undefined;
 }
 
-export const useFeedLike = (feedId: number) => {
+const useFeedLike = (feedId: number) => {
     const queryClient = useQueryClient();
 
     const updateLikeState = (feed: FeedPost): FeedPost => {
@@ -97,3 +97,5 @@ export const useFeedLike = (feedId: number) => {
         isPending: toggleLikeMutation.isPending,
     };
 };
+
+export default useFeedLike;

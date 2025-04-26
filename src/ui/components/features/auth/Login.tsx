@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import defaultProfileImage from '@/assets/defaultImage.png';
 import kakaoSymbol from '@/assets/kakao_login_medium_narrow.png';
-import { useToast } from '@/shared/hooks/useToast';
+import useToast from '@/shared/hooks/useToast';
 import { authService } from '@/core/services/authService';
 import Toast from '../../ui/Toast';
 

@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import defaultProfileImage from '@/assets/defaultImage.png';
 import TabBar from '@/ui/components/ui/TabBar';
 import Toast from '@/ui/components/ui/Toast';
-import { useToast } from '@/shared/hooks/useToast';
+import useToast from '@/shared/hooks/useToast';
 import GenderRadioGroup from '@/ui/components/form/GenderRadioGroup';
 
 import { Gender, ProfileData } from '@/shared/types/profile';

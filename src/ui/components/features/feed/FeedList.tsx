@@ -2,8 +2,8 @@ import LoadingSpinner from '../../common/LoadingSpinner';
 import { useNavigate } from 'react-router-dom';
 import FeedItem from '@/ui/components/features/feed/FeedItem';
 import TabBar from '../../ui/TabBar';
-import { useFeeds } from '@/shared/hooks/useFeeds';
-import { useInfiniteScroll } from '@/shared/hooks/useInfiniteScroll';
+import useFeeds from '@/shared/hooks/useFeeds';
+import useInfiniteScroll from '@/shared/hooks/useInfiniteScroll';
 
 const FeedList = () => {
     const navigate = useNavigate();

@@ -12,7 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { getToken } from '@/shared/utils/auth';
 import { FEED_API_URL } from '@/shared/constants/apiUrl';
-import { useFeedComments } from '@/shared/hooks/useFeedComments';
+import { HashtagInput } from '../feed/HashtagInput';
+import useFeedComments from '@/shared/hooks/useFeedComments';
 
 interface UserProfile {
     nickname: string;
@@ -44,6 +45,7 @@ interface FeedCommentSectionProps {
 const FeedMainContent = ({ feed, userProfile, handleLike, navigate }: FeedMainContentProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState('');
+    const [hashtags, setHashtags] = useState(feed.hashtags.map((tag) => ({ hashtag: tag })));
     const [isDeleting, setIsDeleting] = useState(false);
     const isAuthor = feed?.authorNickname === userProfile?.nickname;
     const totalComments = feed.commentsCount ?? 0;
@@ -51,6 +53,7 @@ const FeedMainContent = ({ feed, userProfile, handleLike, navigate }: FeedMainCo
     // 피드 수정 버튼 클릭
     const handleEdit = () => {
         setEditContent(feed.content);
+        setHashtags(feed.hashtags.map((tag) => ({ hashtag: tag })));
         setIsEditing(true);
     };
 
@@ -61,7 +64,7 @@ const FeedMainContent = ({ feed, userProfile, handleLike, navigate }: FeedMainCo
             const formData = new FormData();
             const feedUpdateRequest = {
                 content: editContent.trim(),
-                hashtags: (editContent.match(/#[^\s#]+/g) || []).map((tag) => tag.slice(1)),
+                hashtags: hashtags.map((h) => h.hashtag),
                 imageUrls: feed.imageUrls || [],
             };
             formData.append(
@@ -146,7 +149,7 @@ const FeedMainContent = ({ feed, userProfile, handleLike, navigate }: FeedMainCo
                 </div>
             )}
             {isEditing ? (
-                <div className="mt-4">
+                <div className="mt-4 flex flex-col gap-2">
                     <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
@@ -154,6 +157,7 @@ const FeedMainContent = ({ feed, userProfile, handleLike, navigate }: FeedMainCo
                         rows={4}
                         placeholder="내용을 입력하세요. 해시태그는 #으로 시작합니다."
                     />
+                    <HashtagInput hashtags={hashtags} onHashtagsChange={setHashtags} />
                 </div>
             ) : (
                 <FeedContent feed={feed} />

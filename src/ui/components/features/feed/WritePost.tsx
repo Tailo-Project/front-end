@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ImageUploader } from './ImageUploader';
 import { HashtagInput } from './HashtagInput';
-import { usePostForm } from '@/shared/hooks/usePostForm';
+import usePostForm from '@/shared/hooks/usePostForm';
 
 const WritePost = () => {
     const navigate = useNavigate();

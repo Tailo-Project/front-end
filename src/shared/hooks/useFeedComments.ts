@@ -3,7 +3,7 @@ import { CommentsResponse } from '@/shared/types/feed';
 import { fetchWithToken } from '@/token';
 import { FEED_API_URL } from '../constants/apiUrl';
 
-export const useFeedComments = (feedId: string | undefined) => {
+const useFeedComments = (feedId: string | undefined) => {
     const queryClient = useQueryClient();
 
     const { data: comments, isLoading } = useQuery<CommentsResponse>({
@@ -68,3 +68,5 @@ export const useFeedComments = (feedId: string | undefined) => {
         deleteComment,
     };
 };
+
+export default useFeedComments;

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useToast } from '@/shared/hooks/useToast';
+import useToast from '@/shared/hooks/useToast';
 import { authService } from '@/core/services/authService';
 import Toast from '@/ui/components/ui/Toast';
 

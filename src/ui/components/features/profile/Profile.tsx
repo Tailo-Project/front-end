@@ -4,8 +4,8 @@ import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/out
 
 import Layout from '@/ui/layouts/layout';
 import Toast from '@/ui/components/ui/Toast';
-import { useToast } from '@/shared/hooks/useToast';
-import { useProfile } from '@/shared/hooks/useProfile';
+import useToast from '@/shared/hooks/useToast';
+import useProfile from '@/shared/hooks/useProfile';
 import LoadingSpinner from '../../common/LoadingSpinner';
 import ProfileHeader from './ProfileHeader';
 import ProfileStats from './ProfileStats';

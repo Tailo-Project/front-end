@@ -10,7 +10,7 @@ import { createFormDataWithJson } from '@/shared/utils/formData';
 import { setToken, setAccountId } from '@/shared/utils/auth';
 import Toast from '@/ui/components/ui/Toast';
 import { SignUpFormData, ToastState } from '@/ui/components/form/types';
-import { useToast } from '@/shared/hooks/useToast';
+import useToast from '@/shared/hooks/useToast';
 import { AUTH_API_URL, MEMBER_API_URL } from '@/shared/constants/apiUrl';
 import { fetchWithToken } from '@/token';
 import { FormInput } from '@/ui/components/form/FormInput';
@@ -75,10 +75,9 @@ const SignUpForm = () => {
             const data = await response.json();
             setIdCheckStatus(data.statusCode);
 
-            showToastMessage(
-                data.statusCode === 200 ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.',
-                data.statusCode === 200 ? 'success' : 'error',
-            );
+            const message = data.statusCode === 200 ? '사용 가능한 아이디입니다.' : '이미 사용 중인 아이디입니다.';
+
+            showToastMessage(message, data.statusCode === 200 ? 'success' : 'error');
         } catch (error) {
             showToastMessage(error instanceof Error ? error.message : '중복 확인 중 오류가 발생했습니다.', 'error');
         } finally {

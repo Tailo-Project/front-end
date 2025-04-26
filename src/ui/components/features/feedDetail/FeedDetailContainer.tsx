@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { getAccountId, getToken } from '@/shared/utils/auth';
-import { useFeedDetail } from '@/shared/hooks/useFeedDetail';
-import { useFeedComments } from '@/shared/hooks/useFeedComments';
-import { useFeedLike } from '@/shared/hooks/useFeedLike';
+import useFeedDetail from '@/shared/hooks/useFeedDetail';
+import useFeedComments from '@/shared/hooks/useFeedComments';
+import useFeedLike from '@/shared/hooks/useFeedLike';
 import { BASE_API_URL } from '@/shared/constants/apiUrl';
 import FeedDetailContent from './FeedDetailContent';
 import LoadingSpinner from '../../common/LoadingSpinner';
