@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getToken, clearAuth } from '@/shared/utils/auth';
 import { fetchWithToken } from '@/token';
@@ -83,31 +83,39 @@ const useProfile = (
         }
     }, [accountId, token, showToast, navigate]);
 
-    const handleFollow = useCallback(async () => {
+    const handleFollow = async () => {
+        let prevIsFollow: boolean;
+        setProfileData((prevProfile) => {
+            prevIsFollow = prevProfile.data.isFollow;
+            const updatedFollowStatus = !prevProfile.data.isFollow;
+            return {
+                data: { ...prevProfile.data, isFollow: updatedFollowStatus },
+            };
+        });
         try {
             const method = profileData.data.isFollow ? 'DELETE' : 'POST';
             const response = await fetchWithToken(`${FOLLOW_API_URL}/${accountId}`, { method });
             if (!response.ok) {
                 throw new Error('팔로우 처리에 실패했습니다.');
             }
-            setProfileData((prevProfile) => {
-                const updatedFollowStatus = !prevProfile.data.isFollow;
-                return {
-                    data: { ...prevProfile.data, isFollow: updatedFollowStatus },
-                };
-            });
             if (showToast)
-                showToast(profileData.data.isFollow ? '팔로우가 취소되었습니다.' : '팔로우하였습니다.', 'success');
+                showToast(!profileData.data.isFollow ? '팔로우하였습니다.' : '팔로우가 취소되었습니다.', 'success');
         } catch {
             if (showToast) showToast('팔로우 처리 중 오류가 발생했습니다.', 'error');
+            // 실패 시 원래대로 롤백
+            setProfileData((prevProfile) => {
+                return {
+                    data: { ...prevProfile.data, isFollow: prevIsFollow },
+                };
+            });
         }
-    }, [profileData, accountId, showToast]);
+    };
 
-    const handleLogout = useCallback(() => {
+    const handleLogout = () => {
         clearAuth();
         navigate('/login');
         if (showToast) showToast('로그아웃되었습니다.', 'success');
-    }, [navigate, showToast]);
+    };
 
     return {
         profileData,
