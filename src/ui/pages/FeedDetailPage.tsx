@@ -78,9 +78,9 @@ const FeedDetailPage = () => {
             return data.data;
         },
         enabled: !!feedId,
-        staleTime: 10 * 1000, // 10초 동안 데이터를 fresh 상태로 유지
-        gcTime: 5 * 60 * 1000, // 5분 동안 캐시 유지
-        refetchOnWindowFocus: false, // 윈도우 포커스 시 자동 리페치 비활성화
+        staleTime: 10 * 1000,
+        gcTime: 5 * 60 * 1000,
+        refetchOnWindowFocus: false,
     });
 
     const { handleLike } = useFeedLike(Number(feedId));
@@ -113,7 +113,6 @@ const FeedDetailPage = () => {
         fetchUserProfile();
     }, []);
 
-    // 댓글 작성 처리
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -138,10 +137,8 @@ const FeedDetailPage = () => {
                 throw new Error('댓글 등록에 실패했습니다.');
             }
 
-            // 댓글 목록만 갱신하고, 피드 데이터는 commentsCount만 업데이트
             await queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] });
 
-            // 피드 데이터의 commentsCount만 업데이트
             queryClient.setQueryData(['feed', Number(feedId)], (oldData: FeedPost | undefined) => {
                 if (!oldData) return oldData;
                 return {
@@ -150,7 +147,6 @@ const FeedDetailPage = () => {
                 };
             });
 
-            // 입력 필드 초기화
             setNewComment('');
             setReplyToId(null);
         } catch (error) {
@@ -177,7 +173,6 @@ const FeedDetailPage = () => {
         try {
             const formData = new FormData();
 
-            // feedUpdateRequest JSON 데이터 추가
             const feedUpdateRequest = {
                 content: editContent.trim(),
                 hashtags: (editContent.match(/#[^\s#]+/g) || []).map((tag) => tag.slice(1)),
@@ -265,10 +260,8 @@ const FeedDetailPage = () => {
         }
     };
 
-    // 답글 작성 모드 설정
     const handleReply = (commentId: number) => {
         setReplyToId(commentId);
-        // 댓글 입력 필드로 포커스 이동
         const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement;
         if (inputElement) {
             inputElement.focus();
@@ -282,14 +275,12 @@ const FeedDetailPage = () => {
     };
 
     const handleComment = () => {
-        // 댓글 입력 필드로 포커스 이동
         const inputElement = document.querySelector('input[type="text"]') as HTMLInputElement;
         if (inputElement) {
             inputElement.focus();
         }
     };
 
-    // 댓글 삭제 처리
     const handleDeleteComment = async (commentId: number) => {
         if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
 
@@ -470,6 +461,21 @@ const FeedDetailPage = () => {
                                     >
                                         답글 달기
                                     </button>
+
+                                    {comment.replies?.replies?.map((reply) => (
+                                        <div
+                                            key={reply.commentId}
+                                            className="ml-8 mt-3 py-3 border-t border-gray-50 bg-gray-50 rounded-md w-80 px-2"
+                                        >
+                                            <FeedHeader
+                                                authorNickname={reply.authorNickname}
+                                                authorProfile={reply.authorProfile || tailogo}
+                                                createdAt={reply.createdAt}
+                                                accountId={reply.accountId}
+                                            />
+                                            <p className="text-xs text-gray-700 mt-1 ml-[52px]">{reply.content}</p>
+                                        </div>
+                                    ))}
                                 </div>
                             ))}
                         </div>
