@@ -358,12 +358,7 @@ const FeedDetailPage = () => {
                     {/* 스크롤 가능한 컨텐츠 */}
                     <div className="flex-1 overflow-y-auto" style={{ height: 'calc(100vh - 120px)' }}>
                         <div className="p-4">
-                            <FeedHeader
-                                authorNickname={feed.authorNickname}
-                                authorProfile={feed.authorProfile}
-                                createdAt={feed.createdAt}
-                                accountId={feed.accountId}
-                            />
+                            <FeedHeader {...feed} />
                             {isAuthor && (
                                 <div className="flex items-center justify-end gap-2">
                                     {isEditing ? (

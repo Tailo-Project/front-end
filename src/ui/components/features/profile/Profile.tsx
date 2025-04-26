@@ -33,12 +33,10 @@ const Profile = () => {
     ]);
     const navigate = useNavigate();
     const location = useLocation();
-    const accountId = location.state?.accountId;
-
+    const { accountId } = location.state || {};
     const myAccountId = localStorage.getItem('accountId');
 
     const isMyProfile = accountId === myAccountId;
-    console.log(isMyProfile, 'isMyProfile');
 
     const { toast, showToast } = useToast();
     const [profileData, setProfileData] = useState<{ data: ProfileData }>({
@@ -56,7 +54,7 @@ const Profile = () => {
     const [isLoading, setIsLoading] = useState(true);
     const token = getToken();
 
-    // 인증 체크 및 accountId 체크
+    // 인증 체크
     useEffect(() => {
         if (!token) {
             showToast('로그인이 필요한 서비스입니다.', 'error');
@@ -64,20 +62,26 @@ const Profile = () => {
             return;
         }
 
-        if (!myAccountId) {
-            showToast('잘못된 접근입니다.', 'error');
-            navigate('/');
+        if (!accountId) {
+            // accountId가 없는 경우 내 프로필로 간주
+            const myId = localStorage.getItem('accountId');
+            if (!myId) {
+                showToast('잘못된 접근입니다.', 'error');
+                navigate('/');
+                return;
+            }
+            // location.state 업데이트
+            navigate('/profile', { state: { accountId: myId }, replace: true });
             return;
         }
-    }, [token, myAccountId, navigate, showToast]);
+    }, [token, accountId, navigate, showToast]);
 
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
                 setIsLoading(true);
 
-                const profileData = await fetchWithToken(`${MEMBER_API_URL}/profile/${myAccountId}`, {});
-
+                const profileData = await fetchWithToken(`${MEMBER_API_URL}/profile/${accountId}`, {});
                 const data = await profileData.json();
 
                 if (!data.data) {
@@ -91,7 +95,7 @@ const Profile = () => {
                 setProfileData({
                     data: {
                         nickname: nickname || '',
-                        id: myAccountId || '',
+                        id: accountId || '',
                         countFollower: countFollower || 0,
                         countFollowing: countFollowing || 0,
                         profileImageUrl: profileImageUrl || '',
@@ -108,12 +112,14 @@ const Profile = () => {
             }
         };
 
-        fetchProfileData();
-    }, [myAccountId, token, showToast, navigate]);
+        if (accountId) {
+            fetchProfileData();
+        }
+    }, [accountId, token, showToast, navigate]);
 
     const handleFollow = async () => {
         try {
-            const response = await fetchWithToken(`${MEMBER_API_URL}/follow/${myAccountId}`, {
+            const response = await fetchWithToken(`${MEMBER_API_URL}/follow/${accountId}`, {
                 method: 'POST',
             });
 
