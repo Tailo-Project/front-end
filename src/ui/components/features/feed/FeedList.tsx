@@ -66,7 +66,6 @@ const FeedList = () => {
                         {allFeedPosts.map((feed) => (
                             <FeedItem key={feed.feedId} feed={feed} />
                         ))}
-                        {/* 무한 스크롤 타겟 */}
                         <div
                             ref={bottomRef}
                             className="h-20 w-full flex items-center justify-center"

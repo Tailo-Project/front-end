@@ -15,7 +15,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
     const navigate = useNavigate();
     const { handleLike } = useFeedLike(feed.feedId);
 
-    const handleComment = (e: React.MouseEvent) => {
+    const handleCommentClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         navigate(`/feeds/${feed.feedId}`);
     };
@@ -38,7 +38,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
 
             <div className="flex flex-wrap gap-2">
                 <LikeButton count={feed.likesCount} isLiked={feed.isLiked} onToggle={handleLike} />
-                <CommentAction count={feed.commentsCount} onClick={handleComment} />
+                <CommentAction count={feed.commentsCount} onClick={handleCommentClick} />
             </div>
 
             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
