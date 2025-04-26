@@ -11,7 +11,7 @@ import { setToken, setAccountId } from '@/shared/utils/auth';
 import Toast from '@/ui/components/ui/Toast';
 import { SignUpFormData, ToastState } from '@/ui/components/form/types';
 import { useToast } from '@/shared/hooks/useToast';
-import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { AUTH_API_URL, MEMBER_API_URL } from '@/shared/constants/apiUrl';
 import { fetchWithToken } from '@/token';
 import { FormInput } from '@/ui/components/form/FormInput';
 
@@ -70,7 +70,7 @@ const SignUpForm = () => {
 
         setIsCheckingId(true);
         try {
-            const response = await fetchWithToken(`${BASE_API_URL}/member/duplicate/${accountId}`, {});
+            const response = await fetchWithToken(`${MEMBER_API_URL}/duplicate/${accountId}`, {});
 
             const data = await response.json();
             setIdCheckStatus(data.statusCode);
@@ -100,7 +100,7 @@ const SignUpForm = () => {
                 files: profileImage ? [{ key: 'profileImage', files: [profileImage] }] : undefined,
             });
 
-            const response = await fetchWithToken(`${BASE_API_URL}/auth/sign-up`, {
+            const response = await fetchWithToken(`${AUTH_API_URL}/sign-up`, {
                 method: 'POST',
                 body: formData,
             });

@@ -19,7 +19,7 @@ const FeedHeader = ({ authorNickname, authorProfile, createdAt, accountId, right
             console.warn('프로필을 볼 수 없습니다: accountId가 없습니다.');
             return;
         }
-        navigate('/profile', { state: { accountId: accountId.toString() } });
+        navigate('/profile', { state: { accountId } });
     };
 
     return (

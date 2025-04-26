@@ -1,3 +1,4 @@
+import { AUTH_API_URL } from '@/shared/constants/apiUrl';
 import { setToken, removeToken, setAccountId } from '@/shared/utils/auth';
 
 interface KakaoTokenResponse {
@@ -34,7 +35,7 @@ export const authService = {
     },
 
     async signInWithKakao(accessToken: string): Promise<UserInfoResponse> {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/sign-in`, {
+        const response = await fetch(`${AUTH_API_URL}/sign-in`, {
             method: 'POST',
             body: JSON.stringify({ provider: 'kakao', accessToken }),
             headers: {

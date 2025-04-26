@@ -4,7 +4,6 @@ interface HashtagListProps {
 }
 
 const HashtagList = ({ hashtags, className = '' }: HashtagListProps) => {
-    console.log(hashtags, 'hashtags');
     if (!hashtags.length) return null;
 
     return (

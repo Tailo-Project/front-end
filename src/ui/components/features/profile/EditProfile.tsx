@@ -13,7 +13,7 @@ import BreedCombobox from '@/ui/components/form/BreedCombobox';
 
 import { createProfileFormData, updateProfile } from '@/core/api/profile';
 import { fetchWithToken } from '@/token';
-import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { MEMBER_API_URL } from '@/shared/constants/apiUrl';
 import { FormInput } from '../../form/FormInput';
 
 interface ProfileResponse {
@@ -78,7 +78,7 @@ const EditProfile = () => {
         const fetchProfile = async () => {
             try {
                 setIsLoading(true);
-                const profileData = await fetchWithToken(`${BASE_API_URL}/member`, {});
+                const profileData = await fetchWithToken(`${MEMBER_API_URL}`, {});
                 const data = await profileData.json();
                 updateFormFields(data.data);
             } catch (error) {

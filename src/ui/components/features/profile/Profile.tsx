@@ -8,7 +8,7 @@ import Toast from '@/ui/components/ui/Toast';
 import { useToast } from '@/shared/hooks/useToast';
 import { clearAuth, getToken } from '@/shared/utils/auth';
 import { fetchWithToken } from '@/token';
-import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { FOLLOW_API_URL, MEMBER_API_URL } from '@/shared/constants/apiUrl';
 
 import LoadingSpinner from '../../common/LoadingSpinner';
 
@@ -33,12 +33,10 @@ const Profile = () => {
     ]);
     const navigate = useNavigate();
     const location = useLocation();
-    const accountId = location.state?.accountId;
-
+    const { accountId } = location.state || {};
     const myAccountId = localStorage.getItem('accountId');
 
     const isMyProfile = accountId === myAccountId;
-    console.log(isMyProfile, 'isMyProfile');
 
     const { toast, showToast } = useToast();
     const [profileData, setProfileData] = useState<{ data: ProfileData }>({
@@ -56,7 +54,7 @@ const Profile = () => {
     const [isLoading, setIsLoading] = useState(true);
     const token = getToken();
 
-    // 인증 체크 및 accountId 체크
+    // 인증 체크
     useEffect(() => {
         if (!token) {
             showToast('로그인이 필요한 서비스입니다.', 'error');
@@ -64,41 +62,46 @@ const Profile = () => {
             return;
         }
 
-        if (!myAccountId) {
-            showToast('잘못된 접근입니다.', 'error');
-            navigate('/');
+        if (!accountId) {
+            const myId = localStorage.getItem('accountId');
+            if (!myId) {
+                showToast('잘못된 접근입니다.', 'error');
+
+                return;
+            }
+            navigate('/profile', { state: { accountId: myId }, replace: true });
             return;
         }
-    }, [token, myAccountId, navigate, showToast]);
+    }, [token, accountId, navigate, showToast]);
 
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
                 setIsLoading(true);
 
-                const profileData = await fetchWithToken(`${BASE_API_URL}/member/profile/${myAccountId}`, {});
-
-                const data = await profileData.json();
-
-                if (!data.data) {
-                    showToast('프로필 정보를 찾을 수 없습니다.', 'error');
-                    navigate('/');
-                    return;
+                const profileData = await fetchWithToken(`${MEMBER_API_URL}/profile/${accountId}`, {});
+                if (!profileData.ok) {
+                    throw new Error('프로필 정보 조회에 실패했습니다.');
                 }
 
-                const { nickname, countFollower, countFollowing, profileImageUrl, isFollow, countFeed } = data.data;
+                const { data } = await profileData.json();
+                if (!data) {
+                    throw new Error('프로필 정보가 없습니다.');
+                }
 
-                setProfileData({
-                    data: {
-                        nickname: nickname || '',
-                        id: myAccountId || '',
-                        countFollower: countFollower || 0,
-                        countFollowing: countFollowing || 0,
-                        profileImageUrl: profileImageUrl || '',
-                        isFollow: isFollow || false,
-                        countFeed: countFeed || 0,
-                    },
-                });
+                const { nickname, countFollower, countFollowing, profileImageUrl, isFollow, countFeed } = data;
+
+                const newData = {
+                    nickname: nickname || '',
+                    id: accountId || '',
+                    countFollower: countFollower || 0,
+                    countFollowing: countFollowing || 0,
+                    profileImageUrl: profileImageUrl || '',
+                    isFollow: isFollow || false,
+                    countFeed: countFeed || 0,
+                };
+
+                setProfileData({ data: newData });
             } catch (error) {
                 console.error('프로필 정보 조회 중 오류:', error);
                 showToast('프로필 정보 조회 중 오류가 발생했습니다.', 'error');
@@ -108,25 +111,28 @@ const Profile = () => {
             }
         };
 
-        fetchProfileData();
-    }, [myAccountId, token, showToast, navigate]);
+        if (accountId) {
+            fetchProfileData();
+        }
+    }, [accountId, token, showToast, navigate]);
 
     const handleFollow = async () => {
         try {
-            const response = await fetchWithToken(`${BASE_API_URL}/member/follow/${myAccountId}`, {
-                method: 'POST',
+            const method = profileData.data.isFollow ? 'DELETE' : 'POST';
+            const response = await fetchWithToken(`${FOLLOW_API_URL}/${accountId}`, { method });
+
+            if (!response.ok) {
+                throw new Error('팔로우 처리에 실패했습니다.');
+            }
+
+            setProfileData((prevProfile) => {
+                const updatedFollowStatus = !prevProfile.data.isFollow;
+                return {
+                    data: { ...prevProfile.data, isFollow: updatedFollowStatus },
+                };
             });
 
-            if (response.ok) {
-                setProfileData((prev) => ({
-                    data: {
-                        ...prev.data,
-                        isFollow: !prev.data.isFollow,
-                        countFollower: prev.data.isFollow ? prev.data.countFollower - 1 : prev.data.countFollower + 1,
-                    },
-                }));
-                showToast(profileData.data.isFollow ? '팔로우가 취소되었습니다.' : '팔로우하였습니다.', 'success');
-            }
+            showToast(profileData.data.isFollow ? '팔로우가 취소되었습니다.' : '팔로우하였습니다.', 'success');
         } catch (error) {
             console.error('팔로우 처리 중 오류:', error);
             showToast('팔로우 처리 중 오류가 발생했습니다.', 'error');
@@ -137,7 +143,6 @@ const Profile = () => {
         try {
             clearAuth();
             navigate('/login');
-
             showToast('로그아웃되었습니다.', 'success');
         } catch (error) {
             console.error('로그아웃 중 오류가 발생했습니다:', error);
@@ -213,16 +218,21 @@ const Profile = () => {
                             </button>
                         </div>
                     ) : (
-                        <button
-                            onClick={handleFollow}
-                            className={`w-full py-2 rounded-md text-sm font-medium transition-colors ${
-                                profileData.data.isFollow
-                                    ? 'border border-gray-300 hover:bg-gray-50'
-                                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                            }`}
-                        >
-                            {profileData.data.isFollow ? '팔로잉' : '팔로우'}
-                        </button>
+                        <div className="flex justify-center gap-4">
+                            <button
+                                onClick={handleFollow}
+                                className={`w-full py-2 rounded-md text-sm font-medium transition-colors ${
+                                    profileData.data.isFollow
+                                        ? 'border border-gray-300 hover:bg-gray-50'
+                                        : 'bg-blue-500 text-white hover:bg-blue-600'
+                                }`}
+                            >
+                                {profileData.data.isFollow ? '팔로잉' : '팔로우'}
+                            </button>
+                            <button className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors bg-blue-500 text-white">
+                                차단
+                            </button>
+                        </div>
                     )}
                 </header>
 
