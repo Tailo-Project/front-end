@@ -472,28 +472,6 @@ const FeedDetailPage = () => {
                                                 authorProfile={reply.authorProfile || tailogo}
                                                 createdAt={reply.createdAt}
                                                 accountId={reply.accountId}
-                                                rightElement={
-                                                    reply.authorNickname === userProfile?.nickname ? (
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="text-xs text-gray-500">
-                                                                {new Date(reply.createdAt).toLocaleString()}
-                                                            </span>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.preventDefault();
-                                                                    e.stopPropagation();
-                                                                }}
-                                                                className="text-xs text-red-500 hover:text-red-600"
-                                                            >
-                                                                삭제
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <span className="text-xs text-gray-500">
-                                                            {new Date(reply.createdAt).toLocaleString()}
-                                                        </span>
-                                                    )
-                                                }
                                             />
                                             <p className="text-xs text-gray-700 mt-1 ml-[52px]">{reply.content}</p>
                                         </div>
