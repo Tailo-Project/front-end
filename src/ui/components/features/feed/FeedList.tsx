@@ -42,7 +42,10 @@ const FeedList = () => {
         );
     }
 
-    const allFeedPosts = data?.pages.flatMap((page) => page.feedPosts) ?? [];
+    const allFeedPosts =
+        data?.pages
+            .flatMap((page) => page.feedPosts)
+            .filter((feed, index, self) => index === self.findIndex((f) => f.feedId === feed.feedId)) ?? [];
 
     return (
         <>
