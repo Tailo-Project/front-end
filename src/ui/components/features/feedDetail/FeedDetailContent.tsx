@@ -96,7 +96,7 @@ const FeedMainContent = ({ feed, userProfile, handleLike, navigate }: FeedMainCo
         if (!window.confirm('피드를 삭제하시겠습니까?')) return;
         setIsDeleting(true);
         try {
-            const response = await fetch(`${FEED_API_URL}/feed/${feed.feedId}`, {
+            const response = await fetch(`${FEED_API_URL}/${feed.feedId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${getToken()}`,
