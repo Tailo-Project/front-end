@@ -63,17 +63,8 @@ const Profile = () => {
                         </button>
                     </div>
 
-                    <ProfileHeader
-                        profileImageUrl={profileData.data?.profileImageUrl}
-                        nickname={profileData.data?.nickname}
-                        id={profileData.data.id}
-                    />
-
-                    <ProfileStats
-                        countFeed={profileData.data.countFeed}
-                        countFollower={profileData.data.countFollower}
-                        countFollowing={profileData.data.countFollowing}
-                    />
+                    <ProfileHeader profileData={profileData} />
+                    <ProfileStats profileData={profileData} />
 
                     <ProfileActions
                         isMyProfile={isMyProfile}
