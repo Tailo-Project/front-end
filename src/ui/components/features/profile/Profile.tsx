@@ -8,7 +8,7 @@ import Toast from '@/ui/components/ui/Toast';
 import { useToast } from '@/shared/hooks/useToast';
 import { clearAuth, getToken } from '@/shared/utils/auth';
 import { fetchWithToken } from '@/token';
-import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { MEMBER_API_URL } from '@/shared/constants/apiUrl';
 
 import LoadingSpinner from '../../common/LoadingSpinner';
 
@@ -76,7 +76,7 @@ const Profile = () => {
             try {
                 setIsLoading(true);
 
-                const profileData = await fetchWithToken(`${BASE_API_URL}/member/profile/${myAccountId}`, {});
+                const profileData = await fetchWithToken(`${MEMBER_API_URL}/profile/${myAccountId}`, {});
 
                 const data = await profileData.json();
 
@@ -113,7 +113,7 @@ const Profile = () => {
 
     const handleFollow = async () => {
         try {
-            const response = await fetchWithToken(`${BASE_API_URL}/member/follow/${myAccountId}`, {
+            const response = await fetchWithToken(`${MEMBER_API_URL}/follow/${myAccountId}`, {
                 method: 'POST',
             });
 

@@ -1,7 +1,7 @@
 import { getAccountId, getToken } from '@/shared/utils/auth';
 import { ProfileData } from '@/shared/types/profile';
 import { createFormDataWithJson } from '@/shared/utils/formData';
-import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { MEMBER_API_URL } from '@/shared/constants/apiUrl';
 import { fetchWithToken } from '@/token';
 
 export const updateProfile = async (formData: FormData) => {
@@ -11,7 +11,7 @@ export const updateProfile = async (formData: FormData) => {
     if (!token) throw new Error('인증 토큰이 없습니다.');
     if (!accountId) throw new Error('계정 ID가 없습니다.');
 
-    const response = await fetchWithToken(`${BASE_API_URL}/member`, {
+    const response = await fetchWithToken(`${MEMBER_API_URL}`, {
         method: 'PATCH',
         body: formData,
     });

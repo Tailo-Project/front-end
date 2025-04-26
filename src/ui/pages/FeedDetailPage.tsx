@@ -20,7 +20,7 @@ import LikeAction from '../components/features/feed/LikeAction';
 import CommentAction from '../components/features/feed/CommentAction';
 
 import { useFeedLike } from '@/shared/hooks/useFeedLike';
-import { BASE_API_URL } from '@/shared/constants/apiUrl';
+import { BASE_API_URL, FEED_API_URL } from '@/shared/constants/apiUrl';
 
 interface UserProfile {
     nickname: string;
@@ -46,7 +46,7 @@ const FeedDetailPage = () => {
     } = useQuery<FeedPost>({
         queryKey: ['feed', Number(feedId)],
         queryFn: async () => {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+            const response = await fetch(`${FEED_API_URL}/${feedId}`, {
                 headers: {
                     Authorization: `Bearer ${getToken()}`,
                 },
@@ -66,7 +66,7 @@ const FeedDetailPage = () => {
     const { data: comments, isLoading: isCommentsLoading } = useQuery<CommentsResponse>({
         queryKey: ['feedComments', Number(feedId)],
         queryFn: async () => {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
+            const response = await fetch(`${FEED_API_URL}/${feedId}/comments`, {
                 headers: {
                     Authorization: `Bearer ${getToken()}`,
                 },
@@ -189,7 +189,7 @@ const FeedDetailPage = () => {
                 new Blob([JSON.stringify(feedUpdateRequest)], { type: 'application/json' }),
             );
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+            const response = await fetch(`${FEED_API_URL}/${feedId}`, {
                 method: 'PATCH',
                 headers: {
                     Authorization: `Bearer ${getToken()}`,
@@ -230,7 +230,7 @@ const FeedDetailPage = () => {
         if (!confirm('피드를 삭제하시겠습니까?')) return;
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}`, {
+            const response = await fetch(`${FEED_API_URL}/feed/${feedId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${getToken()}`,
@@ -294,7 +294,7 @@ const FeedDetailPage = () => {
         if (!window.confirm('댓글을 삭제하시겠습니까?')) return;
 
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments/${commentId}`, {
+            const response = await fetch(`${FEED_API_URL}/${feedId}/comments/${commentId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${getToken()}`,
