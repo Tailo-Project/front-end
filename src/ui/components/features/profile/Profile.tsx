@@ -229,9 +229,6 @@ const Profile = () => {
                             >
                                 {profileData.data.isFollow ? '팔로잉' : '팔로우'}
                             </button>
-                            <button className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors bg-blue-500 text-white">
-                                차단
-                            </button>
                         </div>
                     )}
                 </header>
