@@ -4,12 +4,13 @@ interface HashtagListProps {
 }
 
 const HashtagList = ({ hashtags, className = '' }: HashtagListProps) => {
+    console.log(hashtags, 'hashtags');
     if (!hashtags.length) return null;
 
     return (
         <div className={`flex flex-wrap gap-2 ${className}`}>
-            {hashtags.map((hashtag) => (
-                <span key={hashtag} className="text-blue-500 hover:text-blue-600 cursor-pointer text-sm">
+            {hashtags.map((hashtag, index) => (
+                <span key={`${hashtag}-${index}`} className="text-blue-500 hover:text-blue-600 cursor-pointer text-sm">
                     #{hashtag}
                 </span>
             ))}
