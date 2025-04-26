@@ -20,6 +20,7 @@ import LikeAction from '../components/features/feed/LikeAction';
 import CommentAction from '../components/features/feed/CommentAction';
 
 import { useFeedLike } from '@/shared/hooks/useFeedLike';
+import { BASE_API_URL } from '@/shared/constants/apiUrl';
 
 interface UserProfile {
     nickname: string;
@@ -97,7 +98,7 @@ const FeedDetailPage = () => {
             if (!accountId) return;
 
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/member/profile/${accountId}`, {
+                const response = await fetch(`${BASE_API_URL}/member/profile/${accountId}`, {
                     headers: {
                         Authorization: `Bearer ${getToken()}`,
                     },
@@ -121,7 +122,7 @@ const FeedDetailPage = () => {
         try {
             setIsSubmitting(true);
 
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/feed/${feedId}/comments`, {
+            const response = await fetch(`${BASE_API_URL}/feed/${feedId}/comments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
