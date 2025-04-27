@@ -11,7 +11,6 @@ import ProfileStats from '@/components/features/profile/ProfileStats';
 import ProfileActions from '@/components/features/profile/ProfileActions';
 import ProfilePosts from '@/components/features/profile/ProfilePosts';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-// import useFeeds from '@/hooks/useFeeds';
 import { FEED_API_URL } from '@/constants/apiUrl';
 import { fetchWithToken } from '@/token';
 import { MemberFeed } from '@/types';
@@ -27,7 +26,6 @@ const Profile = () => {
     const { toast, showToast } = useToast();
 
     const { profileData, isLoading, handleFollow, handleLogout } = useProfile(accountId, showToast);
-    // const { data, isLoading: feedsLoading } = useFeeds();
 
     const [memberFeed, setMemberFeed] = useState<MemberFeed[]>([]);
 
@@ -37,23 +35,10 @@ const Profile = () => {
                 method: 'GET',
             });
             const { data } = await response.json();
-
             setMemberFeed(data.memberFeedImages);
         };
         feedImages();
     }, []);
-
-    // const feedPosts = data?.pages.flatMap((page) => page.feedPosts);
-
-    // const allFeedPosts =
-    //     feedPosts?.filter((feed, index, self) => index === self.findIndex((f) => f.feedId === feed.feedId)) ?? [];
-
-    // const filterByAccountId = allFeedPosts.filter((feedPost) => feedPost.accountId === accountId);
-
-    // const imagePosts = filterByAccountId.map((feed) => ({
-    //     id: feed.feedId,
-    //     imageUrl: feed.imageUrls && feed.imageUrls.length > 0 ? feed.imageUrls[0] : '',
-    // }));
 
     useEffect(() => {
         if (toastFromEdit) {
