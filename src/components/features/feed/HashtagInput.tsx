@@ -1,9 +1,8 @@
-import { Hashtag } from '@/types';
 import { useState, KeyboardEvent, ChangeEvent } from 'react';
 
 interface HashtagInputProps {
-    hashtags: Hashtag[];
-    onHashtagsChange: (hashtags: Hashtag[]) => void;
+    hashtags: { hashtag: string }[];
+    onHashtagsChange: (hashtags: { hashtag: string }[]) => void;
 }
 
 export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) => {
