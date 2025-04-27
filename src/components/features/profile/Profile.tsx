@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 
@@ -11,18 +11,12 @@ import ProfileStats from '@/components/features/profile/ProfileStats';
 import ProfileActions from '@/components/features/profile/ProfileActions';
 import ProfilePosts from '@/components/features/profile/ProfilePosts';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import useFeeds from '@/hooks/useFeeds';
 
 const Profile = () => {
-    const [posts] = useState([
-        { id: 1, imageUrl: '' },
-        { id: 2, imageUrl: '' },
-        { id: 3, imageUrl: '' },
-        { id: 4, imageUrl: '' },
-        { id: 5, imageUrl: '' },
-        { id: 6, imageUrl: '' },
-    ]);
     const navigate = useNavigate();
     const location = useLocation();
+    console.log(location.state, 'location.state');
     const accountId = location.state?.accountId || localStorage.getItem('accountId');
     const toastFromEdit = location.state?.toast;
     const myAccountId = localStorage.getItem('accountId');
@@ -30,6 +24,18 @@ const Profile = () => {
     const { toast, showToast } = useToast();
 
     const { profileData, isLoading, handleFollow, handleLogout } = useProfile(accountId, showToast);
+    const { data, isLoading: feedsLoading } = useFeeds();
+
+    const allFeedPosts =
+        data?.pages
+            .flatMap((page) => page.feedPosts)
+            .filter((feed, index, self) => index === self.findIndex((f) => f.feedId === feed.feedId)) ?? [];
+    const imagePosts = allFeedPosts
+        .filter((feed) => feed.accountId === accountId)
+        .map((feed) => ({
+            id: feed.feedId,
+            imageUrl: feed.imageUrls && feed.imageUrls.length > 0 ? feed.imageUrls[0] : '',
+        }));
 
     useEffect(() => {
         if (toastFromEdit) {
@@ -38,7 +44,7 @@ const Profile = () => {
         }
     }, [toastFromEdit, showToast]);
 
-    if (isLoading) {
+    if (isLoading || feedsLoading) {
         return (
             <Layout>
                 <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
@@ -75,7 +81,7 @@ const Profile = () => {
                     />
                 </header>
 
-                <ProfilePosts posts={posts} />
+                <ProfilePosts posts={imagePosts} onImageClick={(feedId) => navigate(`/feeds/${feedId}`)} />
 
                 {toast.show && (
                     <Toast message={toast.message} type={toast.type} onClose={() => showToast('', toast.type, 0)} />
