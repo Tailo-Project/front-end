@@ -84,22 +84,20 @@ const useProfile = (
     }, [accountId, token, showToast, navigate]);
 
     const handleFollow = async () => {
-        let prevIsFollow: boolean;
+        const prevIsFollow: boolean = profileData.data.isFollow;
         setProfileData((prevProfile) => {
-            prevIsFollow = prevProfile.data.isFollow;
             const updatedFollowStatus = !prevProfile.data.isFollow;
             return {
                 data: { ...prevProfile.data, isFollow: updatedFollowStatus },
             };
         });
         try {
-            const method = profileData.data.isFollow ? 'DELETE' : 'POST';
+            const method = prevIsFollow ? 'DELETE' : 'POST';
             const response = await fetchWithToken(`${FOLLOW_API_URL}/${accountId}`, { method });
             if (!response.ok) {
                 throw new Error('팔로우 처리에 실패했습니다.');
             }
-            if (showToast)
-                showToast(!profileData.data.isFollow ? '팔로우하였습니다.' : '팔로우가 취소되었습니다.', 'success');
+            if (showToast) showToast(!prevIsFollow ? '팔로우하였습니다.' : '팔로우가 취소되었습니다.', 'success');
         } catch {
             if (showToast) showToast('팔로우 처리 중 오류가 발생했습니다.', 'error');
             // 실패 시 원래대로 롤백
