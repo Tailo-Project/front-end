@@ -23,7 +23,7 @@ interface ProfileResponse {
     age: number;
     gender: Gender;
     address: string;
-    profileImageUrl: string | null;
+    profileImageUrl: string | File;
     isFollow: boolean;
     accountId: string;
 }
@@ -41,6 +41,7 @@ const EditProfile = () => {
         register,
         handleSubmit: handleFormSubmit,
         setValue,
+        watch,
     } = useForm<ProfileData>({
         mode: 'onChange',
         defaultValues: {
@@ -53,6 +54,8 @@ const EditProfile = () => {
             profileImage: defaultProfileImage,
         },
     });
+
+    const profileImage = watch('profileImage');
 
     const handleBreedChange = (breed: string) => {
         setSelectedBreed(breed);
@@ -72,6 +75,7 @@ const EditProfile = () => {
         );
         setSelectedBreed(breed);
         setValue('breed', breed);
+        setValue('profileImage', profileData.profileImageUrl);
     };
 
     useEffect(() => {
@@ -171,7 +175,9 @@ const EditProfile = () => {
                                             src={
                                                 newProfileImage
                                                     ? URL.createObjectURL(newProfileImage)
-                                                    : defaultProfileImage
+                                                    : typeof profileImage === 'string' && profileImage
+                                                      ? profileImage
+                                                      : defaultProfileImage
                                             }
                                             alt="프로필"
                                             className="w-full h-full object-cover cursor-pointer"
