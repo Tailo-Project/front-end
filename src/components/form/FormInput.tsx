@@ -1,5 +1,5 @@
+import { FormInputProps } from '@/types';
 import { FieldValues } from 'react-hook-form';
-import { FormInputProps } from '@/shared/types/profile';
 
 export const FormInput = <T extends FieldValues>({
     label,
