@@ -1,5 +1,5 @@
 import { getAccountId, getToken } from '@/utils/auth';
-import { ProfileData } from '@/shared/types/profile';
+import { ProfileData } from '@/types';
 import { createFormDataWithJson } from '@/utils/formData';
 import { MEMBER_API_URL } from '@/constants/apiUrl';
 import { fetchWithToken } from '@/token';

@@ -1,4 +1,4 @@
-import { Gender } from '@/shared/types/profile';
+import { Gender } from '@/types';
 
 interface GenderSelectProps {
     label: string;

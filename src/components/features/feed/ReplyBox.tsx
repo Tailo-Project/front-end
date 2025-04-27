@@ -1,4 +1,4 @@
-import { Comment } from '@/shared/types/feed';
+import { Comment } from '@/types';
 
 const ReplyBox = ({ comment }: { comment: Comment }) => {
     return (
