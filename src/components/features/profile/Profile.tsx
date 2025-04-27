@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 
@@ -11,7 +11,10 @@ import ProfileStats from '@/components/features/profile/ProfileStats';
 import ProfileActions from '@/components/features/profile/ProfileActions';
 import ProfilePosts from '@/components/features/profile/ProfilePosts';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import useFeeds from '@/hooks/useFeeds';
+// import useFeeds from '@/hooks/useFeeds';
+import { FEED_API_URL } from '@/constants/apiUrl';
+import { fetchWithToken } from '@/token';
+import { MemberFeed } from '@/types';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -24,19 +27,33 @@ const Profile = () => {
     const { toast, showToast } = useToast();
 
     const { profileData, isLoading, handleFollow, handleLogout } = useProfile(accountId, showToast);
-    const { data, isLoading: feedsLoading } = useFeeds();
+    // const { data, isLoading: feedsLoading } = useFeeds();
 
-    const feedPosts = data?.pages.flatMap((page) => page.feedPosts);
+    const [memberFeed, setMemberFeed] = useState<MemberFeed[]>([]);
 
-    const allFeedPosts =
-        feedPosts?.filter((feed, index, self) => index === self.findIndex((f) => f.feedId === feed.feedId)) ?? [];
+    useEffect(() => {
+        const feedImages = async () => {
+            const response = await fetchWithToken(`${FEED_API_URL}/${isMyProfile ? myAccountId : accountId}/images`, {
+                method: 'GET',
+            });
+            const { data } = await response.json();
 
-    const filterByAccountId = allFeedPosts.filter((feedPost) => feedPost.accountId === accountId);
+            setMemberFeed(data.memberFeedImages);
+        };
+        feedImages();
+    }, []);
 
-    const imagePosts = filterByAccountId.map((feed) => ({
-        id: feed.feedId,
-        imageUrl: feed.imageUrls && feed.imageUrls.length > 0 ? feed.imageUrls[0] : '',
-    }));
+    // const feedPosts = data?.pages.flatMap((page) => page.feedPosts);
+
+    // const allFeedPosts =
+    //     feedPosts?.filter((feed, index, self) => index === self.findIndex((f) => f.feedId === feed.feedId)) ?? [];
+
+    // const filterByAccountId = allFeedPosts.filter((feedPost) => feedPost.accountId === accountId);
+
+    // const imagePosts = filterByAccountId.map((feed) => ({
+    //     id: feed.feedId,
+    //     imageUrl: feed.imageUrls && feed.imageUrls.length > 0 ? feed.imageUrls[0] : '',
+    // }));
 
     useEffect(() => {
         if (toastFromEdit) {
@@ -45,7 +62,7 @@ const Profile = () => {
         }
     }, [toastFromEdit, showToast]);
 
-    if (isLoading || feedsLoading) {
+    if (isLoading) {
         return (
             <Layout>
                 <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
@@ -82,7 +99,7 @@ const Profile = () => {
                     />
                 </header>
 
-                <ProfilePosts posts={imagePosts} onImageClick={(feedId) => navigate(`/feeds/${feedId}`)} />
+                <ProfilePosts memberFeed={memberFeed} onImageClick={(feedId) => navigate(`/feeds/${feedId}`)} />
 
                 {toast.show && (
                     <Toast message={toast.message} type={toast.type} onClose={() => showToast('', toast.type, 0)} />

@@ -100,3 +100,27 @@ export interface FormInputProps<T extends FieldValues = FieldValues> extends Bas
     name: Path<T>;
     register: UseFormRegister<T>;
 }
+
+export interface MemberFeed {
+    feedId: number;
+    imageUrl: string;
+    createdAt?: string;
+}
+
+export interface SignUpFormData {
+    email: string;
+    accountId: string;
+    nickname: string;
+    type: string;
+    age: number;
+    breed: string;
+    gender: 'MALE' | 'FEMALE';
+    address: string;
+    profileImage?: File;
+}
+
+export interface ToastState {
+    message: string;
+    type: 'success' | 'error';
+    show: boolean;
+}

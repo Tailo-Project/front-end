@@ -1,6 +1,6 @@
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { UseFormSetValue } from 'react-hook-form';
-import { SignUpFormData } from './types';
+import { SignUpFormData } from '@/types';
 import useToast from '@/hooks/useToast';
 import Toast from '@/components/Toast';
 

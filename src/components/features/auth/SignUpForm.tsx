@@ -9,7 +9,7 @@ import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 import { createFormDataWithJson } from '@/utils/formData';
 import { setToken, setAccountId } from '@/utils/auth';
 import Toast from '@/components/Toast';
-import { SignUpFormData, ToastState } from '@/components/form/types';
+import { SignUpFormData, ToastState } from '@/types';
 import useToast from '@/hooks/useToast';
 import { AUTH_API_URL, MEMBER_API_URL } from '@/constants/apiUrl';
 import { fetchWithToken } from '@/token';
