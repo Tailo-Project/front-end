@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { FeedListResponse, FeedPost } from '@/shared/types/feed';
+import { FeedListResponse, FeedPost } from '@/types';
 import { FEED_API_URL } from '../constants/apiUrl';
 import { fetchWithToken } from '@/token';
 
@@ -8,7 +8,7 @@ interface ToggleLikeResponse {
 }
 
 interface MutationContext {
-    previousFeeds: FeedListResponse | undefined;
+    previousFeeds: { pages: FeedListResponse[] } | undefined;
     previousFeed: FeedPost | undefined;
 }
 
@@ -24,11 +24,11 @@ const useFeedLike = (feedId: number) => {
         };
     };
 
-    const updateFeedsList = (feeds: FeedListResponse): FeedListResponse => {
-        return {
-            ...feeds,
-            feedPosts: feeds.feedPosts.map((feed) => (feed.feedId === feedId ? updateLikeState(feed) : feed)),
-        };
+    const updateFeedsPages = (pages: FeedListResponse[]): FeedListResponse[] => {
+        return pages.map((page) => ({
+            ...page,
+            feedPosts: page.feedPosts.map((feed) => (feed.feedId === feedId ? updateLikeState(feed) : feed)),
+        }));
     };
 
     const toggleLikeMutation = useMutation({
@@ -56,19 +56,18 @@ const useFeedLike = (feedId: number) => {
                 queryClient.cancelQueries({ queryKey: ['feed', feedId] }),
             ]);
 
-            const previousFeeds = queryClient.getQueryData<FeedListResponse>(['feeds']);
+            const previousFeeds = queryClient.getQueryData<{ pages: FeedListResponse[] }>(['feeds']);
             const previousFeed = queryClient.getQueryData<FeedPost>(['feed', feedId]);
 
             if (previousFeeds) {
-                queryClient.setQueryData<FeedListResponse>(['feeds'], (old) =>
-                    old ? updateFeedsList(old) : previousFeeds,
-                );
+                queryClient.setQueryData(['feeds'], {
+                    ...previousFeeds,
+                    pages: updateFeedsPages(previousFeeds.pages),
+                });
             }
 
             if (previousFeed) {
-                queryClient.setQueryData<FeedPost>(['feed', feedId], (old) =>
-                    old ? updateLikeState(old) : previousFeed,
-                );
+                queryClient.setQueryData<FeedPost>(['feed', feedId], updateLikeState(previousFeed));
             }
 
             return { previousFeeds, previousFeed };

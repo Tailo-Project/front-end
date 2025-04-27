@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { FeedPost } from '@/shared/types/feed';
+import { FeedPost } from '@/types';
 import { fetchWithToken } from '@/token';
 import { FEED_API_URL } from '../constants/apiUrl';
 
-const useFeedDetail = (feedId: string | undefined) => {
+const useFeedDetail = (feedId: string | number) => {
     return useQuery<FeedPost>({
         queryKey: ['feed', Number(feedId)],
         queryFn: async () => {
