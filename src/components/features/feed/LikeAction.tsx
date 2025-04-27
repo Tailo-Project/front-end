@@ -1,9 +1,14 @@
-import { LikeProps } from '@/types';
 import LikeButton from './LikeButton';
 
-const LikeAction = ({ count, isLiked, onToggle }: LikeProps) => (
+interface LikeActionProps {
+    feedId: number;
+    count: number;
+    isLiked: boolean;
+}
+
+const LikeAction = ({ feedId, count, isLiked }: LikeActionProps) => (
     <div className="flex items-center">
-        <LikeButton count={count} isLiked={isLiked} onToggle={onToggle} />
+        <LikeButton feedId={feedId} count={count} isLiked={isLiked} />
     </div>
 );
 
