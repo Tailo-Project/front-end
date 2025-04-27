@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { CommentsResponse } from '@/shared/types/feed';
+import { CommentsResponse } from '@/types';
 import { fetchWithToken } from '@/token';
 import { FEED_API_URL } from '../constants/apiUrl';
 
@@ -38,6 +38,8 @@ const useFeedComments = (feedId: string | undefined) => {
             throw new Error('댓글 등록에 실패했습니다.');
         }
 
+        // 댓글 삭제 전 안내
+
         // 댓글 목록과 피드 데이터 갱신
         await Promise.all([
             queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
@@ -46,6 +48,7 @@ const useFeedComments = (feedId: string | undefined) => {
     };
 
     const deleteComment = async (commentId: number) => {
+        console.log('e');
         const response = await fetchWithToken(`${FEED_API_URL}/${feedId}/comments/${commentId}`, {
             method: 'DELETE',
         });
@@ -53,6 +56,8 @@ const useFeedComments = (feedId: string | undefined) => {
         if (!response.ok) {
             throw new Error('댓글 삭제에 실패했습니다.');
         }
+
+        // 삭제 전 안내
 
         // 댓글 목록과 피드 데이터 갱신
         await Promise.all([

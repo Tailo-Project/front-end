@@ -1,6 +1,6 @@
 import FeedHeader from '@/components/features/feed/FeedHeader';
 import tailogo from '@/assets/tailogo.svg';
-import { CommentsResponse } from '@/shared/types/feed';
+import { CommentsResponse } from '@/types';
 
 interface UserProfile {
     nickname: string;

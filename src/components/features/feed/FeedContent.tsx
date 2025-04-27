@@ -1,4 +1,4 @@
-import { FeedPost } from '@/shared/types/feed';
+import { FeedPost } from '@/types';
 import HashtagList from './HashtagList';
 
 const FeedContent = ({ feed }: { feed: FeedPost }) => {

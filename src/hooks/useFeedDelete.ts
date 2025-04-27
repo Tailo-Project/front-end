@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { FeedListResponse } from '@/shared/types/feed';
+import { FeedListResponse } from '@/types';
 import { fetchWithToken } from '@/token';
 import { FEED_API_URL } from '../constants/apiUrl';
 

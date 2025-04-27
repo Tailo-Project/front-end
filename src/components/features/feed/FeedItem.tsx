@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { FeedPost } from '@/shared/types/feed';
+import { FeedPost } from '@/types';
 import FeedHeader from './FeedHeader';
 import FeedImages from './FeedImages';
-import LikeButton from './LikeButton';
+import LikeAction from './LikeAction';
 import CommentAction from './CommentAction';
-import useFeedLike from '@/hooks/useFeedLike';
 import HashtagList from './HashtagList';
 
 interface FeedItemProps {
@@ -13,7 +12,6 @@ interface FeedItemProps {
 
 const FeedItem = ({ feed }: FeedItemProps) => {
     const navigate = useNavigate();
-    const { handleLike } = useFeedLike(feed.feedId);
 
     const handleCommentClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -37,7 +35,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-                <LikeButton count={feed.likesCount} isLiked={feed.isLiked} onToggle={handleLike} />
+                <LikeAction feedId={feed.feedId} count={feed.likesCount} isLiked={feed.isLiked} />
                 <CommentAction count={feed.commentsCount} onClick={handleCommentClick} />
             </div>
 
