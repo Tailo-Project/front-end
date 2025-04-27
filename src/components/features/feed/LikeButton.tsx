@@ -18,9 +18,6 @@ const LikeButton = ({ feedId, count, isLiked }: LikeButtonProps) => {
                     fill={isLiked ? 'currentColor' : 'none'}
                     stroke="currentColor"
                     viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    role="img"
-                    aria-label="좋아요"
                 >
                     <path
                         strokeLinecap="round"
@@ -30,7 +27,6 @@ const LikeButton = ({ feedId, count, isLiked }: LikeButtonProps) => {
             }
             count={count}
             onClick={handleLike}
-            isLiked={isLiked}
         />
     );
 };

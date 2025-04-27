@@ -4,7 +4,6 @@ export interface ActionButtonProps {
     icon: ReactNode;
     count?: number;
     onClick: (e: MouseEvent<HTMLButtonElement>) => void;
-    isLiked?: boolean;
     disabled?: boolean;
 }
 
