@@ -39,7 +39,6 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
         setIsEditing(true);
     };
 
-    // 피드 수정 완료
     const handleFeedEditSubmit = async () => {
         if (!feed.feedId || !editContent.trim()) return;
         try {
@@ -162,7 +161,7 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
             <div className="flex items-center justify-between px-2">
                 <div className="flex items-center space-x-4">
-                    <LikeAction feedId={feed.feedId} count={feed.likesCount} isLiked={feed.isLiked} />
+                    <LikeAction feedId={feed.feedId} count={feed.likesCount} isLiked={feed.liked} />
                     <CommentAction
                         count={totalComments}
                         onClick={() => {

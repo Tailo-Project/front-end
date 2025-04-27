@@ -33,7 +33,7 @@ export interface FeedPost {
     likesCount: number;
     commentsCount: number;
     createdAt: string;
-    isLiked: boolean;
+    liked: boolean;
 }
 
 export interface Comment {
