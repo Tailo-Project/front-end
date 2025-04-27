@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import { createFormDataWithJson } from '@/utils/formData';
 import { fetchWithToken } from '@/token';
 import { FEED_API_URL } from '../constants/apiUrl';
@@ -14,6 +15,7 @@ const MAX_CONTENT_LENGTH = 2000;
 
 const usePostForm = () => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const [form, setForm] = useState<PostForm>({
         content: '',
         images: [],
@@ -69,6 +71,8 @@ const usePostForm = () => {
                 console.error('서버 응답 에러:', errorData);
                 throw new Error('게시글 등록에 실패했습니다.');
             }
+
+            await queryClient.invalidateQueries({ queryKey: ['feeds'] });
 
             navigate('/');
         } catch (error) {

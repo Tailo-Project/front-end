@@ -4,7 +4,7 @@ import { FEED_API_URL } from '../constants/apiUrl';
 import { fetchWithToken } from '@/token';
 
 interface ToggleLikeResponse {
-    isLiked: boolean;
+    liked: boolean;
 }
 
 interface MutationContext {
@@ -16,10 +16,10 @@ const useFeedLike = (feedId: number) => {
     const queryClient = useQueryClient();
 
     const updateLikeState = (feed: FeedPost): FeedPost => {
-        const willLike = !feed.isLiked;
+        const willLike = !feed.liked;
         return {
             ...feed,
-            isLiked: willLike,
+            liked: willLike,
             likesCount: willLike ? feed.likesCount + 1 : Math.max(0, feed.likesCount - 1),
         };
     };
@@ -45,7 +45,7 @@ const useFeedLike = (feedId: number) => {
 
             if (response.status === 200) {
                 const currentFeed = queryClient.getQueryData<FeedPost>(['feed', feedId]);
-                return { isLiked: currentFeed ? !currentFeed.isLiked : true } as ToggleLikeResponse;
+                return { liked: currentFeed ? !currentFeed.liked : true } as ToggleLikeResponse;
             }
 
             return responseData.data as ToggleLikeResponse;

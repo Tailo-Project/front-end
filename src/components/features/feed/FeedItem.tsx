@@ -35,7 +35,7 @@ const FeedItem = ({ feed }: FeedItemProps) => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-                <LikeAction feedId={feed.feedId} count={feed.likesCount} isLiked={feed.isLiked} />
+                <LikeAction feedId={feed.feedId} count={feed.likesCount} isLiked={feed.liked} />
                 <CommentAction count={feed.commentsCount} onClick={handleCommentClick} />
             </div>
 

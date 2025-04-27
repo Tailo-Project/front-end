@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 
@@ -11,18 +11,14 @@ import ProfileStats from '@/components/features/profile/ProfileStats';
 import ProfileActions from '@/components/features/profile/ProfileActions';
 import ProfilePosts from '@/components/features/profile/ProfilePosts';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { FEED_API_URL } from '@/constants/apiUrl';
+import { fetchWithToken } from '@/token';
+import { MemberFeed } from '@/types';
 
 const Profile = () => {
-    const [posts] = useState([
-        { id: 1, imageUrl: '' },
-        { id: 2, imageUrl: '' },
-        { id: 3, imageUrl: '' },
-        { id: 4, imageUrl: '' },
-        { id: 5, imageUrl: '' },
-        { id: 6, imageUrl: '' },
-    ]);
     const navigate = useNavigate();
     const location = useLocation();
+
     const accountId = location.state?.accountId || localStorage.getItem('accountId');
     const toastFromEdit = location.state?.toast;
     const myAccountId = localStorage.getItem('accountId');
@@ -30,6 +26,19 @@ const Profile = () => {
     const { toast, showToast } = useToast();
 
     const { profileData, isLoading, handleFollow, handleLogout } = useProfile(accountId, showToast);
+
+    const [memberFeed, setMemberFeed] = useState<MemberFeed[]>([]);
+
+    useEffect(() => {
+        const feedImages = async () => {
+            const response = await fetchWithToken(`${FEED_API_URL}/${isMyProfile ? myAccountId : accountId}/images`, {
+                method: 'GET',
+            });
+            const { data } = await response.json();
+            setMemberFeed(data.memberFeedImages);
+        };
+        feedImages();
+    }, []);
 
     useEffect(() => {
         if (toastFromEdit) {
@@ -75,7 +84,7 @@ const Profile = () => {
                     />
                 </header>
 
-                <ProfilePosts posts={posts} />
+                <ProfilePosts memberFeed={memberFeed} onImageClick={(feedId) => navigate(`/feeds/${feedId}`)} />
 
                 {toast.show && (
                     <Toast message={toast.message} type={toast.type} onClose={() => showToast('', toast.type, 0)} />

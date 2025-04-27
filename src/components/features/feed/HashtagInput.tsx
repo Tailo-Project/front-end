@@ -9,13 +9,14 @@ export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) 
     const [hashtag, setHashtag] = useState<string>('');
 
     const handleHashtagSubmit = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
             e.preventDefault();
             const trimmedHashtag = hashtag.trim();
             const isMatchHashtag = !hashtags.some((h) => h.hashtag === trimmedHashtag);
 
             if (trimmedHashtag && isMatchHashtag) {
-                onHashtagsChange([...hashtags, { hashtag: trimmedHashtag }]);
+                const newHashtag = { id: crypto.randomUUID(), hashtag: trimmedHashtag };
+                onHashtagsChange([...hashtags, newHashtag]);
                 setHashtag('');
             }
         }
@@ -28,8 +29,8 @@ export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) 
         }
     };
 
-    const removeHashtag = (index: number) => {
-        onHashtagsChange(hashtags.filter((_, i) => i !== index));
+    const removeHashtag = (id: string) => {
+        onHashtagsChange(hashtags.filter((tag) => tag.hashtag !== id));
     };
 
     return (
@@ -51,7 +52,7 @@ export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) 
                             <span>#{tag.hashtag}</span>
                             <button
                                 type="button"
-                                onClick={() => removeHashtag(index)}
+                                onClick={() => removeHashtag(tag.hashtag)}
                                 className="text-gray-500 hover:text-gray-700"
                             >
                                 ×

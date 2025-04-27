@@ -3,10 +3,16 @@ import { FeedPost } from '@/types';
 import { FEED_API_URL } from '../constants/apiUrl';
 import { fetchWithToken } from '@/token';
 
+interface Pagination {
+    currentPage: number;
+    pageSize: number;
+    totalPages: number;
+    totalItems: number;
+}
+
 interface FeedListResponse {
     feedPosts: FeedPost[];
-    hasNext: boolean;
-    page: number;
+    pagination: Pagination;
 }
 
 const PAGE_SIZE = 10;
@@ -14,20 +20,25 @@ const PAGE_SIZE = 10;
 const useFeeds = () => {
     return useInfiniteQuery<FeedListResponse>({
         queryKey: ['feeds'],
-        queryFn: async ({ pageParam = 0 }) => {
+        queryFn: async ({ pageParam = 1 }) => {
             const response = await fetchWithToken(`${FEED_API_URL}?page=${pageParam}&size=${PAGE_SIZE}`, {});
             const result = await response.json();
             if (!result.data || !Array.isArray(result.data.feedPosts)) {
                 return {
                     feedPosts: [],
-                    hasNext: false,
-                    page: 1,
+                    pagination: {
+                        currentPage: 1,
+                        pageSize: PAGE_SIZE,
+                        totalPages: 1,
+                        totalItems: 0,
+                    },
                 };
             }
             return result.data;
         },
         getNextPageParam: (lastPage) => {
-            return lastPage.hasNext ? lastPage.page + 1 : undefined;
+            const { currentPage, totalPages } = lastPage.pagination;
+            return currentPage < totalPages ? currentPage + 1 : undefined;
         },
         initialPageParam: 0,
         staleTime: 30 * 1000, // 30초
