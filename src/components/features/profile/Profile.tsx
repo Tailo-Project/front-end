@@ -16,7 +16,7 @@ import useFeeds from '@/hooks/useFeeds';
 const Profile = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    console.log(location.state, 'location.state');
+
     const accountId = location.state?.accountId || localStorage.getItem('accountId');
     const toastFromEdit = location.state?.toast;
     const myAccountId = localStorage.getItem('accountId');
