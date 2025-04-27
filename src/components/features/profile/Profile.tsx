@@ -26,16 +26,17 @@ const Profile = () => {
     const { profileData, isLoading, handleFollow, handleLogout } = useProfile(accountId, showToast);
     const { data, isLoading: feedsLoading } = useFeeds();
 
+    const feedPosts = data?.pages.flatMap((page) => page.feedPosts);
+
     const allFeedPosts =
-        data?.pages
-            .flatMap((page) => page.feedPosts)
-            .filter((feed, index, self) => index === self.findIndex((f) => f.feedId === feed.feedId)) ?? [];
-    const imagePosts = allFeedPosts
-        .filter((feed) => feed.accountId === accountId)
-        .map((feed) => ({
-            id: feed.feedId,
-            imageUrl: feed.imageUrls && feed.imageUrls.length > 0 ? feed.imageUrls[0] : '',
-        }));
+        feedPosts?.filter((feed, index, self) => index === self.findIndex((f) => f.feedId === feed.feedId)) ?? [];
+
+    const filterByAccountId = allFeedPosts.filter((feedPost) => feedPost.accountId === accountId);
+
+    const imagePosts = filterByAccountId.map((feed) => ({
+        id: feed.feedId,
+        imageUrl: feed.imageUrls && feed.imageUrls.length > 0 ? feed.imageUrls[0] : '',
+    }));
 
     useEffect(() => {
         if (toastFromEdit) {
