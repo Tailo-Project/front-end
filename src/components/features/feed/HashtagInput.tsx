@@ -1,9 +1,5 @@
+import { Hashtag } from '@/types';
 import { useState, KeyboardEvent, ChangeEvent } from 'react';
-
-interface Hashtag {
-    id: string;
-    hashtag: string;
-}
 
 interface HashtagInputProps {
     hashtags: Hashtag[];
@@ -14,7 +10,7 @@ export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) 
     const [hashtag, setHashtag] = useState<string>('');
 
     const handleHashtagSubmit = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
             e.preventDefault();
             const trimmedHashtag = hashtag.trim();
             const isMatchHashtag = !hashtags.some((h) => h.hashtag === trimmedHashtag);
@@ -35,7 +31,7 @@ export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) 
     };
 
     const removeHashtag = (id: string) => {
-        onHashtagsChange(hashtags.filter((tag) => tag.id !== id));
+        onHashtagsChange(hashtags.filter((tag) => tag.hashtag !== id));
     };
 
     return (
@@ -52,12 +48,12 @@ export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) 
             </div>
             {hashtags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
-                    {hashtags.map((tag) => (
-                        <div key={tag.id} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
+                    {hashtags.map((tag, index) => (
+                        <div key={index} className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full">
                             <span>#{tag.hashtag}</span>
                             <button
                                 type="button"
-                                onClick={() => removeHashtag(tag.id)}
+                                onClick={() => removeHashtag(tag.hashtag)}
                                 className="text-gray-500 hover:text-gray-700"
                             >
                                 ×
