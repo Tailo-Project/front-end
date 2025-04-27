@@ -50,6 +50,7 @@ const FeedList = () => {
     return (
         <>
             <div className="w-full max-w-[375px] mx-auto bg-white pb-16 border border-gray-200">
+                <h3 className="text-lg font-bold p-4">피드 리스트</h3>
                 {allFeedPosts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4">
                         <p className="text-gray-500 text-lg mb-2">아직 게시물이 없습니다</p>
