@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { getAccountId, getToken } from '@/utils/auth';
 import useFeedDetail from '@/hooks/useFeedDetail';
 import useFeedComments from '@/hooks/useFeedComments';
-import useFeedLike from '@/hooks/useFeedLike';
 import { BASE_API_URL } from '@/constants/apiUrl';
 import FeedDetailContent from './FeedDetailContent';
 import LoadingSpinner from '../../common/LoadingSpinner';
@@ -19,9 +18,8 @@ const FeedDetailContainer = () => {
     const { feedId } = useParams<{ feedId: string }>();
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
-    const { data: feed, isLoading: isFeedLoading, isError } = useFeedDetail(feedId);
+    const { data: feed, isLoading: isFeedLoading, isError } = useFeedDetail(feedId!);
     const { comments, isLoading: isCommentsLoading, deleteComment } = useFeedComments(feedId);
-    const { handleLike } = useFeedLike(Number(feedId));
 
     useEffect(() => {
         const fetchUserProfile = async () => {
@@ -55,13 +53,7 @@ const FeedDetailContainer = () => {
     if (!feed) return null;
 
     return (
-        <FeedDetailContent
-            feed={feed}
-            userProfile={userProfile}
-            comments={comments}
-            deleteComment={deleteComment}
-            handleLike={handleLike}
-        />
+        <FeedDetailContent feed={feed} userProfile={userProfile} comments={comments} deleteComment={deleteComment} />
     );
 };
 
