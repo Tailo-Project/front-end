@@ -1,4 +1,6 @@
 import { MouseEvent } from 'react';
+import { UseFormRegister, FieldValues, Path } from 'react-hook-form';
+import React from 'react';
 
 export interface LikeProps {
     count: number;
@@ -58,9 +60,6 @@ export interface FeedListResponse {
     page: number;
 }
 
-import { UseFormRegister, FieldValues, Path } from 'react-hook-form';
-import React from 'react';
-
 export type Gender = 'MALE' | 'FEMALE';
 
 export interface GenderOption {
@@ -98,11 +97,6 @@ export interface BaseInputProps {
 }
 
 export interface FormInputProps<T extends FieldValues = FieldValues> extends BaseInputProps {
-    name: Path<T>;
-    register: UseFormRegister<T>;
-}
-
-export interface FormFieldProps<T extends FieldValues = FieldValues> extends BaseInputProps {
     name: Path<T>;
     register: UseFormRegister<T>;
 }
