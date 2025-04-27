@@ -5,18 +5,18 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import FeedDetailPage from '@/ui/pages/FeedDetailPage';
 
 // Features
-import FeedList from '@/ui/components/features/feed/FeedList';
-import Login from '@/ui/components/features/auth/Login';
-import SignUpForm from '@/ui/components/features/auth/SignUpForm';
-import Profile from '@/ui/components/features/profile/Profile';
-import EditProfile from '@/ui/components/features/profile/EditProfile';
-import KakaoCallback from '@/ui/components/features/auth/KakaoCallback';
-import WritePost from '@/ui/components/features/feed/WritePost';
-import DMInbox from '@/ui/components/features/dm/DMInbox';
-import FriendList from '@/ui/components/features/profile/FriendList';
+import FeedList from '@/components/features/feed/FeedList';
+import Login from '@/components/features/auth/Login';
+import SignUpForm from '@/components/features/auth/SignUpForm';
+import Profile from '@/components/features/profile/Profile';
+import EditProfile from '@/components/features/profile/EditProfile';
+import KakaoCallback from '@/components/features/auth/KakaoCallback';
+import WritePost from '@/components/features/feed/WritePost';
+import DMInbox from '@/components/features/dm/DMInbox';
+import FriendList from '@/components/features/profile/FriendList';
 
 // Common components
-import ProtectedRoute from '@/ui/components/common/ProtectedRoute';
+import ProtectedRoute from '@/components/common/ProtectedRoute';
 
 // Styles
 import '@/App.css';

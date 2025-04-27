@@ -1,12 +1,17 @@
-import { BASE_API_URL } from './shared/constants/apiUrl';
-import { getToken, setToken } from './shared/utils/auth';
+import { BASE_API_URL } from './constants/apiUrl';
+import { getToken, setToken } from './utils/auth';
 
 const refreshToken = async () => {
+    const accountId = localStorage.getItem('accountId');
+    if (!accountId) {
+        throw new Error('accountId가 없습니다. 다시 로그인 해주세요.');
+    }
     try {
-        const response = await fetch(`${BASE_API_URL}/auth/token`, {
+        const response = await fetch(`${BASE_API_URL}/auth/token?accountId=${accountId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                accept: 'application/json',
             },
         });
 
