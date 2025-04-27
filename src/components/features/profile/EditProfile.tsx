@@ -7,7 +7,7 @@ import Toast from '@/components/Toast';
 import useToast from '@/hooks/useToast';
 import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 
-import { Gender, ProfileData } from '@/shared/types/profile';
+import { Gender, ProfileData } from '@/types';
 
 import BreedCombobox from '@/components/form/BreedCombobox';
 
