@@ -20,11 +20,6 @@ interface Notification {
     createdAt: string;
     isRead: boolean;
     url: string;
-
-    type?: 'comment' | 'like' | 'follow' | 'default';
-    // // 프로필 이미지 URL (있으면 사용)
-    // profileImageUrl?: string;
-    // // 닉네임 (있으면 강조)
     nickname?: string;
 }
 
@@ -32,6 +27,11 @@ interface NotificationListResponse {
     notificationList: Notification[];
     pagination: Pagination;
 }
+
+type InfiniteNotificationData = {
+    pages: NotificationListResponse[];
+    pageParams: number[];
+};
 
 const PAGE_SIZE = 10;
 
@@ -78,7 +78,6 @@ const NotificationList = () => {
     });
 
     const allNotifications = data?.pages.flatMap((page) => page.notificationList) ?? [];
-    console.log(allNotifications, 'allNotifications');
 
     const navigate = useNavigate();
 
@@ -87,13 +86,13 @@ const NotificationList = () => {
             method: 'PATCH',
         });
 
-        queryClient.setQueryData(['notifications'], (oldData: any) => {
+        queryClient.setQueryData(['notifications'], (oldData: InfiniteNotificationData) => {
             if (!oldData) return oldData;
             return {
                 ...oldData,
-                pages: oldData.pages.map((page: any) => ({
+                pages: oldData.pages.map((page) => ({
                     ...page,
-                    notificationList: page.notificationList.map((n: any) => (n.id === id ? { ...n, isRead: true } : n)),
+                    notificationList: page.notificationList.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
                 })),
             };
         });
@@ -123,19 +122,6 @@ const NotificationList = () => {
                             className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 transition cursor-pointer active:bg-gray-100
                                 ${!notification.isRead ? 'bg-orange-50' : 'bg-white'}`}
                         >
-                            {/* 프로필 이미지 or 아이콘 */}
-                            {/* <div className="flex-shrink-0">
-                                {notification.profileImageUrl ? (
-                                    <img
-                                        src={notification.profileImageUrl}
-                                        alt="프로필"
-                                        className="w-10 h-10 rounded-full object-cover"
-                                    />
-                                ) : (
-                                    typeIcon[notification.type || 'default']
-                                )}
-                            </div> */}
-
                             <div className="flex-1 min-w-0">
                                 <span className="font-semibold text-gray-900 truncate">
                                     {notification.nickname ? `@${notification.nickname}` : ''}
@@ -145,7 +131,7 @@ const NotificationList = () => {
                                     {formatTimeAgo(notification.createdAt)}
                                 </div>
                             </div>
-                            {/* 안읽음 점 표시 */}
+
                             {!notification.isRead && <span className="w-2 h-2 bg-orange-400 rounded-full ml-2" />}
                         </div>
                     ))}
