@@ -67,6 +67,12 @@ const CommentList = ({ comments, userProfile, onReply, onDelete }: CommentListPr
                                 accountId={reply.accountId}
                             />
                             <p className="text-xs text-gray-700 mt-1 ml-[52px]">{reply.content}</p>
+                            <button
+                                onClick={() => onDelete(reply.commentId)}
+                                className="text-xs text-red-500 hover:text-red-600"
+                            >
+                                삭제
+                            </button>
                         </div>
                     ))}
                 </div>
