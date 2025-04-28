@@ -13,10 +13,14 @@ interface ProfilePostsProps {
 
 const ProfilePosts = ({ onImageClick, memberFeed }: ProfilePostsProps) => {
     return (
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 p-2">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-1 p-2 min-h-[200px]">
             {memberFeed.length === 0 ? (
-                <div className="col-span-3 flex flex-col items-center justify-center py-8 text-gray-400 text-sm">
-                    등록된 이미지 게시물이 없습니다
+                <div className="col-span-full flex flex-col items-center justify-center py-12 text-gray-400">
+                    <div className="w-16 h-16 mb-3 rounded-full bg-gray-100 flex items-center justify-center text-3xl select-none">
+                        🖼️
+                    </div>
+                    <span className="text-base font-medium">등록된 이미지 게시물이 없습니다</span>
+                    <span className="text-xs mt-1 text-gray-300">이미지를 업로드해 나만의 피드를 만들어보세요!</span>
                 </div>
             ) : (
                 memberFeed.map((image) => (

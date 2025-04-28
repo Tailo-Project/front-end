@@ -6,6 +6,7 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useNavigate } from 'react-router-dom';
+import useToast from '@/hooks/useToast';
 
 interface Pagination {
     currentPage: number;
@@ -37,6 +38,7 @@ const PAGE_SIZE = 10;
 
 const NotificationList = () => {
     const queryClient = useQueryClient();
+    const { showToast } = useToast();
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useInfiniteQuery<NotificationListResponse>({
         queryKey: ['notifications'],
         queryFn: async ({ pageParam = 1 }) => {
@@ -81,11 +83,15 @@ const NotificationList = () => {
 
     const navigate = useNavigate();
 
-    const handleFeedClick = async (url: string, id: string) => {
-        await fetchWithToken(`${BASE_API_URL}/notify/${id}/read`, {
+    const markNotificationAsRead = async (id: string) => {
+        const res = await fetchWithToken(`${BASE_API_URL}/notify/${id}/read`, {
             method: 'PATCH',
         });
+        if (!res.ok) throw new Error('알림 읽기 실패');
+        return res;
+    };
 
+    const updateNotificationCache = (id: string) => {
         queryClient.setQueryData(['notifications'], (oldData: InfiniteNotificationData) => {
             if (!oldData) return oldData;
             return {
@@ -96,17 +102,29 @@ const NotificationList = () => {
                 })),
             };
         });
+    };
+
+    const handleNotificationNavigation = (url: string) => {
         const apiFeedMatch = url.match(/\/api\/feed\/(\d+)/);
         if (apiFeedMatch) {
             const feedId = apiFeedMatch[1];
             navigate(`/feeds/${feedId}`);
             return;
         }
-
         if (url.startsWith('http')) {
             window.location.href = url;
         } else {
             navigate(url);
+        }
+    };
+
+    const handleNotificationClick = async (url: string, id: string) => {
+        try {
+            await markNotificationAsRead(id);
+            updateNotificationCache(id);
+            handleNotificationNavigation(url);
+        } catch {
+            showToast('알림 읽기 실패', 'error');
         }
     };
 
@@ -117,7 +135,16 @@ const NotificationList = () => {
                 <div className="flex flex-col gap-0">
                     {allNotifications.map((notification) => (
                         <div
-                            onClick={() => handleFeedClick(notification.url, notification.id)}
+                            onClick={() => handleNotificationClick(notification.url, notification.id)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleNotificationClick(notification.url, notification.id);
+                                }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`알림 클릭 ${notification.nickname ? `@${notification.nickname}` : ''}`}
                             key={notification.id}
                             className={`flex items-center gap-3 px-4 py-3 border-b last:border-b-0 transition cursor-pointer active:bg-gray-100
                                 ${!notification.isRead ? 'bg-orange-50' : 'bg-white'}`}
