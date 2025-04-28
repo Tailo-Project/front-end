@@ -21,93 +21,99 @@ import ProtectedRoute from '@/components/common/ProtectedRoute';
 // Styles
 import '@/App.css';
 
+import { ToastProvider } from '@/ui/components/common/ToastProvider';
+import SseListener from '@/ui/components/common/SseListener';
+
 function App() {
     return (
-        <Routes>
-            <Route
-                path="/"
-                element={
-                    <ProtectedRoute>
-                        <Navigate to="/feeds" replace />
-                    </ProtectedRoute>
-                }
-            />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUpForm />} />
-            <Route path="/oauth/kakao" element={<KakaoCallback />} />
-            <Route
-                path="/feeds"
-                element={
-                    <ProtectedRoute>
-                        <FeedList />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/feeds/:feedId"
-                element={
-                    <ProtectedRoute>
-                        <FeedDetailPage />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/search"
-                element={
-                    <ProtectedRoute>
-                        <div className="p-4">검색 페이지 (준비중)</div>
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/write"
-                element={
-                    <ProtectedRoute>
-                        <WritePost />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/chat"
-                element={
-                    <ProtectedRoute>
-                        <div className="p-4">채팅 페이지 (준비중)</div>
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/profile"
-                element={
-                    <ProtectedRoute>
-                        <Profile />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/profile/edit"
-                element={
-                    <ProtectedRoute>
-                        <EditProfile />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/profile/dm"
-                element={
-                    <ProtectedRoute>
-                        <DMInbox />
-                    </ProtectedRoute>
-                }
-            />
-            <Route
-                path="/profile/friends"
-                element={
-                    <ProtectedRoute>
-                        <FriendList />
-                    </ProtectedRoute>
-                }
-            />
-        </Routes>
+        <ToastProvider>
+            <SseListener />
+            <Routes>
+                <Route
+                    path="/"
+                    element={
+                        <ProtectedRoute>
+                            <Navigate to="/feeds" replace />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUpForm />} />
+                <Route path="/oauth/kakao" element={<KakaoCallback />} />
+                <Route
+                    path="/feeds"
+                    element={
+                        <ProtectedRoute>
+                            <FeedList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/feeds/:feedId"
+                    element={
+                        <ProtectedRoute>
+                            <FeedDetailPage />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/search"
+                    element={
+                        <ProtectedRoute>
+                            <div className="p-4">검색 페이지 (준비중)</div>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/write"
+                    element={
+                        <ProtectedRoute>
+                            <WritePost />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/chat"
+                    element={
+                        <ProtectedRoute>
+                            <div>채팅 페이지 (준비중)</div>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile/edit"
+                    element={
+                        <ProtectedRoute>
+                            <EditProfile />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile/dm"
+                    element={
+                        <ProtectedRoute>
+                            <DMInbox />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile/friends"
+                    element={
+                        <ProtectedRoute>
+                            <FriendList />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </ToastProvider>
     );
 }
 
