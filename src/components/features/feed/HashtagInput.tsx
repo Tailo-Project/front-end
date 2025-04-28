@@ -3,9 +3,10 @@ import { useState, KeyboardEvent, ChangeEvent } from 'react';
 interface HashtagInputProps {
     hashtags: { hashtag: string }[];
     onHashtagsChange: (hashtags: { hashtag: string }[]) => void;
+    inputClassName?: string;
 }
 
-export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) => {
+export const HashtagInput = ({ hashtags, onHashtagsChange, inputClassName }: HashtagInputProps) => {
     const [hashtag, setHashtag] = useState<string>('');
 
     const handleHashtagSubmit = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -42,7 +43,7 @@ export const HashtagInput = ({ hashtags, onHashtagsChange }: HashtagInputProps) 
                     onChange={handleHashtagChange}
                     onKeyDown={handleHashtagSubmit}
                     placeholder="해시태그를 입력하고 Enter를 누르세요"
-                    className="flex-1 p-2 border border-gray-300 rounded-lg"
+                    className={`flex-1 p-2 border border-gray-300 rounded-lg ${inputClassName ?? ''}`}
                 />
             </div>
             {hashtags.length > 0 && (
