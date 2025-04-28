@@ -14,6 +14,7 @@ import KakaoCallback from '@/components/features/auth/KakaoCallback';
 import WritePost from '@/components/features/feed/WritePost';
 import DMInbox from '@/components/features/dm/DMInbox';
 import FriendList from '@/components/features/profile/FriendList';
+import NotificationList from '@/components/features/notification/NotificationList';
 
 // Common components
 import ProtectedRoute from '@/components/common/ProtectedRoute';
@@ -109,6 +110,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <FriendList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/notification"
+                    element={
+                        <ProtectedRoute>
+                            <NotificationList />
                         </ProtectedRoute>
                     }
                 />
