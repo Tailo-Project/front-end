@@ -249,7 +249,7 @@ const EditProfile = () => {
                                     type="submit"
                                     className="w-full py-3 bg-[#FF785D] text-white rounded-lg text-sm font-medium
                                              hover:bg-[#FF785D]/80 focus:ring-2 focus:ring-[#FF785D] focus:ring-offset-2
-                                             transition-colors disabled:bg-gray-300 disabled:cursor-not-allo wed"
+                                             transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                                 >
                                     저장하기
                                 </button>
