@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { EventSourcePolyfill } from 'event-source-polyfill';
-import { getToken } from '@/shared/utils/auth';
+
 import { useToast } from './ToastProvider';
+import { getToken } from '@/utils/auth';
 
 const SseListener = () => {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
