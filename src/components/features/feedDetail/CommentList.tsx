@@ -51,7 +51,7 @@ const CommentList = ({ comments, userProfile, onReply, onDelete }: CommentListPr
                     <p className="text-sm text-gray-700 mt-1 ml-[52px]">{comment.content}</p>
                     <button
                         onClick={() => onReply(comment.commentId)}
-                        className="text-xs text-gray-500 mt-2 ml-[52px] hover:text-blue-500"
+                        className="text-xs text-gray-500 mt-2 ml-[52px] hover:text-[#FF785D]"
                     >
                         답글 달기
                     </button>

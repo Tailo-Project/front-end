@@ -4,6 +4,7 @@ import FeedItem from '@/components/features/feed/FeedItem';
 import TabBar from '../../TabBar';
 import useFeeds from '@/hooks/useFeeds';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
+import Layout from '@/layouts/layout';
 
 const FeedList = () => {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ const FeedList = () => {
                     </p>
                     <button
                         onClick={() => navigate('/login')}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                        className="px-4 py-2 bg-[#FF785D] text-white rounded-lg hover:bg-[#FF785D]/80 transition-colors"
                     >
                         다시 시도
                     </button>
@@ -48,16 +49,18 @@ const FeedList = () => {
             .filter((feed, index, self) => index === self.findIndex((f) => f.feedId === feed.feedId)) ?? [];
 
     return (
-        <>
-            <div className="w-full max-w-[375px] mx-auto bg-white pb-16 border border-gray-200">
-                <h3 className="text-lg font-bold p-4">피드 리스트</h3>
+        <Layout>
+            <div className="w-full max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto bg-white pb-16 border border-gray-200">
+                <header className="flex items-center px-4 h-[52px] border-b border-gray-200 flex-shrink-0">
+                    <h1 className="flex-1 text-center font-medium">피드 리스트</h1>
+                </header>
                 {allFeedPosts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4">
                         <p className="text-gray-500 text-lg mb-2">아직 게시물이 없습니다</p>
                         <p className="text-gray-400 text-sm mb-4">첫 번째 게시물을 작성해보세요!</p>
                         <button
                             onClick={() => navigate('/write')}
-                            className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                            className="px-6 py-2 bg-[#FF785D] text-white rounded-lg hover:bg-[#FF785D]/80 transition-colors"
                         >
                             글쓰기
                         </button>
@@ -78,7 +81,7 @@ const FeedList = () => {
                 )}
             </div>
             <TabBar />
-        </>
+        </Layout>
     );
 };
 

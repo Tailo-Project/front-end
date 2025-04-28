@@ -20,14 +20,15 @@ const WritePost = () => {
 
     return (
         <Layout>
-            <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen pb-16">
+            <div className="w-full max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto bg-white min-h-screen pb-16">
                 <header className="flex justify-between items-center p-4 border-b border-gray-200">
-                    <button onClick={() => navigate('/')} className="text-gray-500 font-semibold">
+                    <button onClick={() => navigate('/')} className="text-gray-500 font-semibold hover:text-gray-600">
                         취소
                     </button>
                     <button
                         onClick={handleSubmit}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                        disabled={!form.content.trim() || form.images.length === 0}
+                        className="px-4 py-2 bg-[#FF785D] text-white rounded-lg hover:bg-[#FF785D]/80 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                     >
                         게시하기
                     </button>

@@ -57,7 +57,7 @@ const KakaoCallback = () => {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-white">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#FF785D]"></div>
             {toast.show && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
         </div>
     );

@@ -59,7 +59,7 @@ const Profile = () => {
 
     return (
         <Layout>
-            <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen pb-16">
+            <div className="w-full max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto bg-white min-h-screen pb-16">
                 <header className="p-4 border-b border-gray-200">
                     <div className="flex items-center justify-between mb-4">
                         <h1 className="text-xl font-bold">마이페이지</h1>

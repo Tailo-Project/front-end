@@ -64,7 +64,7 @@ const DMInbox: React.FC = () => {
                             <p className="text-gray-600 text-sm mt-1">{message.lastMessage}</p>
                         </div>
                         {message.unreadCount > 0 && (
-                            <div className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                            <div className="bg-[#FF785D] text-white text-xs px-2 py-1 rounded-full">
                                 {message.unreadCount}
                             </div>
                         )}

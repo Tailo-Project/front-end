@@ -120,22 +120,22 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
                         <>
                             <button
                                 onClick={handleFeedEditSubmit}
-                                className="text-xs text-blue-500 hover:text-blue-600"
+                                className="text-base text-[#FF785D] hover:text-[#FF785D]/80"
                             >
                                 완료
                             </button>
-                            <button onClick={handleEditCancel} className="text-xs text-gray-500 hover:text-gray-600">
+                            <button onClick={handleEditCancel} className="text-base text-gray-500 hover:text-gray-600">
                                 취소
                             </button>
                         </>
                     ) : (
                         <>
-                            <button onClick={handleFeedEdit} className="text-xs text-gray-500 hover:text-blue-500">
+                            <button onClick={handleFeedEdit} className="text-base text-gray-500 hover:text-[#FF785D]">
                                 수정
                             </button>
                             <button
                                 onClick={handleDeleteModal}
-                                className="text-xs text-red-500 hover:text-red-600"
+                                className="text-base text-red-500 hover:text-red-600"
                                 disabled={isDeleting}
                             >
                                 삭제

@@ -76,7 +76,7 @@ const FriendList = () => {
     };
 
     return (
-        <div className="max-w-[375px] mx-auto bg-white min-h-screen pb-16 p-4">
+        <div className="max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto bg-white min-h-screen pb-16 p-4">
             <h1 className="text-xl font-bold mb-6">친구 관리</h1>
             {isLoading ? (
                 <div className="text-center text-gray-500">로딩 중...</div>

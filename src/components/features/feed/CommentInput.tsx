@@ -28,13 +28,13 @@ const CommentInput = ({
                         value={newComment}
                         onChange={onCommentChange}
                         placeholder={replyToId ? '답글을 입력하세요...' : '댓글을 입력하세요...'}
-                        className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-blue-500"
+                        className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-base"
                     />
                     <button
                         type="submit"
                         disabled={!newComment.trim() || isSubmitting}
-                        className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-medium
-								 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                        className="ml-2 px-4 py-2 bg-[#FF785D] text-white rounded-full text-sm font-medium
+								 hover:bg-[#FF785D]/80 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                     >
                         {isSubmitting ? '등록 중...' : '게시'}
                     </button>

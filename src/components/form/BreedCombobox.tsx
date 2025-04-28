@@ -13,7 +13,7 @@ interface BreedComboboxProps {
 
 const getOptionClassName = (active: boolean): string => {
     const baseClasses = 'cursor-default select-none relative py-2.5 pl-3 pr-9';
-    const activeClasses = active ? 'text-white bg-blue-500' : 'text-gray-900';
+    const activeClasses = active ? 'text-white bg-[#FF785D]' : 'text-gray-900';
 
     return `${baseClasses} ${activeClasses}`.trim();
 };
@@ -113,7 +113,7 @@ const BreedCombobox: React.FC<BreedComboboxProps> = ({
                                         onChange(query);
                                     }}
                                     className="flex items-center w-full px-3 py-2.5
-                                    text-sm text-blue-600 hover:bg-blue-50
+                                    text-sm text-[#FF785D] hover:bg-[#FF785D]/80
                                     transition-colors"
                                     aria-label={`"${query}" 품종 추가`}
                                 >

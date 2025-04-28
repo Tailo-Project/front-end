@@ -36,16 +36,7 @@ const usePostForm = () => {
         setForm((prev) => ({ ...prev, hashtags }));
     };
 
-    const isFormValid = (): boolean => {
-        return form.content.trim().length > 0;
-    };
-
     const submitPost = async () => {
-        if (!isFormValid()) {
-            setError('내용을 입력해주세요.');
-            return;
-        }
-
         const formData = createFormDataWithJson({
             requestKey: 'feedPostRequest',
             jsonData: {

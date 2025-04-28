@@ -12,13 +12,13 @@ const ProfileActions = ({ isMyProfile, isFollow, onEdit, onDM, onFollow }: Profi
             <div className="flex justify-center gap-4">
                 <button
                     onClick={onEdit}
-                    className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors bg-blue-500 text-white"
+                    className="w-full py-2 rounded-md text-sm font-medium hover:bg-[#FF785D]/80 transition-colors bg-[#FF785D] text-white"
                 >
                     프로필 수정
                 </button>
                 <button
                     onClick={onDM}
-                    className="w-full py-2 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors bg-blue-500 text-white"
+                    className="w-full py-2 rounded-md text-sm font-medium hover:bg-[#FF785D]/80 transition-colors bg-[#FF785D] text-white"
                 >
                     DM 보관함
                 </button>
@@ -30,7 +30,9 @@ const ProfileActions = ({ isMyProfile, isFollow, onEdit, onDM, onFollow }: Profi
             <button
                 onClick={onFollow}
                 className={`w-full py-2 rounded-md text-sm font-medium transition-colors ${
-                    isFollow ? 'border border-gray-300 hover:bg-gray-50' : 'bg-blue-500 text-white hover:bg-blue-600'
+                    isFollow
+                        ? 'border border-gray-300 hover:bg-gray-50'
+                        : 'bg-[#FF785D] text-white hover:bg-[#FF785D]/80'
                 }`}
             >
                 {isFollow ? '팔로잉' : '팔로우'}
