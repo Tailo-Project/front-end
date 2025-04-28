@@ -123,7 +123,7 @@ const SignUpForm = () => {
         <div className="flex flex-col items-start justify-start min-h-screen bg-white px-4 py-6">
             {toast.show && <Toast message={toast.message} type={toast.type} onClose={() => showToast('', 'success')} />}
             <h1 className="text-xl font-medium mb-8 flex items-center gap-2 mx-auto">
-                회원가입 | <span className="text-blue-500">추가 정보를 입력해주세요.</span>
+                회원가입 | <span className="text-[#FF785D]">추가 정보를 입력해주세요.</span>
             </h1>
 
             <div className="w-full max-w-[320px] mx-auto">
@@ -225,7 +225,7 @@ const SignUpForm = () => {
                         className={`w-full h-[45px] rounded-xl text-white transition-all duration-300 ${
                             isValid
                                 ? 'bg-[#FF785D] hover:bg-[#FF785D]/80 hover:shadow-md'
-                                : 'bg-[#FFD1BA] cursor-not-allowed'
+                                : 'bg-[#FF785D] cursor-not-allowed'
                         }`}
                     >
                         가입완료

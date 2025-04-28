@@ -56,7 +56,7 @@ export const ImageUploader = ({ images, onImagesChange, error, onError }: ImageU
                 <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                    className="px-4 py-2 bg-[#FF785D] text-white rounded-lg hover:bg-[#FF785D]/80"
                 >
                     이미지 업로드
                 </button>
@@ -82,7 +82,7 @@ export const ImageUploader = ({ images, onImagesChange, error, onError }: ImageU
                             <button
                                 type="button"
                                 onClick={() => removeImage(index)}
-                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                                className="w-6 h-6 absolute top-2 right-2 bg-red-500 text-white rounded-full"
                             >
                                 ×
                             </button>

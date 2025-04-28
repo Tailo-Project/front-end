@@ -13,13 +13,6 @@ const FeedImages = ({ images, authorNickname }: FeedImagesProps) => {
         return 'grid-cols-2 grid-rows-2';
     };
 
-    const getImageClassName = () => {
-        if (images.length === 1) return '';
-        if (images.length === 2) return 'h-[200px]';
-        if (images.length === 3) return 'h-[120px]';
-        return 'h-[140px]';
-    };
-
     return (
         <div className="mb-4">
             <div className={`grid gap-1 ${getGridClassName()}`}>
@@ -28,7 +21,7 @@ const FeedImages = ({ images, authorNickname }: FeedImagesProps) => {
                         key={index}
                         src={image}
                         alt={`${authorNickname}님의 이미지 ${index + 1}`}
-                        className={`w-full ${getImageClassName()} object-cover rounded-lg`}
+                        className={`w-full ${images.length === 1 ? 'aspect-video rounded-2xl' : 'rounded-lg'} object-cover`}
                         loading="lazy"
                     />
                 ))}

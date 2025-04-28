@@ -9,7 +9,10 @@ const HashtagList = ({ hashtags, className = '' }: HashtagListProps) => {
     return (
         <div className={`flex flex-wrap gap-2 ${className}`}>
             {hashtags.map((hashtag, index) => (
-                <span key={`${hashtag}-${index}`} className="text-blue-500 hover:text-blue-600 cursor-pointer text-sm">
+                <span
+                    key={`${hashtag}-${index}`}
+                    className="text-[#FF785D] hover:text-[#FF785D]/80 cursor-pointer text-sm"
+                >
                     #{hashtag}
                 </span>
             ))}

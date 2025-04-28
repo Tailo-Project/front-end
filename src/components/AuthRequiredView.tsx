@@ -6,7 +6,7 @@ const AuthRequiredView = () => {
 
     return (
         <Layout>
-            <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen flex items-center justify-center">
+            <div className="w-full max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto bg-white min-h-screen flex items-center justify-center">
                 <div className="text-center p-4">
                     <svg
                         className="mx-auto mb-4 w-12 h-12 text-gray-400"
@@ -25,7 +25,7 @@ const AuthRequiredView = () => {
                     <p className="text-gray-600 mb-6">서비스를 이용하기 위해 로그인이 필요합니다.</p>
                     <button
                         onClick={() => navigate('/login')}
-                        className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                        className="px-6 py-3 bg-[#FF785D] text-white rounded-lg hover:bg-[#FF785D]/80 transition-colors font-medium"
                     >
                         로그인하러 가기
                     </button>

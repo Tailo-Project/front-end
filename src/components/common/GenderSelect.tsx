@@ -14,7 +14,7 @@ const GenderSelect = ({ label, value, onChange }: GenderSelectProps) => (
                 type="button"
                 onClick={() => onChange('MALE')}
                 className={`flex-1 py-2.5 rounded-lg border ${
-                    value === 'MALE' ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 text-gray-700'
+                    value === 'MALE' ? 'bg-[#FF785D] text-white' : 'text-gray-700'
                 } text-sm font-medium`}
             >
                 남성
@@ -23,7 +23,7 @@ const GenderSelect = ({ label, value, onChange }: GenderSelectProps) => (
                 type="button"
                 onClick={() => onChange('FEMALE')}
                 className={`flex-1 py-2.5 rounded-lg border ${
-                    value === 'FEMALE' ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 text-gray-700'
+                    value === 'FEMALE' ? 'bg-[#FF785D] text-white' : 'text-gray-700'
                 } text-sm font-medium`}
             >
                 여성

@@ -34,10 +34,8 @@ const FeedHeader = ({ authorNickname, authorProfile, createdAt, accountId, right
                     className="w-10 h-10 rounded-full object-cover"
                 />
                 <div className="ml-3">
-                    <span className={`font-medium text-[15px] ${accountId ? 'hover:underline' : ''}`}>
-                        {authorNickname}
-                    </span>
-                    <p className="text-gray-500 text-xs">{formatTimeAgo(createdAt)}</p>
+                    <span className={`text-lg font-bold ${accountId ? 'hover:underline' : ''}`}>{authorNickname}</span>
+                    <p className="text-gray-500 text-sm">{formatTimeAgo(createdAt)}</p>
                 </div>
             </div>
             {rightElement && <div className="ml-auto">{rightElement}</div>}

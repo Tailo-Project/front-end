@@ -115,27 +115,27 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
         <>
             <FeedHeader {...feed} />
             {isAuthor && (
-                <div className="flex items-center justify-end gap-2">
+                <div className="flex items-center justify-end gap-4 mb-4">
                     {isEditing ? (
                         <>
                             <button
                                 onClick={handleFeedEditSubmit}
-                                className="text-xs text-blue-500 hover:text-blue-600"
+                                className="text-base text-[#FF785D] font-bold hover:text-[#FF785D]/80"
                             >
                                 완료
                             </button>
-                            <button onClick={handleEditCancel} className="text-xs text-gray-500 hover:text-gray-600">
+                            <button onClick={handleEditCancel} className="text-base text-gray-500 hover:text-gray-600">
                                 취소
                             </button>
                         </>
                     ) : (
                         <>
-                            <button onClick={handleFeedEdit} className="text-xs text-gray-500 hover:text-blue-500">
+                            <button onClick={handleFeedEdit} className="text-base text-gray-500 hover:text-[#FF785D]">
                                 수정
                             </button>
                             <button
                                 onClick={handleDeleteModal}
-                                className="text-xs text-red-500 hover:text-red-600"
+                                className="text-base text-red-500 hover:text-red-600"
                                 disabled={isDeleting}
                             >
                                 삭제
@@ -145,22 +145,22 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
                 </div>
             )}
             {isEditing ? (
-                <div className="mt-4 flex flex-col gap-2">
+                <div className="mt-4 flex flex-col gap-4 mb-4">
                     <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md"
+                        className="w-full p-2 border border-gray-300 rounded-md text-base"
                         rows={4}
                         placeholder="내용을 입력하세요. 해시태그는 #으로 시작합니다."
                     />
-                    <HashtagInput hashtags={hashtags} onHashtagsChange={setHashtags} />
+                    <HashtagInput hashtags={hashtags} onHashtagsChange={setHashtags} inputClassName="text-base" />
                 </div>
             ) : (
                 <FeedContent feed={feed} />
             )}
             <FeedImages images={feed.imageUrls || []} authorNickname={feed.authorNickname} />
-            <div className="flex items-center justify-between px-2">
-                <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between px-2 mt-4 mb-2">
+                <div className="flex items-center gap-4">
                     <LikeAction feedId={feed.feedId} count={feed.likesCount} isLiked={feed.liked} />
                     <CommentAction
                         count={totalComments}

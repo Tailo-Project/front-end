@@ -36,29 +36,30 @@ const CommentList = ({ comments, userProfile, onReply, onDelete }: CommentListPr
                                             e.stopPropagation();
                                             onDelete(comment.commentId);
                                         }}
-                                        className="text-xs text-red-500 hover:text-red-600"
+                                        className="text-xs text-red-500 hover:text-red-600 ml-2"
                                     >
                                         삭제
                                     </button>
                                 </div>
                             ) : (
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-gray-500 ml-2">
                                     {new Date(comment.createdAt).toLocaleString()}
                                 </span>
                             )
                         }
                     />
-                    <p className="text-sm text-gray-700 mt-1 ml-[52px]">{comment.content}</p>
+                    <p className="text-sm text-gray-700 mt-2 ml-[52px] mb-1">{comment.content}</p>
                     <button
                         onClick={() => onReply(comment.commentId)}
-                        className="text-xs text-gray-500 mt-2 ml-[52px] hover:text-blue-500"
+                        className="text-xs text-gray-500 hover:text-[#FF785D] ml-[52px] mb-2"
                     >
                         답글 달기
                     </button>
                     {comment.replies?.replies?.map((reply) => (
                         <div
                             key={reply.commentId}
-                            className="ml-8 mt-3 py-3 border-t border-gray-50 bg-gray-50 rounded-md w-80 px-2"
+                            className="ml-4 md:ml-8 mt-3 py-3 px-3 border-t border-gray-50 bg-gray-50 rounded-lg"
+                            style={{ maxWidth: 'calc(100% - 2rem)' }}
                         >
                             <FeedHeader
                                 authorNickname={reply.authorNickname}
@@ -66,7 +67,15 @@ const CommentList = ({ comments, userProfile, onReply, onDelete }: CommentListPr
                                 createdAt={reply.createdAt}
                                 accountId={reply.accountId}
                             />
-                            <p className="text-xs text-gray-700 mt-1 ml-[52px]">{reply.content}</p>
+                            <div className="flex items-center justify-between mt-2 ml-[52px]">
+                                <p className="text-xs text-gray-700 mb-1">{reply.content}</p>
+                                <button
+                                    onClick={() => onDelete(reply.commentId)}
+                                    className="text-xs text-red-500 hover:text-red-600 ml-2"
+                                >
+                                    삭제
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

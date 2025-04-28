@@ -46,7 +46,6 @@ const FeedCommentSection = ({
 
     // 댓글 삭제 버튼 클릭 시
     const handleDeleteClick = (commentId: number) => {
-        console.log(commentId, 'commentId');
         confirmModal.show(
             {
                 title: '댓글 삭제',

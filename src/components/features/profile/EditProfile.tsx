@@ -139,11 +139,11 @@ const EditProfile = () => {
 
     return (
         <>
-            <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen">
+            <div className="w-full max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto bg-white min-h-screen">
                 {isLoading ? (
                     <div className="flex justify-center items-center min-h-screen">
                         <div className="flex flex-col items-center gap-2">
-                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
+                            <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#FF785D] border-t-transparent" />
                             <span className="text-sm text-gray-500">프로필 불러오는 중...</span>
                         </div>
                     </div>
@@ -170,7 +170,7 @@ const EditProfile = () => {
                         <form onSubmit={handleFormSubmit(onSubmit)} className="p-6 space-y-6">
                             <div className="flex flex-col items-center">
                                 <div className="relative mb-3">
-                                    <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 hover:border-blue-500 transition-colors">
+                                    <div className="w-24 h-24 rounded-full overflow-hidden">
                                         <img
                                             src={
                                                 newProfileImage
@@ -195,7 +195,7 @@ const EditProfile = () => {
                                 <button
                                     type="button"
                                     onClick={handleImageClick}
-                                    className="text-blue-500 text-sm font-medium hover:text-blue-600 transition-colors"
+                                    className="text-[#FF785D] text-base font-medium hover:text-[#FF785D]/80 transition-colors border border-[#FF785D] rounded-lg px-4 py-2"
                                 >
                                     프로필 사진 변경
                                 </button>
@@ -247,8 +247,8 @@ const EditProfile = () => {
                             <div className="pt-4">
                                 <button
                                     type="submit"
-                                    className="w-full py-3 bg-blue-500 text-white rounded-lg text-sm font-medium
-                                             hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                                    className="w-full py-3 bg-[#FF785D] text-white rounded-lg text-sm font-medium
+                                             hover:bg-[#FF785D]/80 focus:ring-2 focus:ring-[#FF785D] focus:ring-offset-2
                                              transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                                 >
                                     저장하기

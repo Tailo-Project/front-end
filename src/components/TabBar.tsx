@@ -73,13 +73,13 @@ const TabBar = () => {
     ];
 
     return (
-        <div className="max-w-[375px] mx-auto fixed bottom-0 left-0 right-0 flex justify-center bg-white border-t border-gray-200">
+        <div className="max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto fixed bottom-0 left-0 right-0 flex justify-center bg-white border-t border-gray-200">
             <div className="w-full flex justify-between items-center px-4 py-2">
                 {tabs.map((tab) => (
                     <button
                         key={tab.path}
                         className={`flex flex-col items-center p-2 ${
-                            location.pathname === tab.path ? 'text-blue-500' : 'text-gray-500'
+                            location.pathname === tab.path ? 'text-[#FF785D]' : 'text-gray-500'
                         }`}
                         onClick={() => navigate(tab.path)}
                     >
