@@ -10,15 +10,12 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 const updateSW = registerSW({
     immediate: true,
     onNeedRefresh() {
-        if (confirm('새로운 버전이 있습니다. 업데이트하시겠습니까?')) {
-            updateSW(true);
-        }
+        updateSW(true);
     },
     onOfflineReady() {
         console.log('앱이 오프라인에서도 사용할 수 있습니다.');
     },
     onRegistered(r) {
-        console.log('서비스 워커가 등록되었습니다.');
         if (r) {
             setInterval(
                 () => {
