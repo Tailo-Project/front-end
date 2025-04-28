@@ -1,4 +1,4 @@
-import ActionButton from '../../ActionButton';
+import ActionButton from '@/components/ActionButton';
 import useFeedLike from '@/hooks/useFeedLike';
 
 interface LikeButtonProps {

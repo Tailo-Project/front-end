@@ -2,9 +2,9 @@ import { useNavigate } from 'react-router-dom';
 import { FeedPost } from '@/types';
 import FeedHeader from './FeedHeader';
 import FeedImages from './FeedImages';
-import LikeAction from './LikeAction';
-import CommentAction from './CommentAction';
 import HashtagList from './HashtagList';
+import LikeAction from './like/LikeAction';
+import CommentAction from './comment/CommentAction';
 
 interface FeedItemProps {
     feed: FeedPost;
