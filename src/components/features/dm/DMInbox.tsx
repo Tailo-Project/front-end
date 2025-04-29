@@ -16,19 +16,27 @@ interface ChatRoom {
 }
 
 const DMInbox = () => {
-    const { accountId } = useLocation().state;
+    const location = useLocation();
+    const { accountId } = location.state;
+
     const [chatRoom, setChatRoom] = useState<ChatRoom[]>([]);
 
-    console.log(chatRoom, 'chatRoom');
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchDMInbox = async () => {
-            const response = await fetchWithToken(`${BASE_API_URL}/chat/room?accountIds=${accountId}`, {
-                method: 'POST',
-            });
-            const data = await response.json();
-            setChatRoom(Array.isArray(data.data) ? data.data : [data.data]);
+            try {
+                const response = await fetchWithToken(
+                    `${BASE_API_URL}/chat/room?accountIds=${encodeURIComponent(accountId)}`,
+                    {
+                        method: 'POST',
+                    },
+                );
+                const data = await response.json();
+                setChatRoom(Array.isArray(data.data) ? data.data : [data.data]);
+            } catch (error) {
+                console.error('DM 채팅방 가져오기 실패:', error);
+            }
         };
         fetchDMInbox();
     }, [accountId]);

@@ -18,8 +18,9 @@ const ProfileActions = ({ isMyProfile, isFollow, onFollow, accountId }: ProfileA
             const response = await fetchWithToken(`${BASE_API_URL}/chat/room?accountIds=${accountId}`, {
                 method: 'POST',
             });
+            const { data } = await response.json();
             if (response.ok) {
-                navigate('/profile/dm', { state: { accountId } });
+                navigate('/profile/dm', { state: { roomId: data.roomId } });
             } else {
                 alert('채팅방 생성에 실패했습니다.');
             }

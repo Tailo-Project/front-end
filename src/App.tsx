@@ -71,14 +71,6 @@ function App() {
                     }
                 />
                 <Route
-                    path="/chat"
-                    element={
-                        <ProtectedRoute>
-                            <div>채팅 페이지 (준비중)</div>
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
                     path="/profile"
                     element={
                         <ProtectedRoute>
@@ -106,8 +98,6 @@ function App() {
                     path="/dm/:roomId"
                     element={
                         <ProtectedRoute>
-                            {/* <div>DM 채팅 페이지 (준비중)</div>
-                            R */}
                             <Room />
                         </ProtectedRoute>
                     }

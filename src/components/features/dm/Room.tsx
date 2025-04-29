@@ -2,7 +2,7 @@ import { BASE_API_URL } from '@/constants/apiUrl';
 import Layout from '@/layouts/layout';
 import { fetchWithToken } from '@/token';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 interface Room {
     roomId: string;
@@ -16,19 +16,28 @@ interface Room {
 }
 
 const Room = () => {
-    const { roomId } = useLocation().state;
+    const { roomId: paramRoomId } = useParams();
+    const { roomId: stateRoomId } = useLocation().state || {};
+    const roomId = paramRoomId || stateRoomId;
     const [room, setRoom] = useState<Room | null>(null);
-    console.log(roomId);
+
     useEffect(() => {
-        const fetchRoom = async () => {
-            const response = await fetchWithToken(`${BASE_API_URL}/chat/room/${roomId}`, {
-                method: 'GET',
-            });
-            const data = await response.json();
-            setRoom(data.data);
-        };
-        fetchRoom();
+        try {
+            const fetchRoom = async () => {
+                const response = await fetchWithToken(`${BASE_API_URL}/chat/room/${roomId}`, {
+                    method: 'GET',
+                });
+                const data = await response.json();
+                setRoom(data.data);
+            };
+            fetchRoom();
+        } catch (error) {
+            console.error('채팅방 가져오기 실패:', error);
+        }
     }, [roomId]);
+
+    const currentUserId = localStorage.getItem('accountId');
+    const otherUserId = room?.members.find((member) => member.accountId !== currentUserId);
 
     return (
         <Layout>
@@ -38,11 +47,11 @@ const Room = () => {
                     <div className="flex flex-col items-center py-4 border-b">
                         <img
                             className="w-16 h-16 rounded-full object-cover mb-2"
-                            src={room.members[1].profileImageUrl}
+                            src={otherUserId?.profileImageUrl}
                             alt="프로필 이미지"
                         />
                         <div className="text-center">
-                            <p className="font-semibold text-lg">{room.members[1].accountId}</p>
+                            <p className="font-semibold text-lg">{otherUserId?.accountId}</p>
                             <p className="text-xs text-gray-400">Secondary/Default</p>
                         </div>
                         <button className="mt-2 text-sm text-white bg-[#ff785d] px-4 py-2 rounded-md">
