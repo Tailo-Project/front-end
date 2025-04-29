@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import useConfirmModal from '@/hooks/useConfirmModal';
 import ConfirmModal from '@/components/common/ConfirmModal';
 import { useQueryClient } from '@tanstack/react-query';
+import { fetchWithToken } from '@/token';
 
 interface UserProfile {
     nickname: string;
@@ -38,8 +39,9 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
     const confirmModal = useConfirmModal();
 
     const handleFeedEdit = () => {
+        const hashtags = Array.isArray(feed.hashtags) ? feed.hashtags.map((h) => ({ hashtag: h })) : [];
         setEditContent(feed.content);
-        setHashtags(Array.isArray(feed.hashtags) ? feed.hashtags.map((h) => ({ hashtag: h })) : []);
+        setHashtags(hashtags);
         setIsEditing(true);
     };
 
@@ -48,16 +50,13 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
         try {
             const feedUpdateRequest = {
                 content: editContent.trim(),
-                hashtags: hashtags,
+                hashtags,
                 imageUrls: feed.imageUrls || [],
             };
             const formData = new FormData();
             formData.append('feedUpdateRequest', new Blob([JSON.stringify(feedUpdateRequest)]));
-            const response = await fetch(`${FEED_API_URL}/${feed.feedId}`, {
+            const response = await fetchWithToken(`${FEED_API_URL}/${feed.feedId}`, {
                 method: 'PATCH',
-                headers: {
-                    Authorization: `Bearer ${getToken()}`,
-                },
                 body: formData,
             });
             if (!response.ok) {
@@ -73,13 +72,11 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
         }
     };
 
-    // 피드 수정 취소
     const handleEditCancel = () => {
         setIsEditing(false);
         setEditContent('');
     };
 
-    // 피드 삭제
     const handleDelete = async () => {
         setIsDeleting(true);
         try {
@@ -102,7 +99,6 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
         }
     };
 
-    // 삭제 버튼 클릭 시 모달 오픈
     const handleDeleteModal = () => {
         confirmModal.show(
             {
