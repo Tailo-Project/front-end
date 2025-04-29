@@ -17,7 +17,7 @@ interface ChatRoom {
 
 const DMInbox = () => {
     const location = useLocation();
-    const { accountId } = location.state;
+    const accountId = location.state?.accountId;
 
     const [chatRoom, setChatRoom] = useState<ChatRoom[]>([]);
 
@@ -41,43 +41,51 @@ const DMInbox = () => {
         fetchDMInbox();
     }, [accountId]);
 
+    console.log(chatRoom);
+
     return (
         <Layout>
             <div className="max-w-screen-md mx-auto p-4">
                 <h1 className="text-xl font-bold mb-4">DM 보관함</h1>
                 <div className="flex flex-col gap-4">
-                    {chatRoom.map((room) => (
-                        <button
-                            onClick={() => {
-                                navigate(`/dm/${room.roomId}`, { state: { roomId: room.roomId } });
-                            }}
-                            key={room.roomId}
-                            className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 transition"
-                            aria-label={`${room.roomName} 채팅방으로 이동`}
-                        >
-                            <div className="flex -space-x-2">
-                                {room.members.slice(0, 2).map((member) => (
-                                    <img
-                                        key={member.memberId}
-                                        src={member.profileImageUrl}
-                                        alt={`${member.accountId} 프로필`}
-                                        className="w-10 h-10 rounded-full border-2 border-white object-cover"
-                                    />
-                                ))}
-                                {room.countMember > 2 && (
-                                    <span className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-xs font-bold border-2 border-white">
-                                        +{room.countMember - 2}
+                    {chatRoom.length === 0 ? (
+                        <div className="flex justify-center items-center text-center text-gray-500 text-lg py-10">
+                            준비중입니다.
+                        </div>
+                    ) : (
+                        chatRoom.map((room) => (
+                            <button
+                                onClick={() => {
+                                    navigate(`/dm/${room.roomId}`, { state: { roomId: room.roomId } });
+                                }}
+                                key={room.roomId}
+                                className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 transition"
+                                aria-label={`${room.roomName} 채팅방으로 이동`}
+                            >
+                                <div className="flex -space-x-2">
+                                    {room.members.slice(0, 2).map((member) => (
+                                        <img
+                                            key={member.memberId}
+                                            src={member.profileImageUrl}
+                                            alt={`${member.accountId} 프로필`}
+                                            className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                                        />
+                                    ))}
+                                    {room.countMember > 2 && (
+                                        <span className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-xs font-bold border-2 border-white">
+                                            +{room.countMember - 2}
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex flex-col text-left">
+                                    <span className="font-semibold text-base">{room.roomName}</span>
+                                    <span className="text-xs text-gray-500">
+                                        {room.members.map((m) => m.accountId).join(', ')}
                                     </span>
-                                )}
-                            </div>
-                            <div className="flex flex-col text-left">
-                                <span className="font-semibold text-base">{room.roomName}</span>
-                                <span className="text-xs text-gray-500">
-                                    {room.members.map((m) => m.accountId).join(', ')}
-                                </span>
-                            </div>
-                        </button>
-                    ))}
+                                </div>
+                            </button>
+                        ))
+                    )}
                 </div>
             </div>
         </Layout>
