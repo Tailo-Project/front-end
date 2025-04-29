@@ -24,7 +24,9 @@ const FriendList = () => {
     // 차단 목록 불러오기
     const fetchBlocked = async () => {
         try {
-            const res = await fetchWithToken(`${MEMBER_API_URL}/block`, {});
+            const res = await fetchWithToken(`${MEMBER_API_URL}/block`, {
+                method: 'GET',
+            });
             if (!res.ok) throw new Error('차단 목록을 불러오지 못했습니다.');
             const { data } = await res.json();
             // data가 accountId 배열이라고 가정
@@ -44,7 +46,9 @@ const FriendList = () => {
         const fetchFriends = async () => {
             setIsLoading(true);
             try {
-                const res = await fetchWithToken(`${FOLLOW_API_URL}/${myAccountId}/following`, {});
+                const res = await fetchWithToken(`${FOLLOW_API_URL}/${myAccountId}/following`, {
+                    method: 'GET',
+                });
                 if (!res.ok) throw new Error('친구 목록을 불러오지 못했습니다.');
                 const { data } = await res.json();
                 setFriends(data?.content || []);

@@ -21,7 +21,9 @@ const useFeeds = () => {
     return useInfiniteQuery<FeedListResponse>({
         queryKey: ['feeds'],
         queryFn: async ({ pageParam = 1 }) => {
-            const response = await fetchWithToken(`${FEED_API_URL}?page=${pageParam}&size=${PAGE_SIZE}`, {});
+            const response = await fetchWithToken(`${FEED_API_URL}?page=${pageParam}&size=${PAGE_SIZE}`, {
+                method: 'GET',
+            });
             const result = await response.json();
             if (!result.data || !Array.isArray(result.data.feedPosts)) {
                 return {

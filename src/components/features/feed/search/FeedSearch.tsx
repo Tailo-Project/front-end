@@ -90,7 +90,7 @@ const FeedSearch = () => {
     return (
         <Layout>
             <div className="w-full max-w-[375px] mx-auto bg-white min-h-screen p-0">
-                <h2 className="text-xl font-bold px-4 pt-6 pb-2">검색</h2>
+                <h2 className="text-xl font-bold px-4 pt-6 pb-2">피드 검색</h2>
                 <input
                     type="text"
                     className="w-full p-2 border border-gray-300 rounded-md text-base focus:outline-blue-400"
