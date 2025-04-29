@@ -11,6 +11,7 @@ import { FEED_API_URL } from '@/constants/apiUrl';
 import { useNavigate } from 'react-router-dom';
 import useConfirmModal from '@/hooks/useConfirmModal';
 import ConfirmModal from '@/components/common/ConfirmModal';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface UserProfile {
     nickname: string;
@@ -24,9 +25,12 @@ interface FeedMainContentProps {
 }
 
 const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContentProps) => {
+    const queryClient = useQueryClient();
     const [isEditing, setIsEditing] = useState(false);
     const [editContent, setEditContent] = useState('');
-    const [hashtags, setHashtags] = useState(feed.hashtags.map((tag: string) => ({ hashtag: tag })));
+    const [hashtags, setHashtags] = useState<{ hashtag: string }[]>(
+        Array.isArray(feed.hashtags) ? feed.hashtags.map((h) => ({ hashtag: h })) : [],
+    );
     const [isDeleting, setIsDeleting] = useState(false);
     const isAuthor = feed?.authorNickname === userProfile?.nickname;
     const totalComments = feed.commentsCount ?? 0;
@@ -35,23 +39,20 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
 
     const handleFeedEdit = () => {
         setEditContent(feed.content);
-        setHashtags(feed.hashtags.map((tag: string) => ({ hashtag: tag })));
+        setHashtags(Array.isArray(feed.hashtags) ? feed.hashtags.map((h) => ({ hashtag: h })) : []);
         setIsEditing(true);
     };
 
     const handleFeedEditSubmit = async () => {
         if (!feed.feedId || !editContent.trim()) return;
         try {
-            const formData = new FormData();
             const feedUpdateRequest = {
                 content: editContent.trim(),
-                hashtags: hashtags.map((h: { hashtag: string }) => h.hashtag),
+                hashtags: hashtags,
                 imageUrls: feed.imageUrls || [],
             };
-            formData.append(
-                'feedUpdateRequest',
-                new Blob([JSON.stringify(feedUpdateRequest)], { type: 'application/json' }),
-            );
+            const formData = new FormData();
+            formData.append('feedUpdateRequest', new Blob([JSON.stringify(feedUpdateRequest)]));
             const response = await fetch(`${FEED_API_URL}/${feed.feedId}`, {
                 method: 'PATCH',
                 headers: {
@@ -64,6 +65,9 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
                 throw new Error(errorData.message || '피드 수정에 실패했습니다.');
             }
             setIsEditing(false);
+
+            await queryClient.invalidateQueries({ queryKey: ['feeds'] });
+            await queryClient.invalidateQueries({ queryKey: ['feed', Number(feed.feedId)] });
         } catch (error) {
             alert(error instanceof Error ? error.message : '피드 수정에 실패했습니다.');
         }
@@ -151,7 +155,7 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
                         onChange={(e) => setEditContent(e.target.value)}
                         className="w-full p-2 border border-gray-300 rounded-md text-base"
                         rows={4}
-                        placeholder="내용을 입력하세요. 해시태그는 #으로 시작합니다."
+                        placeholder="내용을 입력하세요."
                     />
                     <HashtagInput hashtags={hashtags} onHashtagsChange={setHashtags} inputClassName="text-base" />
                 </div>
