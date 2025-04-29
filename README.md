@@ -2,33 +2,43 @@
 
 ## 목차
 
-- [파일 및 폴더 구조](#파일_및_폴더_구조)
-- [명명 규칙](#명명_규칙)
-- [React 컴포넌트](#react-컴포넌트)
+- [파일 및 폴더 구조 (File and Folder Structure)](#파일-및-폴더-구조-file-and-folder-structure)
+- [명명 규칙 (Naming Convention)](#명명-규칙-naming-convention)
+- [React 컴포넌트 (React Component)](#react-컴포넌트-react-component)
 - [TypeScript](#typescript)
 - [CSS / Styling](#css--styling)
-- [Import 순서](#import-순서)
-- [코드 포맷팅](#코드-포맷팅)
-- [주석](#주석)
-- [Git 커밋 메시지](#git-커밋-메시지)
+- [Import 순서 (Import Order)](#import-순서-import-order)
+- [코드 포맷팅 (Code Formatting)](#코드-포맷팅-code-formatting)
+- [주석 (Comments)](#주석-comments)
+- [Git 커밋 메시지 (Git Commit Message)](#git-커밋-메시지-git-commit-message)
 
-## 파일 및 폴더 구조
+## 파일 및 폴더 구조 (File and Folder Structure)
 
 ### 폴더 구조
 
 ```
 src/
-├── assets/          # 이미지, 폰트 등 정적 파일
-├── components/      # 재사용 가능한 컴포넌트
-│   ├── common/      # 공통 컴포넌트 (Button, Input 등)
-│   └── feature/     # 특정 기능과 관련된 컴포넌트
-├── hooks/           # 커스텀 훅
-├── pages/           # 페이지 컴포넌트
-├── services/        # API 호출 관련 코드
-├── store/           # 상태 관리 (Context API)
-├── types/           # TypeScript 타입 정의
-├── utils/           # 유틸리티 함수
-└── App.tsx          # 앱 진입점
+├── assets/          # 프로젝트에서 사용하는 이미지, 아이콘, 폰트 등 정적 파일
+├── components/      # 재사용 가능한 UI 컴포넌트 모음
+│   ├── common/      # 여러 곳에서 공통적으로 쓰이는 컴포넌트 (예: LoadingSpinner, ConfirmModal 등)
+│   ├── features/    # 도메인/기능별 컴포넌트 (예: profile, feed, chat 등)
+│   ├── form/        # 폼 관련 컴포넌트
+│   └── ...          # 기타 개별 컴포넌트 파일
+├── hooks/           # 커스텀 React 훅 (예: useProfile, useDebounce 등)
+├── api/             # API 요청 관련 함수 (예: profile.ts)
+├── constants/       # 상수값 및 환경설정 (예: apiUrl.ts)
+├── layouts/         # 페이지 레이아웃 컴포넌트 (예: layout.tsx)
+├── utils/           # 유틸리티 함수 (예: date.ts, auth.ts 등)
+├── core/            # 핵심 비즈니스 로직, 서비스, API 래퍼 등
+├── contexts/        # React Context API 관련 파일 (상태 관리)
+├── ui/              # UI 관련 컴포넌트 및 페이지 (pages, components 등)
+│   ├── components/  # UI 전용 컴포넌트
+│   └── pages/       # 실제 라우팅되는 페이지 컴포넌트 (예: MainPage, FeedDetailPage)
+├── App.tsx          # 앱 진입점, 전체 라우팅 및 글로벌 설정
+├── main.tsx         # React DOM 렌더링 엔트리포인트
+├── types.ts         # 전역 타입 정의
+├── token.ts         # 토큰 관련 유틸리티
+├── authService.ts   # 인증 관련 서비스 함수
 ```
 
 ### 파일 명명 규칙
@@ -38,7 +48,7 @@ src/
 - 스타일 파일: 컴포넌트와 동일한 이름 사용 (예: `Button.styles.ts`)
 - 테스트 파일: `.test.tsx` 또는 `.spec.tsx` 접미사 사용
 
-## 명명 규칙
+## 명명 규칙 (Naming Convention)
 
 ### 변수 및 함수
 
@@ -83,7 +93,7 @@ const Button = ({ children, onClick }) => {
 export default Button;
 ```
 
-## React 컴포넌트
+## React 컴포넌트 (React Component)
 
 ### 함수형 컴포넌트 사용
 
@@ -234,7 +244,7 @@ const calculateSum = (a: number, b: number): number => {
 };
 ```
 
-## 주석
+## 주석 (Comments)
 
 ### 주석 작성 규칙
 
@@ -260,7 +270,7 @@ function expensiveCalculation() {
 }
 ```
 
-## Git 커밋 메시지
+## Git 커밋 메시지 (Git Commit Message)
 
 ### 커밋 메시지 형식
 
