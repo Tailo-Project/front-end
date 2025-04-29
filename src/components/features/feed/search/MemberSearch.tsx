@@ -4,34 +4,24 @@ import { fetchWithToken } from '@/token';
 import useDebounce from '@/hooks/useDebounce';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import defaultProfileImage from '@/assets/defaultImage.png';
-import { formatTimeAgo } from '@/utils/date';
 import { useNavigate } from 'react-router-dom';
 
-interface FeedSearchProps {
+interface MemberSearchProps {
     keyword: string;
 }
 
-interface FeedItem {
-    feedPostId: number;
+interface MemberItem {
     accountId: string;
     nickname: string;
     profileImageUrl: string;
-    content: string;
-    hashtags: string[];
-    imageUrls: string[];
-    createdAt: string;
-    updatedAt: string;
     isFollowing: boolean;
-    likesCount: number;
-    commentsCount: number;
-    isLiked: boolean;
 }
 
 const PAGE_SIZE = 10;
 
-const FeedSearch = ({ keyword }: FeedSearchProps) => {
+const MemberSearch = ({ keyword }: MemberSearchProps) => {
     const navigate = useNavigate();
-    const [results, setResults] = useState<FeedItem[]>([]);
+    const [results, setResults] = useState<MemberItem[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(0);
@@ -65,12 +55,12 @@ const FeedSearch = ({ keyword }: FeedSearchProps) => {
             setError(null);
             try {
                 const res = await fetchWithToken(
-                    `${BASE_API_URL}/search/feeds?keyword=${debouncedKeyword}&page=${page}&size=${PAGE_SIZE}`,
+                    `${BASE_API_URL}/search/members?keyword=${debouncedKeyword}&page=${page}&size=${PAGE_SIZE}`,
                     { method: 'GET' },
                 );
-                if (!res.ok) throw new Error('피드 검색 실패');
+                if (!res.ok) throw new Error('사용자 검색 실패');
                 const { data } = await res.json();
-                const newResults = data.feedSearchResponses || [];
+                const newResults = data.memberSearchResponses || [];
                 setResults((prev) => (page === 0 ? newResults : [...prev, ...newResults]));
                 setHasNext(data.hasNext ?? false);
             } catch {
@@ -91,34 +81,24 @@ const FeedSearch = ({ keyword }: FeedSearchProps) => {
             {!loading && !error && results.length === 0 && debouncedKeyword && (
                 <div className="text-gray-400">검색 결과가 없습니다.</div>
             )}
-            {results.map((result) => (
-                <div className="flex flex-col gap-2" key={result.feedPostId}>
-                    <div
-                        className="cursor-pointer hover:bg-gray-100 p-2 rounded-md"
-                        onClick={() => navigate(`/feeds/${result.feedPostId}`)}
-                    >
-                        <div className="flex items-center gap-2">
-                            <div className="w-10 h-10 rounded-full bg-gray-200">
-                                <img
-                                    src={result.profileImageUrl || defaultProfileImage}
-                                    alt="프로필 이미지"
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                            <div className="text-sm">{result.nickname}</div>
-                            <div className="text-sm">{formatTimeAgo(result.createdAt)}</div>
-                        </div>
-                        <div className="text-sm">{result.content}</div>
+            {results.map((user) => (
+                <div
+                    className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 cursor-pointer"
+                    key={user.accountId}
+                    onClick={() => navigate(`/profile/${user.accountId}`)}
+                >
+                    <div className="w-10 h-10 rounded-full bg-gray-200">
                         <img
-                            src={result.imageUrls[0] || defaultProfileImage}
-                            alt="피드 이미지"
+                            src={user.profileImageUrl || defaultProfileImage}
+                            alt="프로필 이미지"
                             className="w-full h-full object-cover"
                         />
-                        <div className="flex items-center gap-2">
-                            <div className="text-sm">{result.likesCount} 좋아요</div>
-                            <div className="text-sm">{result.commentsCount} 댓글</div>
-                        </div>
                     </div>
+                    <div className="flex-1">
+                        <div className="font-semibold text-base">{user.nickname}</div>
+                        <div className="text-xs text-gray-500">@{user.accountId}</div>
+                    </div>
+                    {user.isFollowing && <span className="text-xs text-blue-500">팔로잉</span>}
                 </div>
             ))}
             {results.length > 0 && (
@@ -135,4 +115,4 @@ const FeedSearch = ({ keyword }: FeedSearchProps) => {
     );
 };
 
-export default FeedSearch;
+export default MemberSearch;
