@@ -13,14 +13,15 @@ interface ProfileStatsProps {
 }
 
 const ProfileStats = ({ profileData }: ProfileStatsProps) => {
-    console.log(profileData, 'profileData');
     const navigate = useNavigate();
     const { countFeed = 0, countFollower = 0, countFollowing = 0 } = profileData.data ?? {};
     const handleFollowerClick = () => {
-        navigate('/profile/followers');
+        navigate('/profile/friends', {
+            state: { accountId: profileData.data.id, isFollow: profileData.data.isFollow },
+        });
     };
     const handleFollowingClick = () => {
-        navigate('/profile/following', {
+        navigate('/profile/friends', {
             state: { accountId: profileData.data.id, isFollow: profileData.data.isFollow },
         });
     };

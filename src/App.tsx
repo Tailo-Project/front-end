@@ -1,10 +1,7 @@
-// External dependencies
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-// Pages
 import FeedDetailPage from '@/ui/pages/FeedDetailPage';
 
-// Features
 import FeedList from '@/components/features/feed/FeedList';
 import Login from '@/components/features/auth/Login';
 import SignUpForm from '@/components/features/auth/SignUpForm';
@@ -16,10 +13,8 @@ import DMInbox from '@/components/features/dm/DMInbox';
 import FriendList from '@/components/features/profile/FriendList';
 import NotificationList from '@/components/features/notification/NotificationList';
 
-// Common components
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 
-// Styles
 import '@/App.css';
 
 import { ToastProvider } from '@/ui/components/common/ToastProvider';
@@ -106,19 +101,29 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-                <Route
-                    path="/profile/friends"
-                    element={
-                        <ProtectedRoute>
-                            <FriendList />
-                        </ProtectedRoute>
-                    }
-                />
+
                 <Route
                     path="/notification"
                     element={
                         <ProtectedRoute>
                             <NotificationList />
+                        </ProtectedRoute>
+                    }
+                />
+
+                {/* <Route
+                    path="/profile/following"
+                    element={
+                        <ProtectedRoute>
+                            <FollowingList />
+                        </ProtectedRoute>
+                    }
+                /> */}
+                <Route
+                    path="/profile/friends"
+                    element={
+                        <ProtectedRoute>
+                            <FriendList />
                         </ProtectedRoute>
                     }
                 />
