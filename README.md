@@ -2,21 +2,21 @@
 
 ## 목차
 
-- [파일 및 폴더 구조 (File and Folder Structure)](#파일-및-폴더-구조-file-and-folder-structure)
-- [명명 규칙 (Naming Convention)](#명명-규칙-naming-convention)
-- [React 컴포넌트 (React Component)](#react-컴포넌트-react-component)
+- [파일 및 폴더 구조](#파일-및-폴더-구조)
+- [명명 규칙](#명명-규칙)
+- [React 컴포넌트](#react-컴포넌트)
 - [TypeScript](#typescript)
 - [CSS / Styling](#css--styling)
-- [Import 순서 (Import Order)](#import-순서-import-order)
-- [코드 포맷팅 (Code Formatting)](#코드-포맷팅-code-formatting)
-- [주석 (Comments)](#주석-comments)
-- [Git 커밋 메시지 (Git Commit Message)](#git-커밋-메시지-git-commit-message)
-- [스택 (Stack)](#스택-stack)
-- [선정 이유 (Stack Rationale)](#선정-이유-stack-rationale)
-- [개발 환경 (Development Environment)](#개발-환경-development-environment)
-- [와이어프레임 (Wireframe)](#와이어프레임-wireframe)
+- [Import 순서](#import-순서)
+- [코드 포맷팅](#코드-포맷팅)
+- [주석](#주석)
+- [Git 커밋 메시지](#git-커밋-메시지)
+- [스택](#스택)
+- [선정 이유](#선정-이유)
+- [개발 환경](#개발-환경)
+- [와이어프레임](#와이어프레임)
 
-## 파일 및 폴더 구조 (File and Folder Structure)
+## 파일 및 폴더 구조
 
 ### 폴더 구조
 
@@ -52,7 +52,7 @@ src/
 - 스타일 파일: 컴포넌트와 동일한 이름 사용 (예: `Button.styles.ts`)
 - 테스트 파일: `.test.tsx` 또는 `.spec.tsx` 접미사 사용
 
-## 명명 규칙 (Naming Convention)
+## 명명 규칙
 
 ### 변수 및 함수
 
@@ -97,7 +97,7 @@ const Button = ({ children, onClick }) => {
 export default Button;
 ```
 
-## React 컴포넌트 (React Component)
+## React 컴포넌트
 
 ### 함수형 컴포넌트 사용
 
@@ -248,7 +248,7 @@ const calculateSum = (a: number, b: number): number => {
 };
 ```
 
-## 주석 (Comments)
+## 주석
 
 ### 주석 작성 규칙
 
@@ -274,7 +274,7 @@ function expensiveCalculation() {
 }
 ```
 
-## Git 커밋 메시지 (Git Commit Message)
+## Git 커밋 메시지
 
 ### 커밋 메시지 형식
 
@@ -303,13 +303,13 @@ fix/map-marker-click
 refactor/auth-logic
 ```
 
-## 스택 (Stack)
+## 스택
 
 Front : React, TypeScript, TailwindCSS, Tanstack Query, react-hook-form
 Deploy : Vercel
 Build : vite
 
-## 선정 이유 (Stack Rationale)
+## 선정 이유
 
 ### TailwindCSS
 
@@ -323,6 +323,6 @@ Build : vite
 
 입력 폼이 많아질수록 관리해야 하는 state가 늘어나고 유효성 검사 및 에러 처리에 대한 중복 코드가 늘어날 것이라 생각해서 적용했습니다.
 
-## 와이어프레임 (Wireframe)
+## 와이어프레임
 
 [링크](https://www.figma.com/design/idMxRdIYXeFxHkw44OBZ7k/tailo?node-id=0-1&t=OfRMmrv6iTBaeSQv-1)
