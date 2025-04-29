@@ -65,7 +65,7 @@ const FeedSearch = ({ keyword }: FeedSearchProps) => {
             setError(null);
             try {
                 const res = await fetchWithToken(
-                    `${BASE_API_URL}/search/feeds?keyword=${debouncedKeyword}&page=${page}&size=${PAGE_SIZE}`,
+                    `${BASE_API_URL}/search/feeds?keyword=${encodeURIComponent(debouncedKeyword)}&page=${page}&size=${PAGE_SIZE}`,
                     { method: 'GET' },
                 );
                 if (!res.ok) throw new Error('피드 검색 실패');

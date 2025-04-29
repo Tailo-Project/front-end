@@ -6,6 +6,7 @@ import { getToken } from '@/utils/auth';
 
 const MAX_RETRY_COUNT = 5;
 let retryCount = 0;
+let hasFailed = false;
 
 const SseListener = () => {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -56,7 +57,8 @@ const SseListener = () => {
                 if (retryCount < MAX_RETRY_COUNT) {
                     retryCount++;
                     timeoutRef.current = setTimeout(() => connectSSE(), 5000);
-                } else {
+                } else if (!hasFailed) {
+                    hasFailed = true;
                     showToast('SSE 연결 실패');
                 }
             };
@@ -81,6 +83,8 @@ const SseListener = () => {
             if (timeoutRef.current !== null) {
                 clearTimeout(timeoutRef.current);
             }
+            hasFailed = false;
+            retryCount = 0;
         };
     }, [token, showToast]);
 
