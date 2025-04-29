@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ArrowRightOnRectangleIcon as LogoutIcon } from '@heroicons/react/24/outline';
 
 import Layout from '@/layouts/layout';
@@ -17,9 +17,10 @@ import { MemberFeed } from '@/types';
 
 const Profile = () => {
     const navigate = useNavigate();
+    const { accountId: paramAccountId } = useParams();
     const location = useLocation();
 
-    const accountId = location.state?.accountId || localStorage.getItem('accountId');
+    const accountId = paramAccountId || location.state?.accountId || localStorage.getItem('accountId');
     const toastFromEdit = location.state?.toast;
     const myAccountId = localStorage.getItem('accountId');
     const isMyProfile = accountId === myAccountId;

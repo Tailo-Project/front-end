@@ -19,7 +19,7 @@ import '@/App.css';
 
 import { ToastProvider } from '@/ui/components/common/ToastProvider';
 import SseListener from '@/ui/components/common/SseListener';
-import FeedSearch from './components/features/feed/search/FeedSearch';
+import FeedAndMemberSearch from './components/features/feed/search/FeedAndMemberSearch';
 import Room from './components/features/dm/Room';
 
 function App() {
@@ -58,7 +58,7 @@ function App() {
                     path="/search"
                     element={
                         <ProtectedRoute>
-                            <FeedSearch />
+                            <FeedAndMemberSearch />
                         </ProtectedRoute>
                     }
                 />
@@ -72,6 +72,22 @@ function App() {
                 />
                 <Route
                     path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile/:accountId"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile/:accountId"
                     element={
                         <ProtectedRoute>
                             <Profile />

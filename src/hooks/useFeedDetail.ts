@@ -7,7 +7,9 @@ const useFeedDetail = (feedId: string | number) => {
     return useQuery<FeedPost>({
         queryKey: ['feed', Number(feedId)],
         queryFn: async () => {
-            const response = await fetchWithToken(`${FEED_API_URL}/${feedId}`, {});
+            const response = await fetchWithToken(`${FEED_API_URL}/${feedId}`, {
+                method: 'GET',
+            });
             if (!response.ok) {
                 throw new Error('피드 조회에 실패했습니다.');
             }
