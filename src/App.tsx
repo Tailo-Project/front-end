@@ -14,6 +14,7 @@ import KakaoCallback from '@/components/features/auth/KakaoCallback';
 import WritePost from '@/components/features/feed/WritePost';
 import DMInbox from '@/components/features/dm/DMInbox';
 import FriendList from '@/components/features/profile/FriendList';
+import NotificationList from '@/components/features/notification/NotificationList';
 
 // Common components
 import ProtectedRoute from '@/components/common/ProtectedRoute';
@@ -23,6 +24,8 @@ import '@/App.css';
 
 import { ToastProvider } from '@/ui/components/common/ToastProvider';
 import SseListener from '@/ui/components/common/SseListener';
+import FeedSearch from '@/components/features/feed/search/FeedSearch';
+import FollowingList from '@/components/features/profile/FollowingList';
 
 function App() {
     return (
@@ -60,7 +63,7 @@ function App() {
                     path="/search"
                     element={
                         <ProtectedRoute>
-                            <div className="p-4">검색 페이지 (준비중)</div>
+                            <FeedSearch />
                         </ProtectedRoute>
                     }
                 />
@@ -109,6 +112,23 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <FriendList />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/notification"
+                    element={
+                        <ProtectedRoute>
+                            <NotificationList />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/profile/following"
+                    element={
+                        <ProtectedRoute>
+                            <FollowingList />
                         </ProtectedRoute>
                     }
                 />
