@@ -168,7 +168,7 @@ const FeedAndMemberSearch = () => {
                                     <div
                                         className="cursor-pointer hover:bg-gray-100 p-2 rounded-md"
                                         onClick={() => {
-                                            navigate(`/feed/${result.feedPostId}`);
+                                            navigate(`/feeds/${result.feedPostId}`);
                                         }}
                                     >
                                         <div className="flex items-center gap-2">
