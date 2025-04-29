@@ -26,7 +26,7 @@ const Profile = () => {
     const { toast, showToast } = useToast();
 
     const { profileData, isLoading, handleFollow, handleLogout } = useProfile(accountId, showToast);
-
+    console.log(profileData);
     const [memberFeed, setMemberFeed] = useState<MemberFeed[]>([]);
 
     useEffect(() => {
@@ -78,9 +78,8 @@ const Profile = () => {
                     <ProfileActions
                         isMyProfile={isMyProfile}
                         isFollow={profileData.data.isFollow}
-                        onEdit={() => navigate('/profile/edit')}
-                        onDM={() => navigate('/profile/dm')}
                         onFollow={handleFollow}
+                        accountId={profileData.data.id}
                     />
                 </header>
 

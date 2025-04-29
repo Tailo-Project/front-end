@@ -20,6 +20,7 @@ import '@/App.css';
 import { ToastProvider } from '@/ui/components/common/ToastProvider';
 import SseListener from '@/ui/components/common/SseListener';
 import FeedSearch from './components/features/feed/search/FeedSearch';
+import Room from './components/features/dm/Room';
 
 function App() {
     return (
@@ -101,7 +102,16 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
+                <Route
+                    path="/dm/:roomId"
+                    element={
+                        <ProtectedRoute>
+                            {/* <div>DM 채팅 페이지 (준비중)</div>
+                            R */}
+                            <Room />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route
                     path="/notification"
                     element={
