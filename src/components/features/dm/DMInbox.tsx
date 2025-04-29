@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BASE_API_URL } from '@/constants/apiUrl';
 import { fetchWithToken } from '@/token';
