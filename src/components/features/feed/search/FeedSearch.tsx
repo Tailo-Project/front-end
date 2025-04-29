@@ -7,6 +7,7 @@ import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 
 import defaultProfileImage from '@/assets/defaultImage.png';
 import { formatTimeAgo } from '@/utils/date';
+import { useNavigate } from 'react-router-dom';
 
 interface FeedSearchProps {
     feedPostId: number;
@@ -27,6 +28,7 @@ interface FeedSearchProps {
 const PAGE_SIZE = 10;
 
 const FeedSearch = () => {
+    const navigate = useNavigate();
     const [feedSearchKeyword, setFeedSearchKeyword] = useState('');
     const [results, setResults] = useState<FeedSearchProps[]>([]);
     const [loading, setLoading] = useState(false);
@@ -103,29 +105,37 @@ const FeedSearch = () => {
                     {!loading && !error && results.length === 0 && debouncedKeyword && (
                         <div className="text-gray-400">검색 결과가 없습니다.</div>
                     )}
-                    <div className="flex flex-col gap-2 ">
+
+                    <div className="flex flex-col gap-2">
                         {results.map((result) => (
-                            <div className="flex flex-col gap-2 " key={result.feedPostId}>
-                                <div className="flex items-center gap-2 ">
-                                    <div className="w-10 h-10 rounded-full bg-gray-200">
-                                        <img
-                                            src={result.profileImageUrl || defaultProfileImage}
-                                            alt="프로필 이미지"
-                                            className="w-full h-full object-cover"
-                                        />
+                            <div className="flex flex-col gap-2" key={result.feedPostId}>
+                                <div
+                                    className="cursor-pointer hover:bg-gray-100 p-2 rounded-md"
+                                    onClick={() => {
+                                        navigate(`/feed/${result.feedPostId}`);
+                                    }}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-10 h-10 rounded-full bg-gray-200">
+                                            <img
+                                                src={result.profileImageUrl || defaultProfileImage}
+                                                alt="프로필 이미지"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="text-sm">{result.nickname}</div>
+                                        <div className="text-sm">{formatTimeAgo(result.createdAt)}</div>
                                     </div>
-                                    <div className="text-sm">{result.nickname}</div>
-                                    <div className="text-sm">{formatTimeAgo(result.createdAt)}</div>
-                                </div>
-                                <div className="text-sm">{result.content}</div>
-                                <img
-                                    src={result.imageUrls[0] || defaultProfileImage}
-                                    alt="피드 이미지"
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="flex items-center gap-2">
-                                    <div className="text-sm">{result.likesCount} 좋아요</div>
-                                    <div className="text-sm">{result.commentsCount} 댓글</div>
+                                    <div className="text-sm">{result.content}</div>
+                                    <img
+                                        src={result.imageUrls[0] || defaultProfileImage}
+                                        alt="피드 이미지"
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <div className="flex items-center gap-2">
+                                        <div className="text-sm">{result.likesCount} 좋아요</div>
+                                        <div className="text-sm">{result.commentsCount} 댓글</div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
