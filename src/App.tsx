@@ -24,6 +24,7 @@ import '@/App.css';
 
 import { ToastProvider } from '@/ui/components/common/ToastProvider';
 import SseListener from '@/ui/components/common/SseListener';
+import FeedSearch from './components/features/feed/search/FeedSearch';
 
 function App() {
     return (
@@ -61,7 +62,7 @@ function App() {
                     path="/search"
                     element={
                         <ProtectedRoute>
-                            <div className="p-4">검색 페이지 (준비중)</div>
+                            <FeedSearch />
                         </ProtectedRoute>
                     }
                 />
