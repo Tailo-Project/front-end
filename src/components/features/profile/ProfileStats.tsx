@@ -17,12 +17,12 @@ const ProfileStats = ({ profileData }: ProfileStatsProps) => {
     const { countFeed = 0, countFollower = 0, countFollowing = 0 } = profileData.data ?? {};
     const handleFollowerClick = () => {
         navigate('/profile/friends', {
-            state: { accountId: profileData.data.id, isFollow: profileData.data.isFollow },
+            state: { accountId: profileData.data.id, isFollow: profileData.data.isFollow, type: 'following' },
         });
     };
     const handleFollowingClick = () => {
         navigate('/profile/friends', {
-            state: { accountId: profileData.data.id, isFollow: profileData.data.isFollow },
+            state: { accountId: profileData.data.id, isFollow: profileData.data.isFollow, type: 'followers' },
         });
     };
     return (

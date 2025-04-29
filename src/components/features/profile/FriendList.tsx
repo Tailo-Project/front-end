@@ -5,6 +5,7 @@ import Layout from '@/layouts/layout';
 import defaultProfileImage from '@/assets/defaultImage.png';
 import BackButton from '@/components/BackButton';
 import { getAccountId } from '@/utils/auth';
+import { useLocation } from 'react-router-dom';
 
 interface FriendListProps {
     accountId: string;
@@ -17,9 +18,11 @@ interface FriendListProps {
 type FriendListType = 'following' | 'followers';
 
 const FriendList = () => {
+    const location = useLocation();
+    const initialTab = location.state?.type || 'following';
     const [friendList, setFriendList] = useState<FriendListProps[]>([]);
     const accountId = getAccountId();
-    const [activeTab, setActiveTab] = useState<FriendListType>('following');
+    const [activeTab, setActiveTab] = useState<FriendListType>(initialTab);
 
     const handleFollow = async (followerId: string) => {
         const targetUser = friendList.find((user) => user.accountId === followerId);
@@ -36,29 +39,27 @@ const FriendList = () => {
         );
     };
 
-    const fetchList = async (type: FriendListType) => {
-        let url = '';
-        if (type === 'following') {
-            // 팔로워 리스트
-            url = `${FOLLOW_API_URL}/${accountId}/following`;
-        } else if (type === 'followers') {
-            // 팔로잉 리스트
-            url = `${FOLLOW_API_URL}/${accountId}`;
-        }
-
-        const response = await fetchWithToken(url, { method: 'GET' });
-        const { data } = await response.json();
-
-        const listWithState = data.content.map((item: Omit<FriendListProps, 'isFollowing'>) => ({
-            ...item,
-            isFollowing: true,
-        }));
-        setFriendList(listWithState);
-    };
-
     useEffect(() => {
-        fetchList(activeTab);
-    }, [activeTab]);
+        const fetchList = async () => {
+            let url = '';
+            if (activeTab === 'following') {
+                url = `${FOLLOW_API_URL}/${accountId}/following`;
+            } else if (activeTab === 'followers') {
+                url = `${FOLLOW_API_URL}/${accountId}`;
+            }
+
+            const response = await fetchWithToken(url, { method: 'GET' });
+            const { data } = await response.json();
+
+            const listWithState = data.content.map((item: Omit<FriendListProps, 'isFollowing'>) => ({
+                ...item,
+                isFollowing: true,
+            }));
+            setFriendList(listWithState);
+        };
+
+        fetchList();
+    }, [activeTab, accountId]);
 
     return (
         <Layout>
