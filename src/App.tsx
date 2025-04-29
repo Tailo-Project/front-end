@@ -127,14 +127,6 @@ function App() {
                     }
                 />
 
-                {/* <Route
-                    path="/profile/following"
-                    element={
-                        <ProtectedRoute>
-                            <FollowingList />
-                        </ProtectedRoute>
-                    }
-                /> */}
                 <Route
                     path="/profile/friends"
                     element={
