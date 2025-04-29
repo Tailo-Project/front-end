@@ -66,8 +66,6 @@ const FriendList = () => {
             <div className="p-4">
                 <div className="flex items-center mb-4">
                     <BackButton />
-                    <h1 className="text-xl font-bold">팔로워 목록</h1>
-                    <span className="ml-2 text-gray-500">({friendList.length})</span>
                 </div>
                 <div className="flex flex-row gap-4 items-center justify-center">
                     <button
@@ -86,6 +84,7 @@ const FriendList = () => {
                 <div className="flex flex-col gap-4">
                     {activeTab === 'following' ? (
                         <div className="flex flex-col gap-4">
+                            <h1 className="text-xl font-bold">팔로워 목록</h1>
                             {friendList.length === 0 ? (
                                 <div>팔로워가 없습니다.</div>
                             ) : (
@@ -119,6 +118,7 @@ const FriendList = () => {
                         </div>
                     ) : (
                         <div className="flex flex-col gap-4">
+                            <h1 className="text-xl font-bold">팔로잉 목록</h1>
                             {friendList.length === 0 ? (
                                 <div className="text-center text-gray-500 font-bold mt-4">팔로잉이 없습니다.</div>
                             ) : (

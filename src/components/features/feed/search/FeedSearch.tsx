@@ -48,7 +48,6 @@ const FeedSearch = () => {
 
     useEffect(() => {
         setResults([]);
-        setPage(1);
         setHasNext(false);
         setError(null);
     }, [debouncedKeyword]);
