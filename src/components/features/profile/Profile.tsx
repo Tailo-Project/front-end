@@ -27,7 +27,6 @@ const Profile = () => {
     const { toast, showToast } = useToast();
 
     const { profileData, isLoading, handleFollow, handleLogout } = useProfile(accountId, showToast);
-    console.log(profileData);
     const [memberFeed, setMemberFeed] = useState<MemberFeed[]>([]);
 
     useEffect(() => {
