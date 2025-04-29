@@ -20,6 +20,7 @@ import '@/App.css';
 import { ToastProvider } from '@/ui/components/common/ToastProvider';
 import SseListener from '@/ui/components/common/SseListener';
 import FeedAndMemberSearch from './components/features/feed/search/FeedAndMemberSearch';
+import Room from './components/features/dm/Room';
 
 function App() {
     return (
@@ -70,15 +71,15 @@ function App() {
                     }
                 />
                 <Route
-                    path="/chat"
+                    path="/profile"
                     element={
                         <ProtectedRoute>
-                            <div>채팅 페이지 (준비중)</div>
+                            <Profile />
                         </ProtectedRoute>
                     }
                 />
                 <Route
-                    path="/profile"
+                    path="/profile/:accountId"
                     element={
                         <ProtectedRoute>
                             <Profile />
@@ -109,7 +110,14 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-
+                <Route
+                    path="/dm/:roomId"
+                    element={
+                        <ProtectedRoute>
+                            <Room />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route
                     path="/notification"
                     element={

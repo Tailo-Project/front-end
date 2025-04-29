@@ -44,7 +44,7 @@ const TabBar = () => {
         },
         {
             name: '채팅',
-            path: '/chat',
+            path: '/dm',
             icon: (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path

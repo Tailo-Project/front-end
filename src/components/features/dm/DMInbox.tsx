@@ -1,77 +1,86 @@
-import React, { useState } from 'react';
-import { formatTimeAgo } from '@/utils/date';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { BASE_API_URL } from '@/constants/apiUrl';
+import { fetchWithToken } from '@/token';
+import Layout from '@/layouts/layout';
 
-interface DMMessage {
-    id: string;
-    sender: {
-        id: string;
-        nickname: string;
-        profileImage: string;
-    };
-    lastMessage: string;
-    timestamp: Date;
-    unreadCount: number;
+interface ChatRoom {
+    countMember: number;
+    members: {
+        accountId: string;
+        memberId: number;
+        profileImageUrl: string;
+    }[];
+    roomId: string;
+    roomName: string;
 }
 
-const DMInbox: React.FC = () => {
-    // 임시 데이터
-    const [messages] = useState<DMMessage[]>([
-        {
-            id: '1',
-            sender: {
-                id: '1',
-                nickname: '김태일러',
-                profileImage: 'https://via.placeholder.com/40',
-            },
-            lastMessage: '안녕하세요! 옷 사이즈 문의드립니다.',
-            timestamp: new Date(),
-            unreadCount: 2,
-        },
-        {
-            id: '2',
-            sender: {
-                id: '2',
-                nickname: '이스타일',
-                profileImage: 'https://via.placeholder.com/40',
-            },
-            lastMessage: '네, 말씀해주세요.',
-            timestamp: new Date(Date.now() - 86400000), // 1일 전
-            unreadCount: 0,
-        },
-    ]);
+const DMInbox = () => {
+    const location = useLocation();
+    const { accountId } = location.state;
+
+    const [chatRoom, setChatRoom] = useState<ChatRoom[]>([]);
+
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchDMInbox = async () => {
+            try {
+                const response = await fetchWithToken(
+                    `${BASE_API_URL}/chat/room?accountIds=${encodeURIComponent(accountId)}`,
+                    {
+                        method: 'POST',
+                    },
+                );
+                const data = await response.json();
+                setChatRoom(Array.isArray(data.data) ? data.data : [data.data]);
+            } catch (error) {
+                console.error('DM 채팅방 가져오기 실패:', error);
+            }
+        };
+        fetchDMInbox();
+    }, [accountId]);
 
     return (
-        <div className="max-w-screen-md mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">DM 보관함</h1>
-            <div className="space-y-4">
-                {messages.map((message) => (
-                    <div
-                        key={message.id}
-                        className="flex items-center gap-4 p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer"
-                    >
-                        <img
-                            src={message.sender.profileImage}
-                            alt={message.sender.nickname}
-                            className="w-10 h-10 rounded-full object-cover"
-                        />
-                        <div className="flex-1">
-                            <div className="flex justify-between items-start">
-                                <span className="font-semibold">{message.sender.nickname}</span>
-                                <span className="text-sm text-gray-500">
-                                    {formatTimeAgo(message.timestamp.toISOString())}
+        <Layout>
+            <div className="max-w-screen-md mx-auto p-4">
+                <h1 className="text-xl font-bold mb-4">DM 보관함</h1>
+                <div className="flex flex-col gap-4">
+                    {chatRoom.map((room) => (
+                        <button
+                            onClick={() => {
+                                navigate(`/dm/${room.roomId}`, { state: { roomId: room.roomId } });
+                            }}
+                            key={room.roomId}
+                            className="flex items-center gap-3 p-3 rounded-lg border hover:bg-gray-50 transition"
+                            aria-label={`${room.roomName} 채팅방으로 이동`}
+                        >
+                            <div className="flex -space-x-2">
+                                {room.members.slice(0, 2).map((member) => (
+                                    <img
+                                        key={member.memberId}
+                                        src={member.profileImageUrl}
+                                        alt={`${member.accountId} 프로필`}
+                                        className="w-10 h-10 rounded-full border-2 border-white object-cover"
+                                    />
+                                ))}
+                                {room.countMember > 2 && (
+                                    <span className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full text-xs font-bold border-2 border-white">
+                                        +{room.countMember - 2}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex flex-col text-left">
+                                <span className="font-semibold text-base">{room.roomName}</span>
+                                <span className="text-xs text-gray-500">
+                                    {room.members.map((m) => m.accountId).join(', ')}
                                 </span>
                             </div>
-                            <p className="text-gray-600 text-sm mt-1">{message.lastMessage}</p>
-                        </div>
-                        {message.unreadCount > 0 && (
-                            <div className="bg-[#FF785D] text-white text-xs px-2 py-1 rounded-full">
-                                {message.unreadCount}
-                            </div>
-                        )}
-                    </div>
-                ))}
+                        </button>
+                    ))}
+                </div>
             </div>
-        </div>
+        </Layout>
     );
 };
 
