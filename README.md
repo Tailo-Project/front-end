@@ -11,6 +11,10 @@
 - [코드 포맷팅 (Code Formatting)](#코드-포맷팅-code-formatting)
 - [주석 (Comments)](#주석-comments)
 - [Git 커밋 메시지 (Git Commit Message)](#git-커밋-메시지-git-commit-message)
+- [스택 (Stack)](#스택-stack)
+- [선정 이유 (Stack Rationale)](#선정-이유-stack-rationale)
+- [개발 환경 (Development Environment)](#개발-환경-development-environment)
+- [와이어프레임 (Wireframe)](#와이어프레임-wireframe)
 
 ## 파일 및 폴더 구조 (File and Folder Structure)
 
@@ -299,4 +303,26 @@ fix/map-marker-click
 refactor/auth-logic
 ```
 
----
+## 스택 (Stack)
+
+Front : React, TypeScript, TailwindCSS, Tanstack Query, react-hook-form
+Deploy : Vercel
+Build : vite
+
+## 선정 이유 (Stack Rationale)
+
+### TailwindCSS
+
+초반에 빠른 디자인을 위해 채택했습니다.
+
+### Tanstack Query
+
+좋아요 기능을 구현하면서 피드 리스트 및 피드 상세에서 좋아요 기능을 추가해야 했는데, Tanstack Query의 캐싱 기능을 이용하면 유용할 것이라 생각해서 적용했습니다.
+
+### react-hook-form
+
+입력 폼이 많아질수록 관리해야 하는 state가 늘어나고 유효성 검사 및 에러 처리에 대한 중복 코드가 늘어날 것이라 생각해서 적용했습니다.
+
+## 와이어프레임 (Wireframe)
+
+[링크](https://www.figma.com/design/idMxRdIYXeFxHkw44OBZ7k/tailo?node-id=0-1&t=OfRMmrv6iTBaeSQv-1)
