@@ -90,6 +90,7 @@ const FeedMainContent = ({ feed, userProfile, onDeleteSuccess }: FeedMainContent
                 const errorData = await response.json();
                 throw new Error(errorData.message || '피드 삭제에 실패했습니다.');
             }
+            await queryClient.invalidateQueries({ queryKey: ['feeds'] });
             if (onDeleteSuccess) onDeleteSuccess();
             navigate('/');
         } catch (error) {
