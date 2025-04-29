@@ -1,6 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { BASE_API_URL } from '@/constants/apiUrl';
-import { fetchWithToken } from '@/token';
 
 interface ProfileActionsProps {
     isMyProfile: boolean;
@@ -15,15 +13,7 @@ const ProfileActions = ({ isMyProfile, isFollow, onFollow, accountId }: ProfileA
     // 메시지 보내기 버튼 클릭 시 방 생성
     const handleMessageClick = async () => {
         try {
-            const response = await fetchWithToken(`${BASE_API_URL}/chat/room?accountIds=${accountId}`, {
-                method: 'POST',
-            });
-            const { data } = await response.json();
-            if (response.ok) {
-                navigate('/profile/dm', { state: { roomId: data.roomId } });
-            } else {
-                alert('채팅방 생성에 실패했습니다.');
-            }
+            navigate('/profile/dm', { state: { accountId } });
         } catch {
             alert('네트워크 오류가 발생했습니다.');
         }
