@@ -4,6 +4,9 @@ import { EventSourcePolyfill } from 'event-source-polyfill';
 import { useToast } from './ToastProvider';
 import { getToken } from '@/utils/auth';
 
+const MAX_RETRY_COUNT = 5;
+let retryCount = 0;
+
 const SseListener = () => {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
@@ -24,8 +27,7 @@ const SseListener = () => {
             });
 
             eventSourceRef.current.addEventListener('sse', (event) => {
-                const messageEvent = event as MessageEvent<string>;
-                const data = messageEvent.data;
+                const data = (event as MessageEvent).data;
                 if (typeof data === 'string' && data.trim().startsWith('[accountId]:') && data.includes('connected.')) {
                     resetTimeout();
                     return;
@@ -51,7 +53,12 @@ const SseListener = () => {
                 if (timeoutRef.current !== null) {
                     clearTimeout(timeoutRef.current);
                 }
-                timeoutRef.current = setTimeout(() => connectSSE(), 5000);
+                if (retryCount < MAX_RETRY_COUNT) {
+                    retryCount++;
+                    timeoutRef.current = setTimeout(() => connectSSE(), 5000);
+                } else {
+                    showToast('SSE 연결 실패');
+                }
             };
 
             resetTimeout();

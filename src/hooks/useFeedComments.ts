@@ -9,7 +9,9 @@ const useFeedComments = (feedId: string | undefined) => {
     const { data: comments, isLoading } = useQuery<CommentsResponse>({
         queryKey: ['feedComments', Number(feedId)],
         queryFn: async () => {
-            const response = await fetchWithToken(`${FEED_API_URL}/${feedId}/comments`, {});
+            const response = await fetchWithToken(`${FEED_API_URL}/${feedId}/comments`, {
+                method: 'GET',
+            });
             if (!response.ok) {
                 throw new Error('댓글 조회에 실패했습니다.');
             }

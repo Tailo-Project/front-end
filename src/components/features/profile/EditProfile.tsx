@@ -82,7 +82,9 @@ const EditProfile = () => {
         const fetchProfile = async () => {
             try {
                 setIsLoading(true);
-                const profileData = await fetchWithToken(`${MEMBER_API_URL}`, {});
+                const profileData = await fetchWithToken(`${MEMBER_API_URL}`, {
+                    method: 'GET',
+                });
                 const data = await profileData.json();
                 updateFormFields(data.data);
             } catch (error) {

@@ -1,4 +1,4 @@
-import CommentInput from '@/components/features/feed/CommentInput';
+import CommentInput from '@/components/features/feed/comment/CommentInput';
 import CommentList from './CommentList';
 import useFeedComments from '@/hooks/useFeedComments';
 import { CommentsResponse } from '@/types';

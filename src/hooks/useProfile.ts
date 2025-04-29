@@ -52,7 +52,9 @@ const useProfile = (
         const fetchProfileData = async () => {
             try {
                 setIsLoading(true);
-                const profileData = await fetchWithToken(`${MEMBER_API_URL}/profile/${accountId}`, {});
+                const profileData = await fetchWithToken(`${MEMBER_API_URL}/profile/${accountId}`, {
+                    method: 'GET',
+                });
                 if (!profileData.ok) {
                     throw new Error('프로필 정보 조회에 실패했습니다.');
                 }

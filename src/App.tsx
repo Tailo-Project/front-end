@@ -24,8 +24,7 @@ import '@/App.css';
 
 import { ToastProvider } from '@/ui/components/common/ToastProvider';
 import SseListener from '@/ui/components/common/SseListener';
-import FeedSearch from '@/components/features/feed/search/FeedSearch';
-import FollowingList from '@/components/features/profile/FollowingList';
+import FeedSearch from './components/features/feed/search/FeedSearch';
 
 function App() {
     return (
@@ -120,15 +119,6 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <NotificationList />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/profile/following"
-                    element={
-                        <ProtectedRoute>
-                            <FollowingList />
                         </ProtectedRoute>
                     }
                 />
