@@ -15,7 +15,8 @@ import { AUTH_API_URL, MEMBER_API_URL } from '@/constants/apiUrl';
 import { fetchWithToken } from '@/token';
 import { FormInput } from '@/components/form/FormInput';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { schema, SignUpFormData } from '@/schema/signUpSchema';
+import { signUpSchema, SignUpFormData } from '@/schema/signUpSchema';
+
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
 interface LocationState {
@@ -35,11 +36,11 @@ const SignUpForm = () => {
     const {
         register,
         handleSubmit,
-        formState: { isValid },
+        formState: { isValid, errors },
         setValue,
         watch,
     } = useForm<SignUpFormData>({
-        resolver: zodResolver(schema),
+        resolver: zodResolver(signUpSchema),
         defaultValues: {
             email: email || '',
             gender: 'MALE',
@@ -152,6 +153,7 @@ const SignUpForm = () => {
                             required
                             placeholder="이메일을 입력해주세요"
                             disabled
+                            errorMessage={errors.email?.message}
                         />
 
                         <FormInput
@@ -160,6 +162,7 @@ const SignUpForm = () => {
                             register={register}
                             required
                             placeholder="닉네임을 입력해주세요."
+                            errorMessage={errors.nickname?.message}
                         />
 
                         <FormInput
@@ -168,6 +171,7 @@ const SignUpForm = () => {
                             register={register}
                             required
                             placeholder="아이디를 입력해주세요."
+                            errorMessage={errors.accountId?.message}
                             rightElement={
                                 <button
                                     type="button"
@@ -191,6 +195,7 @@ const SignUpForm = () => {
                             register={register}
                             required
                             placeholder="ex) 강아지, 고양이, 햄스터"
+                            errorMessage={errors.type?.message}
                         />
 
                         <BreedCombobox
