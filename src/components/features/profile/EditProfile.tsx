@@ -6,8 +6,10 @@ import TabBar from '@/components/TabBar';
 import Toast from '@/components/Toast';
 import useToast from '@/hooks/useToast';
 import GenderRadioGroup from '@/components/form/GenderRadioGroup';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { profileSchema, ProfileFormData } from '@/schema/profileSchema';
 
-import { Gender, ProfileData } from '@/types';
+import { Gender } from '@/types';
 
 import BreedCombobox from '@/components/form/BreedCombobox';
 
@@ -42,8 +44,10 @@ const EditProfile = () => {
         handleSubmit: handleFormSubmit,
         setValue,
         watch,
-    } = useForm<ProfileData>({
+        formState: { errors },
+    } = useForm<ProfileFormData>({
         mode: 'onChange',
+        resolver: zodResolver(profileSchema),
         defaultValues: {
             nickname: '',
             breed: '',
@@ -68,11 +72,11 @@ const EditProfile = () => {
 
     const updateFormFields = (profileData: ProfileResponse) => {
         const { breed, ...otherFields } = profileData;
-        (Object.entries(otherFields) as [keyof Omit<ProfileData, 'profileImage' | 'breed'>, string | number][]).forEach(
-            ([key, value]) => {
-                setValue(key, value);
-            },
-        );
+        (
+            Object.entries(otherFields) as [keyof Omit<ProfileFormData, 'profileImage' | 'breed'>, string | number][]
+        ).forEach(([key, value]) => {
+            setValue(key, value);
+        });
         setSelectedBreed(breed);
         setValue('breed', breed);
         setValue('profileImage', profileData.profileImageUrl);
@@ -123,7 +127,7 @@ const EditProfile = () => {
         }
     };
 
-    const onSubmit = async (data: ProfileData) => {
+    const onSubmit = async (data: ProfileFormData) => {
         try {
             await updateProfile(
                 createProfileFormData({
@@ -210,6 +214,7 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="닉네임을 입력하세요"
+                                    errorMessage={errors.nickname?.message}
                                 />
 
                                 <BreedCombobox
@@ -225,6 +230,7 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="타입을 입력해주세요"
+                                    errorMessage={errors.type?.message}
                                 />
 
                                 <FormInput
@@ -233,6 +239,8 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="나이를 입력해주세요"
+                                    errorMessage={errors.age?.message}
+                                    type="number"
                                 />
 
                                 <GenderRadioGroup register={register} name="gender" />
@@ -243,6 +251,7 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="주소를 입력해주세요"
+                                    errorMessage={errors.address?.message}
                                 />
                             </div>
 
