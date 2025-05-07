@@ -9,12 +9,13 @@ import GenderRadioGroup from '@/components/form/GenderRadioGroup';
 import { createFormDataWithJson } from '@/utils/formData';
 import { setToken, setAccountId } from '@/utils/auth';
 import Toast from '@/components/Toast';
-import { SignUpFormData, ToastState } from '@/types';
+import { ToastState } from '@/types';
 import useToast from '@/hooks/useToast';
 import { AUTH_API_URL, MEMBER_API_URL } from '@/constants/apiUrl';
 import { fetchWithToken } from '@/token';
 import { FormInput } from '@/components/form/FormInput';
-
+import { zodResolver } from '@hookform/resolvers/zod';
+import { schema, SignUpFormData } from '@/schema/signUpSchema';
 const INITIAL_BREEDS = ['말티즈', '포메라니안', '치와와', '푸들', '시바견', '말라뮤트'];
 
 interface LocationState {
@@ -26,7 +27,7 @@ const SignUpForm = () => {
     const email = (location.state as LocationState)?.email;
 
     const [selectedBreed, setSelectedBreed] = useState('');
-    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [profileImage, setProfileImage] = useState<File | null>(null);
     const [isCheckingId, setIsCheckingId] = useState(false);
     const [idCheckStatus, setIdCheckStatus] = useState<number | null>(null);
     const { toast, showToast } = useToast();
@@ -38,11 +39,14 @@ const SignUpForm = () => {
         setValue,
         watch,
     } = useForm<SignUpFormData>({
-        mode: 'onChange',
+        resolver: zodResolver(schema),
         defaultValues: {
-            email,
+            email: email || '',
             gender: 'MALE',
             breed: '',
+            age: 0,
+            address: '',
+            profileImage: profileImage || undefined,
         },
     });
 

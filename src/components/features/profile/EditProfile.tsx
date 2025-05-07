@@ -45,8 +45,7 @@ const EditProfile = () => {
         setValue,
         watch,
         formState: { errors },
-    } = useForm<ProfileFormData>({
-        mode: 'onChange',
+    } = useForm({
         resolver: zodResolver(profileSchema),
         defaultValues: {
             nickname: '',
@@ -240,7 +239,6 @@ const EditProfile = () => {
                                     required
                                     placeholder="나이를 입력해주세요"
                                     errorMessage={errors.age?.message}
-                                    type="number"
                                 />
 
                                 <GenderRadioGroup register={register} name="gender" />

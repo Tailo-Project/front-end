@@ -41,7 +41,7 @@ export const FormInput = <T extends FieldValues>({
                     <div className="absolute inset-y-0 right-0 flex items-center pr-2">{rightElement}</div>
                 )}
             </div>
-            {errorMessage && <p className="text-red-500 text-xs italic">{errorMessage}</p>}
+            {errorMessage && <p className="text-red-500 text-sm">{errorMessage}</p>}
         </div>
     );
 };
