@@ -6,8 +6,10 @@ import TabBar from '@/components/TabBar';
 import Toast from '@/components/Toast';
 import useToast from '@/hooks/useToast';
 import GenderRadioGroup from '@/components/form/GenderRadioGroup';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { profileSchema, ProfileFormData } from '@/schema/profileSchema';
 
-import { Gender, ProfileData } from '@/types';
+import { Gender } from '@/types';
 
 import BreedCombobox from '@/components/form/BreedCombobox';
 
@@ -35,15 +37,16 @@ const EditProfile = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [breeds, setBreeds] = useState<string[]>(['말티즈', '비숑', '푸들', '치와와', '포메라니안']); // 임시 데이터
     const [selectedBreed, setSelectedBreed] = useState('');
-    const [newProfileImage, setNewProfileImage] = useState<File | null>(null);
+    const [newProfileImage, setNewProfileImage] = useState<File>();
 
     const {
         register,
         handleSubmit: handleFormSubmit,
         setValue,
         watch,
-    } = useForm<ProfileData>({
-        mode: 'onChange',
+        formState: { errors },
+    } = useForm({
+        resolver: zodResolver(profileSchema),
         defaultValues: {
             nickname: '',
             breed: '',
@@ -68,11 +71,11 @@ const EditProfile = () => {
 
     const updateFormFields = (profileData: ProfileResponse) => {
         const { breed, ...otherFields } = profileData;
-        (Object.entries(otherFields) as [keyof Omit<ProfileData, 'profileImage' | 'breed'>, string | number][]).forEach(
-            ([key, value]) => {
-                setValue(key, value);
-            },
-        );
+        (
+            Object.entries(otherFields) as [keyof Omit<ProfileFormData, 'profileImage' | 'breed'>, string | number][]
+        ).forEach(([key, value]) => {
+            setValue(key, value);
+        });
         setSelectedBreed(breed);
         setValue('breed', breed);
         setValue('profileImage', profileData.profileImageUrl);
@@ -102,28 +105,25 @@ const EditProfile = () => {
         fileInputRef.current?.click();
     };
 
-    const checkImageSize = (file: File) => {
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (file.size > maxSize) {
-            showToast(`이미지 크기는 ${maxSize / 1024 / 1024}MB 이하여야 합니다.`, 'error');
-            return false;
-        }
-        return true;
-    };
-
     const handleImageInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         try {
             const file = event.target.files?.[0];
-
-            if (file && checkImageSize(file)) {
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('프로필 이미지는 5MB 이하의 파일만 가능합니다.', 'error');
+                    return;
+                }
                 setNewProfileImage(file);
+                setValue('profileImage', file);
+            } else {
+                setValue('profileImage', defaultProfileImage);
             }
         } catch {
             showToast('이미지 업로드에 실패했습니다.', 'error');
         }
     };
 
-    const onSubmit = async (data: ProfileData) => {
+    const onSubmit = async (data: ProfileFormData) => {
         try {
             await updateProfile(
                 createProfileFormData({
@@ -194,6 +194,9 @@ const EditProfile = () => {
                                         className="hidden"
                                     />
                                 </div>
+                                {typeof errors.profileImage?.message === 'string' && (
+                                    <span className="text-red-500 text-xs mt-1">{errors.profileImage.message}</span>
+                                )}
                                 <button
                                     type="button"
                                     onClick={handleImageClick}
@@ -210,6 +213,7 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="닉네임을 입력하세요"
+                                    errorMessage={errors.nickname?.message}
                                 />
 
                                 <BreedCombobox
@@ -225,6 +229,7 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="타입을 입력해주세요"
+                                    errorMessage={errors.type?.message}
                                 />
 
                                 <FormInput
@@ -233,6 +238,7 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="나이를 입력해주세요"
+                                    errorMessage={errors.age?.message}
                                 />
 
                                 <GenderRadioGroup register={register} name="gender" />
@@ -243,6 +249,7 @@ const EditProfile = () => {
                                     register={register}
                                     required
                                     placeholder="주소를 입력해주세요"
+                                    errorMessage={errors.address?.message}
                                 />
                             </div>
 

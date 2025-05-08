@@ -1,7 +1,7 @@
 interface FormDataWithJsonOptions {
     requestKey: string;
     jsonData: Record<string, unknown>;
-    files?: { key: string; files: File[] }[];
+    files?: { key: string; files: (File | string)[] }[];
 }
 
 export const createFormDataWithJson = ({ requestKey, jsonData, files = [] }: FormDataWithJsonOptions): FormData => {
