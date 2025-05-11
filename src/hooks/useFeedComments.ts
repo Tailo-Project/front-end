@@ -41,6 +41,7 @@ const useFeedComments = (feedId: string | undefined) => {
         }
 
         await queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] });
+        await queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] });
     };
 
     const deleteComment = async (commentId: number) => {
@@ -53,6 +54,7 @@ const useFeedComments = (feedId: string | undefined) => {
         }
 
         await queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] });
+        await queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] });
     };
 
     return {
