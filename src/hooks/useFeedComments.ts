@@ -40,10 +40,8 @@ const useFeedComments = (feedId: string | undefined) => {
             throw new Error('댓글 등록에 실패했습니다.');
         }
 
-        await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
-            queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] }),
-        ]);
+        await queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] });
+        await queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] });
     };
 
     const deleteComment = async (commentId: number) => {
@@ -55,10 +53,8 @@ const useFeedComments = (feedId: string | undefined) => {
             throw new Error('댓글 삭제에 실패했습니다.');
         }
 
-        await Promise.all([
-            queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] }),
-            queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] }),
-        ]);
+        await queryClient.invalidateQueries({ queryKey: ['feedComments', Number(feedId)] });
+        await queryClient.invalidateQueries({ queryKey: ['feed', Number(feedId)] });
     };
 
     return {
