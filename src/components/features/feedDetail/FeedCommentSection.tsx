@@ -4,6 +4,7 @@ import useFeedComments from '@/hooks/useFeedComments';
 import { CommentsResponse } from '@/types';
 import { useState } from 'react';
 import useConfirmModal from '@/hooks/useConfirmModal';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 interface UserProfile {
     nickname: string;
@@ -15,7 +16,6 @@ interface FeedCommentSectionProps {
     comments: CommentsResponse | undefined;
     deleteComment: (commentId: number) => Promise<void>;
     feedId: string;
-    confirmModal: ReturnType<typeof useConfirmModal>;
 }
 
 const FeedCommentSection = ({
@@ -23,8 +23,8 @@ const FeedCommentSection = ({
     comments,
     deleteComment,
     feedId,
-    confirmModal,
 }: FeedCommentSectionProps) => {
+    const confirmModal = useConfirmModal();
     const { addComment } = useFeedComments(feedId);
     const [replyToId, setReplyToId] = useState<number | null>(null);
     const [newComment, setNewComment] = useState('');
@@ -61,6 +61,10 @@ const FeedCommentSection = ({
 
     return (
         <>
+            <ConfirmModal
+                {...confirmModal}
+                onCancel={confirmModal.hide}
+            />
             <CommentInput
                 newComment={newComment}
                 onCommentChange={(e) => setNewComment(e.target.value)}

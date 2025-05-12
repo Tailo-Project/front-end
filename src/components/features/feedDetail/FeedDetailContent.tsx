@@ -45,16 +45,10 @@ const FeedDetailContent = ({ feed, userProfile, comments, deleteComment }: FeedD
                         comments={comments}
                         deleteComment={deleteComment}
                         feedId={String(feed.feedId)}
-                        confirmModal={confirmModal}
                     />
                 </div>
                 <ConfirmModal
-                    open={confirmModal.open}
-                    title={confirmModal.title}
-                    description={confirmModal.description}
-                    confirmText={confirmModal.confirmText}
-                    cancelText={confirmModal.cancelText}
-                    onConfirm={confirmModal.handleConfirm}
+                    {...confirmModal}
                     onCancel={confirmModal.hide}
                 />
                 {toast.show && <Toast message={toast.message} type={toast.type} onClose={hideToast} />}
