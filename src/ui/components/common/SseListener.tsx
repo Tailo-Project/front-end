@@ -8,6 +8,14 @@ const MAX_RETRY_COUNT = 5;
 let retryCount = 0;
 let hasFailed = false;
 
+interface NotificationData {
+    id: number;
+    message: string;
+    url: string;
+    isRead: boolean;
+    createdAt: string;
+}
+
 const SseListener = () => {
     const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const eventSourceRef = useRef<EventSourcePolyfill | null>(null);
@@ -35,16 +43,18 @@ const SseListener = () => {
                 }
                 if (typeof data === 'string' && data.trim().startsWith('{')) {
                     try {
-                        const parsed = JSON.parse(data);
-                        if (parsed.message) {
+                        const parsed: NotificationData = JSON.parse(data);
+
+                        if (
+                            parsed.message.includes('좋아요를 눌렀습니다') ||
+                            parsed.message.includes('댓글을 남겼습니다') ||
+                            parsed.message.includes('팔로우')
+                        ) {
                             showToast(parsed.message);
                         }
                     } catch (e) {
-                        showToast(data);
                         console.error('알림 파싱 오류', e, data);
                     }
-                } else {
-                    showToast(data);
                 }
                 resetTimeout();
             });
