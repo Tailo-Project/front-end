@@ -79,6 +79,11 @@ const FeedList = () => {
                         >
                             {isFetchingNextPage && <LoadingSpinner />}
                         </div>
+                        {hasNextPage ? null : (
+                            <div className="flex flex-col items-center justify-center">
+                                <p className="text-gray-500 text-lg">더 이상 게시물이 없습니다</p>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
