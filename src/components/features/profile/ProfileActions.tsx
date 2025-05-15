@@ -1,3 +1,5 @@
+import { BASE_API_URL } from '@/constants/apiUrl';
+import { fetchWithToken } from '@/token';
 import { useNavigate } from 'react-router-dom';
 
 interface ProfileActionsProps {
@@ -13,9 +15,21 @@ const ProfileActions = ({ isMyProfile, isFollow, onFollow, accountId }: ProfileA
     // 메시지 보내기 버튼 클릭 시 방 생성
     const handleMessageClick = async () => {
         try {
-            navigate('/profile/dm', { state: { accountId } });
-        } catch {
-            alert('네트워크 오류가 발생했습니다.');
+            const response = await fetchWithToken(
+                `${BASE_API_URL}/chat/room?accountIds=${encodeURIComponent(accountId)}`,
+                {
+                    method: 'POST',
+                },
+            );
+            const data = await response.json();
+            if (data.data) {
+                navigate(`/dm/${data.data.roomId}`, { state: { roomId: data.data.roomId } });
+            } else {
+                throw new Error('채팅방을 생성할 수 없습니다.');
+            }
+        } catch (error) {
+            console.error('채팅방 생성 실패:', error);
+            alert('채팅방을 생성하는 중 오류가 발생했습니다.');
         }
     };
     const handleEditClick = () => {
