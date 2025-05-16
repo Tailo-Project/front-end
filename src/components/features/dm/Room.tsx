@@ -42,11 +42,9 @@ const Room = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // 상대방 프로필 정보 가져오기
         const fetchOtherUserProfile = async () => {
             try {
                 if (!otherAccountId) {
-                    console.log('상대방 accountId가 없습니다.');
                     return;
                 }
 
@@ -68,10 +66,6 @@ const Room = () => {
             } catch (error) {
                 console.error('프로필 정보 가져오기 실패:', error);
                 // 에러 발생 시 기본 프로필 정보 설정
-                setOtherUser({
-                    accountId: 'Unknown',
-                    profileImageUrl: '/default-profile.png',
-                });
             }
         };
 
@@ -171,7 +165,7 @@ const Room = () => {
                 <div className="flex flex-col items-center py-4 border-b">
                     <img
                         className="w-16 h-16 rounded-full object-cover mb-2"
-                        src={otherUser?.profileImageUrl || defaultOtherUser.profileImageUrl}
+                        src={otherUser?.profileImageUrl}
                         alt="프로필 이미지"
                     />
                     <div className="text-center">
