@@ -60,7 +60,7 @@ const Room = () => {
                 if (data) {
                     setOtherUser({
                         accountId: data.accountId,
-                        profileImageUrl: data.profileImageUrl || '/default-profile.png',
+                        profileImageUrl: data.profileImageUrl,
                     });
                 }
             } catch (error) {
@@ -71,12 +71,6 @@ const Room = () => {
 
         fetchOtherUserProfile();
     }, [otherAccountId]);
-
-    // 상대방 프로필 정보가 없을 때의 기본값
-    const defaultOtherUser = {
-        accountId: 'Unknown',
-        profileImageUrl: '/default-profile.png',
-    };
 
     useEffect(() => {
         const client = new StompJS.Client({
@@ -169,7 +163,7 @@ const Room = () => {
                         alt="프로필 이미지"
                     />
                     <div className="text-center">
-                        <p className="font-semibold text-lg">{otherUser?.accountId || defaultOtherUser.accountId}</p>
+                        <p className="font-semibold text-lg">{otherUser?.accountId}</p>
                         <p className="text-xs text-gray-400">Secondary/Default</p>
                     </div>
                     <button
