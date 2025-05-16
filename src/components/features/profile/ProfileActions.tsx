@@ -21,9 +21,9 @@ const ProfileActions = ({ isMyProfile, isFollow, onFollow, accountId }: ProfileA
                     method: 'POST',
                 },
             );
-            const data = await response.json();
-            if (data.data) {
-                navigate(`/dm/${data.data.roomId}`, { state: { roomId: data.data.roomId } });
+            const { data } = await response.json();
+            if (data) {
+                navigate(`/dm/${data.roomId}`, { state: { roomId: data.roomId, otherAccountId: accountId } });
             } else {
                 throw new Error('채팅방을 생성할 수 없습니다.');
             }
