@@ -28,7 +28,6 @@ interface ChatMessage {
 const Room = () => {
     const { roomId: paramRoomId } = useParams();
     const location = useLocation();
-    console.log('Location state:', location.state); // location.state의 전체 구조를 확인
 
     const { roomId: stateRoomId, otherAccountId } = location.state || {};
     const roomId = paramRoomId || stateRoomId;
