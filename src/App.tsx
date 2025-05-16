@@ -9,7 +9,7 @@ import Profile from '@/components/features/profile/Profile';
 import EditProfile from '@/components/features/profile/EditProfile';
 import KakaoCallback from '@/components/features/auth/KakaoCallback';
 import WritePost from '@/components/features/feed/WritePost';
-import DMInbox from '@/components/features/dm/DMInbox';
+// import DMInbox from '@/components/features/dm/DMInbox';
 import FriendList from '@/components/features/profile/FriendList';
 import NotificationList from '@/components/features/notification/NotificationList';
 
@@ -103,14 +103,6 @@ function App() {
                     }
                 />
                 <Route
-                    path="/profile/dm"
-                    element={
-                        <ProtectedRoute>
-                            <DMInbox />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
                     path="/dm/:roomId"
                     element={
                         <ProtectedRoute>
@@ -118,6 +110,14 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
+                {/* <Route
+                    path="/dm/:roomId"
+                    element={
+                        <ProtectedRoute>
+                            <Room />
+                        </ProtectedRoute>
+                    }
+                /> */}
                 <Route
                     path="/notification"
                     element={
