@@ -155,8 +155,6 @@ const Room = () => {
                 body: JSON.stringify(newMessage),
             });
 
-            // 메시지 전송 후 상태 업데이트
-            setChatList((prev) => [...prev, newMessage]);
             setNewChat(''); // 입력창 초기화
         } catch (error) {
             console.error('메시지 전송 오류:', error);
