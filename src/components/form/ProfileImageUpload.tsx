@@ -1,17 +1,30 @@
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { UseFormSetValue } from 'react-hook-form';
-import { SignUpFormData } from '@/types';
+import { SignUpFormData } from '@/schema/signUpSchema';
 import useToast from '@/hooks/useToast';
 import Toast from '@/components/Toast';
+import { useEffect, useState } from 'react';
 
 interface ProfileImageUploadProps {
-    profileImage: string | null;
-    setProfileImage: (image: string | null) => void;
+    profileImage: File | null;
+    setProfileImage: (image: File | null) => void;
     setValue: UseFormSetValue<SignUpFormData>;
 }
 
 const ProfileImageUpload = ({ profileImage, setProfileImage, setValue }: ProfileImageUploadProps) => {
     const { showToast, toast } = useToast();
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (profileImage) {
+            const url = URL.createObjectURL(profileImage);
+            setPreviewUrl(url);
+            return () => URL.revokeObjectURL(url);
+        } else {
+            setPreviewUrl(null);
+        }
+    }, [profileImage]);
+
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
 
@@ -20,14 +33,8 @@ const ProfileImageUpload = ({ profileImage, setProfileImage, setValue }: Profile
             return;
         }
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (typeof reader.result === 'string') {
-                    setProfileImage(reader.result);
-                    setValue('profileImage', file);
-                }
-            };
-            reader.readAsDataURL(file);
+            setProfileImage(file);
+            setValue('profileImage', file);
         }
     };
 
@@ -46,8 +53,8 @@ const ProfileImageUpload = ({ profileImage, setProfileImage, setValue }: Profile
                     htmlFor="profileImage"
                     className="block w-full h-full rounded-full border-2 border-dashed border-gray-300 cursor-pointer overflow-hidden"
                 >
-                    {profileImage ? (
-                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                    {previewUrl ? (
+                        <img src={previewUrl} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
                         <div className="flex items-center justify-center w-full h-full text-gray-400">
                             <PlusIcon className="w-6 h-6" />

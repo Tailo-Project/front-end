@@ -1,13 +1,17 @@
 import { useState } from 'react';
 
-interface UseConfirmModalOptions {
-    title?: string;
-    description?: string;
-    confirmText?: string;
-    cancelText?: string;
-}
+type ModalState = {
+    open: boolean;
+    title: string;
+    description: string;
+    confirmText: string;
+    cancelText: string;
+    onConfirm: () => void;
+};
 
-const DEFAULTS = {
+type ModalOptions = Partial<Omit<ModalState, 'open' | 'onConfirm'>>;
+
+const DEFAULTS: Omit<ModalState, 'open' | 'onConfirm'> = {
     title: '삭제 확인',
     description: '정말로 삭제하시겠습니까?',
     confirmText: '삭제',
@@ -15,22 +19,17 @@ const DEFAULTS = {
 };
 
 const useConfirmModal = () => {
-    const [modal, setModal] = useState({
+    const [modal, setModal] = useState<ModalState>({
         open: false,
-        title: DEFAULTS.title,
-        description: DEFAULTS.description,
-        confirmText: DEFAULTS.confirmText,
-        cancelText: DEFAULTS.cancelText,
-        onConfirm: (() => {}) as () => void,
+        ...DEFAULTS,
+        onConfirm: () => {},
     });
 
-    const show = (options: UseConfirmModalOptions = {}, onConfirm: () => void) => {
+    const show = (options: ModalOptions = {}, onConfirm: () => void) => {
         setModal({
+            ...DEFAULTS,
+            ...options,
             open: true,
-            title: options.title || DEFAULTS.title,
-            description: options.description || DEFAULTS.description,
-            confirmText: options.confirmText || DEFAULTS.confirmText,
-            cancelText: options.cancelText || DEFAULTS.cancelText,
             onConfirm,
         });
     };
@@ -45,7 +44,12 @@ const useConfirmModal = () => {
     };
 
     return {
-        ...modal,
+        open: modal.open,
+        title: modal.title,
+        description: modal.description,
+        confirmText: modal.confirmText,
+        cancelText: modal.cancelText,
+        onConfirm: modal.onConfirm,
         show,
         hide,
         handleConfirm,

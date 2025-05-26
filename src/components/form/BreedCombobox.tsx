@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent, ChangeEvent } from 'react';
+import { useState, KeyboardEvent, ChangeEvent } from 'react';
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 
@@ -31,14 +31,14 @@ const renderBreedOption = (breed: string, selected: boolean, active: boolean) =>
     );
 };
 
-const BreedCombobox: React.FC<BreedComboboxProps> = ({
+const BreedCombobox = ({
     value,
     onChange,
     breeds,
     onAddBreed,
     placeholder = '품종을 선택해주세요',
     className = '',
-}) => {
+}: BreedComboboxProps) => {
     const [query, setQuery] = useState('');
 
     const filteredBreeds =
@@ -129,4 +129,4 @@ const BreedCombobox: React.FC<BreedComboboxProps> = ({
     );
 };
 
-export default React.memo(BreedCombobox);
+export default BreedCombobox;
