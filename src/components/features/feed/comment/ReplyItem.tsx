@@ -1,9 +1,17 @@
 import FeedHeader from '@/components/features/feed/components/FeedHeader';
 import tailogo from '@/assets/tailogo.svg';
-import { CommentsResponse } from '@/types';
+
+interface Reply {
+    commentId: number;
+    authorNickname: string;
+    authorProfile: string | null;
+    content: string;
+    createdAt: string;
+    accountId: string;
+}
 
 interface ReplyItemProps {
-    reply: CommentsResponse['comments'][number]['replies']['replies'][number];
+    reply: Reply;
     onDelete: (commentId: number) => void;
 }
 

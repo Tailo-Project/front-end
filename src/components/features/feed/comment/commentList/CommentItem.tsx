@@ -1,14 +1,9 @@
 import { MouseEvent } from 'react';
 import FeedHeader from '@/components/features/feed/components/FeedHeader';
 import tailogo from '@/assets/tailogo.svg';
-import { CommentsResponse } from '@/types';
+import { CommentsResponse, UserProfile } from '@/types';
 import ReplyItem from '../ReplyItem';
 import CommentHeaderActions from './CommentHeaderActions';
-
-interface UserProfile {
-    nickname: string;
-    profileImageUrl: string;
-}
 
 interface CommentItemProps {
     comment: CommentsResponse['comments'][number];

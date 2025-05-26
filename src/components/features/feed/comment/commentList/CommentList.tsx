@@ -1,10 +1,5 @@
-import { CommentsResponse } from '@/types';
+import { CommentsResponse, UserProfile } from '@/types';
 import CommentItem from './CommentItem';
-
-export interface UserProfile {
-    nickname: string;
-    profileImageUrl: string;
-}
 
 interface CommentListProps {
     comments: CommentsResponse['comments'];
