@@ -1,4 +1,4 @@
-import FeedHeader from '@/components/features/feed/FeedHeader';
+import FeedHeader from '@/components/features/feed/components/FeedHeader';
 import tailogo from '@/assets/tailogo.svg';
 import { CommentsResponse } from '@/types';
 

@@ -1,5 +1,5 @@
 import { FeedPost } from '@/types';
-import HashtagList from './HashtagList';
+import HashtagList from '@/components/features/feed/HashtagList';
 
 const FeedContent = ({ feed }: { feed: FeedPost }) => {
     return (

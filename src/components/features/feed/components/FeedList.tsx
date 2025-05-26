@@ -1,11 +1,11 @@
-import LoadingSpinner from '../../common/LoadingSpinner';
+import LoadingSpinner from '../../../common/LoadingSpinner';
 import { useNavigate } from 'react-router-dom';
-import FeedItem from '@/components/features/feed/FeedItem';
-import TabBar from '../../TabBar';
+import FeedItem from '@/components/features/feed/components/FeedItem';
+import TabBar from '../../../TabBar';
 import useFeeds from '@/hooks/useFeeds';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import Layout from '@/layouts/layout';
-import NotificationIcon from '../notification/NotificationIcon';
+import NotificationIcon from '../../notification/NotificationIcon';
 
 const FeedList = () => {
     const navigate = useNavigate();
@@ -51,7 +51,7 @@ const FeedList = () => {
 
     return (
         <Layout>
-            <div className="w-full max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto bg-red-700 pb-16 border border-gray-200">
+            <div className="w-full max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto pb-16 border border-gray-200">
                 <header className="flex items-center px-4 h-[52px] border-b border-gray-200 flex-shrink-0">
                     <h1 className="flex-1 text-center font-medium">피드 리스트</h1>
                     <NotificationIcon />
