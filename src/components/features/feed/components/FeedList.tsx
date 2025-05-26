@@ -1,11 +1,11 @@
-import LoadingSpinner from '../../common/LoadingSpinner';
+import LoadingSpinner from '../../../common/LoadingSpinner';
 import { useNavigate } from 'react-router-dom';
-import FeedItem from '@/components/features/feed/FeedItem';
-import TabBar from '../../TabBar';
+import FeedItem from '@/components/features/feed/components/FeedItem';
+import TabBar from '../../../TabBar';
 import useFeeds from '@/hooks/useFeeds';
 import useInfiniteScroll from '@/hooks/useInfiniteScroll';
 import Layout from '@/layouts/layout';
-import NotificationIcon from '../notification/NotificationIcon';
+import NotificationIcon from '../../notification/NotificationIcon';
 
 const FeedList = () => {
     const navigate = useNavigate();

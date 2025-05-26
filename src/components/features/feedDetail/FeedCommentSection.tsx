@@ -1,5 +1,5 @@
 import CommentInput from '@/components/features/feed/comment/CommentInput';
-import CommentList from './CommentList';
+import CommentList from '../feed/comment/commentList/CommentList';
 import useFeedComments from '@/hooks/useFeedComments';
 import { CommentsResponse } from '@/types';
 import { useState } from 'react';

@@ -1,6 +1,6 @@
-import FeedHeader from '@/components/features/feed/FeedHeader';
-import FeedImages from '@/components/features/feed/FeedImages';
-import FeedContent from '@/components/features/feed/FeedContent';
+import FeedHeader from '@/components/features/feed/components/FeedHeader';
+import FeedImages from '@/components/features/feed/components/FeedImages';
+import FeedContent from '@/components/features/feed/components/FeedContent';
 import LikeAction from '@/components/features/feed/like/LikeAction';
 import CommentAction from '@/components/features/feed/comment/CommentAction';
 import { HashtagInput } from '../feed/HashtagInput';
