@@ -1,6 +1,10 @@
 import { MouseEvent } from 'react';
 import { UseFormRegister, FieldValues, Path } from 'react-hook-form';
-import React from 'react';
+
+export interface UserProfile {
+    nickname: string;
+    profileImageUrl: string;
+}
 
 export interface LikeProps {
     count: number;
