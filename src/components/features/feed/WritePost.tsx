@@ -3,6 +3,7 @@ import { ImageUploader } from './ImageUploader';
 import { HashtagInput } from './HashtagInput';
 import usePostForm from '@/hooks/usePostForm';
 import Layout from '@/layouts/layout';
+import { FiArrowLeft } from 'react-icons/fi';
 
 const WritePost = () => {
     const navigate = useNavigate();
@@ -11,49 +12,78 @@ const WritePost = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            await submitPost();
-        } catch {
-            // Error is already handled in usePostForm
+        if (!form.content.trim()) {
+            setError('내용을 입력해주세요.');
+            return;
         }
+        if (form.images.length === 0) {
+            setError('이미지를 1개 이상 업로드해주세요.');
+            return;
+        }
+
+        submitPost();
     };
+
+    const isSubmitDisabled = !form.content.trim() || form.images.length === 0;
 
     return (
         <Layout>
-            <div className="w-full max-w-[375px] md:max-w-[600px] lg:max-w-[900px] mx-auto bg-white min-h-screen pb-16">
-                <header className="flex justify-between items-center p-4 border-b border-gray-200">
-                    <button onClick={() => navigate('/')} className="text-gray-500 font-semibold hover:text-gray-600">
-                        취소
-                    </button>
-                    <button
-                        onClick={handleSubmit}
-                        disabled={!form.content.trim() || form.images.length === 0}
-                        className="px-4 py-2 bg-[#FF785D] text-white rounded-lg hover:bg-[#FF785D]/80 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                    >
-                        게시하기
-                    </button>
-                </header>
-                <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
-                    <div className="relative">
-                        <textarea
-                            placeholder="내용을 입력하세요"
-                            value={form.content}
-                            onChange={(e) => updateContent(e.target.value)}
-                            className="min-h-[300px] p-2 text-base border-none outline-none resize-y w-full"
-                        />
-                        <span className="absolute right-2 bottom-2 text-sm text-gray-400">
-                            {form.content.length}/{MAX_CONTENT_LENGTH}
-                        </span>
+            <div className="w-full max-w-[600px] mx-auto bg-white min-h-screen">
+                <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm p-4 border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                            aria-label="뒤로 가기"
+                        >
+                            <FiArrowLeft className="w-5 h-5" />
+                        </button>
+                        <h1 className="text-lg font-semibold text-gray-900">새 게시물</h1>
+                        <button
+                            onClick={handleSubmit}
+                            disabled={isSubmitDisabled}
+                            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                                isSubmitDisabled
+                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    : 'bg-[#FF785D] text-white hover:bg-[#FF6A4D]'
+                            }`}
+                        >
+                            공유하기
+                        </button>
                     </div>
+                </header>
 
-                    <ImageUploader
-                        images={form.images}
-                        onImagesChange={updateImages}
-                        error={error}
-                        onError={setError}
-                    />
+                <form onSubmit={handleSubmit} className="flex flex-col h-[calc(100vh-56px)]">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                        <div className="relative">
+                            <textarea
+                                placeholder="이야기를 나눠보세요..."
+                                value={form.content}
+                                onChange={(e) => updateContent(e.target.value)}
+                                className="w-full min-h-[120px] p-3 text-gray-900 placeholder-gray-400 text-base border-0 focus:ring-0 resize-none"
+                                maxLength={MAX_CONTENT_LENGTH}
+                                rows={5}
+                            />
+                            <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+                                {form.content.length}/{MAX_CONTENT_LENGTH}
+                            </div>
+                        </div>
 
-                    <HashtagInput hashtags={form.hashtags} onHashtagsChange={updateHashtags} />
+                        <div className="space-y-4">
+                            <h2 className="text-sm font-medium text-gray-700">사진 추가</h2>
+                            <ImageUploader
+                                images={form.images}
+                                onImagesChange={updateImages}
+                                error={error}
+                                onError={setError}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <h2 className="text-sm font-medium text-gray-700">해시태그</h2>
+                            <HashtagInput hashtags={form.hashtags} onHashtagsChange={updateHashtags} />
+                        </div>
+                    </div>
                 </form>
             </div>
         </Layout>
