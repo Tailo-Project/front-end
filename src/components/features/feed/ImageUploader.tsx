@@ -14,7 +14,7 @@ const MAX_IMAGE_SIZE = 8 * 1024 * 1024;
 export const ImageUploader = ({ images, onImagesChange, error, onError }: ImageUploaderProps) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-
+    const [isDragOver, setIsDragOver] = useState(false);
     const validateImage = (file: File): boolean => {
         if (!file.type.startsWith('image/')) {
             onError('이미지 파일만 업로드할 수 있습니다.');
@@ -60,13 +60,19 @@ export const ImageUploader = ({ images, onImagesChange, error, onError }: ImageU
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
-        e.currentTarget.classList.add('border-[#FF785D]', 'bg-[#FFF5F3]');
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
     };
 
     const handleDrop = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
-        e.currentTarget.classList.remove('border-[#FF785D]', 'bg-[#FFF5F3]');
+        setIsDragOver(false);
 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             processFiles(e.dataTransfer.files);
@@ -81,8 +87,9 @@ export const ImageUploader = ({ images, onImagesChange, error, onError }: ImageU
     return (
         <div className="space-y-4">
             <div
-                className="border-2 border-dashed rounded-xl p-6 text-center transition-colors border-gray-300 hover:border-gray-400 bg-gray-50"
+                className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors bg-gray-50 ${isDragOver ? 'border-[#FF785D] bg-[#FFF5F3]' : 'border-gray-300 hover:border-gray-400 bg-gray-50'}`}
                 onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >
                 <div className="flex flex-col items-center justify-center space-y-3">

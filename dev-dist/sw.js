@@ -74,25 +74,37 @@ define(['./workbox-a896ab28'], function (workbox) {
         }
     });
 
-  /**
-   * The precacheAndRoute() method efficiently caches and responds to
-   * requests for URLs in the manifest.
-   * See https://goo.gl/S9QRab
-   */
-  workbox.precacheAndRoute([{
-    "url": "index.html",
-    "revision": "0.kr4csf3c698"
-  }], {});
-  workbox.cleanupOutdatedCaches();
-  workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
-    allowlist: [/^\/$/]
-  }));
-  workbox.registerRoute(/^https:\/\/api\.*/i, new workbox.NetworkFirst({
-    "cacheName": "api-cache",
-    "networkTimeoutSeconds": 10,
-    plugins: [new workbox.CacheableResponsePlugin({
-      statuses: [0, 200]
-    })]
-  }), 'GET');
-
-}));
+    /**
+     * The precacheAndRoute() method efficiently caches and responds to
+     * requests for URLs in the manifest.
+     * See https://goo.gl/S9QRab
+     */
+    workbox.precacheAndRoute(
+        [
+            {
+                url: 'index.html',
+                revision: '0.ca3q460mqf',
+            },
+        ],
+        {},
+    );
+    workbox.cleanupOutdatedCaches();
+    workbox.registerRoute(
+        new workbox.NavigationRoute(workbox.createHandlerBoundToURL('index.html'), {
+            allowlist: [/^\/$/],
+        }),
+    );
+    workbox.registerRoute(
+        /^https:\/\/api\.*/i,
+        new workbox.NetworkFirst({
+            cacheName: 'api-cache',
+            networkTimeoutSeconds: 10,
+            plugins: [
+                new workbox.CacheableResponsePlugin({
+                    statuses: [0, 200],
+                }),
+            ],
+        }),
+        'GET',
+    );
+});
