@@ -1,4 +1,4 @@
-import { useState, KeyboardEvent, ChangeEvent } from 'react';
+import { useState, KeyboardEvent, ChangeEvent, CompositionEvent } from 'react';
 
 interface HashtagInputProps {
     hashtags: { hashtag: string }[];
@@ -9,9 +9,11 @@ interface HashtagInputProps {
 export const HashtagInput = ({ hashtags, onHashtagsChange, inputClassName }: HashtagInputProps) => {
     const [hashtag, setHashtag] = useState<string>('');
 
-    const handleHashtagSubmit = (e: KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter' && !e.nativeEvent.isComposing) {
-            e.preventDefault();
+    const handleHashtagSubmit = (e: KeyboardEvent<HTMLInputElement> | CompositionEvent) => {
+        if (e.type === 'compositionend') return;
+        const keyboardEvent = e as KeyboardEvent<HTMLInputElement>;
+        if (keyboardEvent.key === 'Enter' && !keyboardEvent.nativeEvent.isComposing) {
+            keyboardEvent.preventDefault();
             const trimmedHashtag = hashtag.trim();
             const isMatchHashtag = !hashtags.some((h) => h.hashtag === trimmedHashtag);
 
@@ -41,6 +43,9 @@ export const HashtagInput = ({ hashtags, onHashtagsChange, inputClassName }: Has
                     type="text"
                     value={hashtag}
                     onChange={handleHashtagChange}
+                    onCompositionStart={handleHashtagSubmit}
+                    onCompositionUpdate={handleHashtagSubmit}
+                    onCompositionEnd={handleHashtagSubmit}
                     onKeyDown={handleHashtagSubmit}
                     placeholder="해시태그를 입력하고 Enter를 누르세요"
                     className={`flex-1 p-2 border border-gray-300 rounded-lg ${inputClassName ?? ''}`}
