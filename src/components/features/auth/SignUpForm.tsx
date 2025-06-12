@@ -11,7 +11,7 @@ import { setToken, setAccountId } from '@/utils/auth';
 import Toast from '@/components/Toast';
 import { ToastState } from '@/types';
 import useToast from '@/hooks/useToast';
-import { AUTH_API_URL, MEMBER_API_URL } from '@/constants/apiUrl';
+import { AUTH_API_URL } from '@/constants/apiUrl';
 import { fetchWithToken } from '@/token';
 import { FormInput } from '@/components/form/FormInput';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -75,7 +75,7 @@ const SignUpForm = () => {
 
         setIsCheckingId(true);
         try {
-            const response = await fetchWithToken(`${MEMBER_API_URL}/duplicate/${accountId}`, {
+            const response = await fetchWithToken(`${AUTH_API_URL}/duplicate/${accountId}`, {
                 method: 'GET',
             });
 
